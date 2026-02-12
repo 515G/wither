@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Now</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+    <h1>Weather Now</h1>
+
+    <div class="search">
+        <input id="city" placeholder="اكتب اسم المدينة بالعربي">
+
+        <button id="btn">🔍</button>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="card" id="card">
+        <div id="cityName"></div>
+        <div class="temp" id="temp"></div>
+        <div class="desc" id="desc"></div>
+
+        <div class="row">
+            <div>💨 <span id="wind"></span></div>
+            <div>💧 <span id="humidity"></span></div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
