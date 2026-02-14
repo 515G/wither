@@ -4,11 +4,19 @@ const cityInput = document.getElementById("city");
 const locBtn = document.getElementById("location-btn");
 
 // قاموس لصور الخلفيات بناءً على حالة الطقس
+// قاموس الصور المطور ليشمل كافة حالات الطقس
 const bgImages = {
     Clear: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=1600&q=80",
     Clouds: "https://images.unsplash.com/photo-1534088568595-a066f7104218?auto=format&fit=crop&w=1600&q=80",
     Rain: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1600&q=80",
+    Drizzle: "https://images.unsplash.com/photo-1558486012-817176f84c6d?auto=format&fit=crop&w=1600&q=80",
+    Thunderstorm: "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?auto=format&fit=crop&w=1600&q=80",
     Snow: "https://images.unsplash.com/photo-1478265409131-1f65c88f965c?auto=format&fit=crop&w=1600&q=80",
+    Mist: "https://images.unsplash.com/photo-1543968996-ee822b8176ba?auto=format&fit=crop&w=1600&q=80",
+    Smoke: "https://images.unsplash.com/photo-1536514498073-50e69d39c6cf?auto=format&fit=crop&w=1600&q=80",
+    Haze: "https://images.unsplash.com/photo-1423209086112-cf2c8acd502f?auto=format&fit=crop&w=1600&q=80",
+    Dust: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&w=1600&q=80",
+    Sand: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&w=1600&q=80",
     Default: "https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?auto=format&fit=crop&w=1600&q=80"
 };
 
@@ -62,3 +70,4 @@ async function getWeather(city, lat = null, lon = null) {
         error.textContent = "خطأ في الاتصال!";
     }
 }
+
