@@ -7,7 +7,39 @@ const themes = {
     Default: "linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)"
 };
 
-// التبديل بين الأقسام
+// انتظر حتى يتم تحميل الـ HTML بالكامل قبل تفعيل الأزرار
+document.addEventListener("DOMContentLoaded", () => {
+    const searchBtn = document.getElementById("search-btn");
+    const locBtn = document.getElementById("loc-btn");
+    const cityInput = document.getElementById("city-input");
+
+    // تفعيل زر البحث
+    if (searchBtn) {
+        searchBtn.onclick = () => {
+            const city = cityInput.value;
+            if (city) fetchWeather(city);
+        };
+    }
+
+    // تفعيل البحث عند ضغط Enter
+    if (cityInput) {
+        cityInput.onkeypress = (e) => {
+            if (e.key === "Enter") fetchWeather(cityInput.value);
+        };
+    }
+
+    // تفعيل زر الموقع
+    if (locBtn) {
+        locBtn.onclick = () => {
+            navigator.geolocation.getCurrentPosition(
+                p => fetchWeather(null, p.coords.latitude, p.coords.longitude),
+                err => alert("يرجى تفعيل الوصول للموقع")
+            );
+        };
+    }
+});
+
+// وظيفة التبديل بين الأقسام (Tabs)
 function changeTab(tabId, btn) {
     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -15,26 +47,22 @@ function changeTab(tabId, btn) {
     btn.classList.add('active');
 }
 
-// أحداث الأزرار
-document.getElementById("search-btn").addEventListener("click", () => {
-    const city = document.getElementById("city-input").value;
-    if(city) fetchWeather(city);
-});
-
-document.getElementById("loc-btn").addEventListener("click", () => {
-    navigator.geolocation.getCurrentPosition(p => fetchWeather(null, p.coords.latitude, p.coords.longitude));
-});
-
 async function fetchWeather(city, lat, lon) {
     let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
-    if(city) url += `&q=${encodeURIComponent(city)}`;
+    if (city) url += `&q=${encodeURIComponent(city)}`;
     else url += `&lat=${lat}&lon=${lon}`;
 
     try {
         const res = await fetch(url);
         const data = await res.json();
-        if(data.cod !== 200) throw new Error();
+        
+        if (data.cod !== 200) {
+            document.getElementById("error-msg").textContent = "المدينة غير موجودة!";
+            document.getElementById("weather-display").style.display = "none";
+            return;
+        }
 
+        // تحديث الواجهة
         document.getElementById("cityName").textContent = data.name;
         const temp = Math.round(data.main.temp);
         document.getElementById("temp-val").textContent = temp + "°";
@@ -43,17 +71,19 @@ async function fetchWeather(city, lat, lon) {
         
         // اقتراح الملابس
         const sug = document.getElementById("suggestion-msg");
-        if(temp < 15) sug.textContent = "🧥 الجو بارد، البس ثقيل!";
-        else if(temp < 25) sug.textContent = "👕 الجو لطيف، ملابس خفيفة.";
+        if (temp < 15) sug.textContent = "🧥 الجو بارد، البس ثقيل!";
+        else if (temp < 25) sug.textContent = "👕 الجو لطيف، ملابس خفيفة.";
         else sug.textContent = "☀️ الجو حار، البس صيفي.";
 
         document.body.style.background = themes[data.weather[0].main] || themes.Default;
+        
+        // جلب التوقعات
         fetchForecast(data.coord.lat, data.coord.lon);
 
         document.getElementById("weather-display").style.display = "block";
         document.getElementById("error-msg").textContent = "";
-    } catch {
-        document.getElementById("error-msg").textContent = "لم نجد المدينة!";
+    } catch (e) {
+        document.getElementById("error-msg").textContent = "خطأ في الاتصال بالإنترنت!";
     }
 }
 
@@ -63,9 +93,9 @@ async function fetchForecast(lat, lon) {
     const container = document.getElementById("forecast-box");
     container.innerHTML = "";
 
-    for(let i=0; i<data.list.length; i+=8) {
+    for (let i = 0; i < data.list.length; i += 8) {
         const d = data.list[i];
-        const day = new Date(d.dt_txt).toLocaleDateString('ar-EG', {weekday:'short'});
+        const day = new Date(d.dt_txt).toLocaleDateString('ar-EG', { weekday: 'short' });
         container.innerHTML += `
             <div class="forecast-item">
                 <div>${day}</div>
