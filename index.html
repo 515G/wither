@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Pro Max | عبدالرحمن الشديفات</title>
+    <title>Weather</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-card">
+    <div class="search-area">
+        <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+        <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
+    </div>
+
+    <p id="msg-box" class="message"></p>
+
     <nav class="tabs">
         <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
         <button class="tab-btn" onclick="openTab(event, 'tips-tab')"><i class="fas fa-lightbulb"></i></button>
@@ -17,22 +25,12 @@
     </nav>
 
     <div id="weather-tab" class="tab-content active">
-        <div class="search-area">
-            <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
-            <button id="search-btn"><i class="fas fa-search"></i></button>
-            <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
-        </div>
-
-        <p id="msg-box" class="message"></p>
-
         <div id="weather-info" class="weather-result" style="display: none;">
             <h2 id="city-name"></h2>
             <img id="main-icon" src="" alt="حالة الطقس">
             <h1 id="temp-display"></h1>
             <p id="weather-desc"></p>
-            
             <div class="suggestion" id="outfit-msg"></div>
-
             <div class="forecast" id="forecast-container"></div>
         </div>
     </div>
@@ -41,8 +39,7 @@
         <h3>نصائح الطقس</h3>
         <ul class="tips-list">
             <li>🧥 إذا كانت الحرارة تحت 15، ارتدِ ملابس ثقيلة.</li>
-            <li>☀️ في الأيام المشمسة، اشرب الماء بانتظام.</li>
-            <li>🌧️ إذا كان هناك مطر، خذ مظلتك.</li>
+            <li>☀️ في الأيام المشمسة، لا تنسَ شرب الماء.</li>
         </ul>
     </div>
 
