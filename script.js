@@ -1,57 +1,77 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-<div class="app-card">
-    <nav class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'tips-tab')"><i class="fas fa-lightbulb"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'about-tab')"><i class="fas fa-info-circle"></i></button>
-    </nav>
+function openTab(evt, tabName) {
+    const tabcontent = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
+    
+    const tablinks = document.getElementsByClassName("tab-btn");
+    for (let i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+    
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
+}
 
-    <div id="weather-tab" class="tab-content active">
-        <div class="search-area">
-            <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
-            <button id="search-btn"><i class="fas fa-search"></i></button>
-            <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
-        </div>
+document.addEventListener("DOMContentLoaded", () => {
+    const searchBtn = document.getElementById("search-btn");
+    const geoBtn = document.getElementById("geo-btn");
+    const cityInput = document.getElementById("city-input");
 
-        <p id="msg-box" class="message"></p>
+    searchBtn.onclick = () => getWeatherData(cityInput.value);
+    cityInput.onkeypress = (e) => e.key === "Enter" && getWeatherData(cityInput.value);
+    geoBtn.onclick = () => navigator.geolocation.getCurrentPosition(p => 
+        getWeatherData(null, p.coords.latitude, p.coords.longitude));
+});
 
-        <div id="weather-info" class="weather-result" style="display: none;">
-            <h2 id="city-name"></h2>
-            <img id="main-icon" src="" alt="حالة الطقس">
-            <h1 id="temp-display"></h1>
-            <p id="weather-desc"></p>
-            
-            <div class="suggestion" id="outfit-msg"></div>
+async function getWeatherData(city, lat = null, lon = null) {
+    const msg = document.getElementById("msg-box");
+    const weatherInfo = document.getElementById("weather-info");
+    if (!city && lat === null) return;
 
-            <div class="forecast" id="forecast-container"></div>
-        </div>
-    </div>
+    let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
+    url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
 
-    <div id="tips-tab" class="tab-content">
-        <h3>نصائح الطقس</h3>
-        <ul class="tips-list">
-            <li>🧥 إذا كانت الحرارة تحت 15، ارتدِ ملابس ثقيلة.</li>
-            <li>☀️ في الأيام المشمسة، اشرب الماء بانتظام.</li>
-            <li>🌧️ إذا كان هناك مطر، خذ مظلتك.</li>
-        </ul>
-    </div>
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.cod !== 200) throw new Error();
 
-    <div id="about-tab" class="tab-content">
-        <h3>حول التطبيق</h3>
-        <p>تم التطوير بواسطة: <b>عبدالرحمن الشديفات</b></p>
-    </div>
-</div>
+        msg.innerText = "";
+        document.getElementById("city-name").innerText = data.name;
+        document.getElementById("temp-display").innerText = Math.round(data.main.temp) + "°";
+        document.getElementById("weather-desc").innerText = data.weather[0].description;
+        document.getElementById("main-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        
+        const outfit = document.getElementById("outfit-msg");
+        const temp = data.main.temp;
+        if(temp < 15) outfit.innerText = "🧥 الجو بارد، البس ثقيل.";
+        else if(temp < 25) outfit.innerText = "👕 الجو معتدل، ملابس خفيفة.";
+        else outfit.innerText = "☀️ الجو حار، البس صيفي.";
 
-<script src="script.js"></script>
-</body>
-</html>
+        getForecast(data.coord.lat, data.coord.lon);
+        weatherInfo.style.display = "block";
+    } catch {
+        msg.innerText = "تعذر العثور على المدينة!";
+        weatherInfo.style.display = "none";
+    }
+}
+
+async function getForecast(lat, lon) {
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`);
+    const data = await res.json();
+    const container = document.getElementById("forecast-container");
+    container.innerHTML = "";
+
+    const days = {};
+    data.list.forEach(item => {
+        const date = new Date(item.dt_txt).toLocaleDateString('ar-EG', {weekday: 'short'});
+        if (!days[date] && Object.keys(days).length < 4) {
+            days[date] = item;
+            container.innerHTML += `
+                <div class="forecast-day">
+                    <p>${date}</p>
+                    <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png">
+                    <p>${Math.round(item.main.temp)}°</p>
+                </div>`;
+        }
+    });
+}
