@@ -3,88 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Pro Max | النسخة النهائية</title>
+    <title>Weather</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.12);
-            --border: rgba(255, 255, 255, 0.2);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-
-        body {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            transition: 1s ease;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .app-container {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            width: 90%; max-width: 400px;
-            padding: 25px; color: white;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        .nav-bar {
-            display: flex; justify-content: space-around;
-            background: rgba(255,255,255,0.1);
-            padding: 8px; border-radius: 15px; margin-bottom: 20px;
-        }
-
-        .nav-btn {
-            background: none; border: none; color: white;
-            font-size: 18px; cursor: pointer; opacity: 0.5; transition: 0.3s;
-        }
-
-        .nav-btn.active { opacity: 1; transform: scale(1.2); }
-
-        .content-section { display: none; animation: fadeIn 0.4s ease; }
-        .content-section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* صندوق البحث */
-        .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
-        .search-box input {
-            flex: 1; background: rgba(255,255,255,0.2); border: none;
-            padding: 12px 15px; border-radius: 12px; color: white; outline: none;
-            font-size: 16px;
-        }
-        .search-box button {
-            width: 45px; height: 45px; border-radius: 12px; border: none;
-            background: rgba(255,255,255,0.3); color: white; cursor: pointer;
-            transition: 0.3s;
-        }
-        .search-box button:hover { background: white; color: #333; }
-
-        .temp { font-size: 65px; font-weight: bold; margin: 10px 0; }
-        .suggestion-box { background: rgba(255,255,255,0.15); padding: 12px; border-radius: 15px; margin: 15px 0; font-size: 14px; }
-        
-        .forecast-container {
-            display: flex; justify-content: space-between;
-            margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .forecast-item { font-size: 12px; text-align: center; }
-        .forecast-item img { width: 35px; }
-
-        .tip-item { background: rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: right; }
-        .error { color: #ffbaba; margin-bottom: 10px; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -108,135 +29,26 @@
             <h2 id="cityName"></h2>
             <img id="weatherIcon" src="" alt="">
             <div class="temp" id="temp-val"></div>
-            <div id="weather-desc" style="margin-bottom: 10px; text-transform: capitalize;"></div>
+            <div id="weather-desc"></div>
             <div id="suggestion-msg" class="suggestion-box"></div>
             
-            <div class="forecast-container" id="forecast-box">
-                </div>
+            <div class="forecast-container" id="forecast-box"></div>
         </div>
     </div>
 
     <div id="tips" class="content-section">
-        <h3 style="margin-bottom: 15px;">نصائح الطقس اليومية</h3>
-        <div class="tip-item">🧥 الجو بارد؟ تأكد من ارتداء ملابس ثقيلة.</div>
-        <div class="tip-item">☀️ الجو مشمس؟ لا تنسَ نظارتك الشمسية.</div>
-        <div class="tip-item">💧 الرطوبة عالية؟ اشرب الكثير من الماء.</div>
-        <div class="tip-item">🚲 الرياح هادئة؟ وقت رائع للمشي أو الرياضة.</div>
+        <h3>نصائح الطقس</h3>
+        <div class="tip-item">🧥 الجو بارد؟ ارتدِ ملابس ثقيلة.</div>
+        <div class="tip-item">☀️ الشمس قوية؟ لا تنسَ واقي الشمس.</div>
+        <div class="tip-item">💧 اشرب الكثير من الماء دائماً.</div>
     </div>
 
     <div id="about" class="content-section">
-        <h3 style="margin-bottom: 15px;">حول التطبيق</h3>
-        <p style="line-height: 1.6;">تطبيق Weather Pro Max يقدم لك معلومات دقيقة عن الطقس مع خلفيات متحركة تتغير حسب الأجواء.</p>
-        <br>
-        <div style="font-size: 24px; display: flex; justify-content: center; gap: 15px;">
-            <i class="fab fa-github"></i>
-            <i class="fab fa-linkedin"></i>
-        </div>
+        <h3>حول التطبيق</h3>
+        <p>تطبيق طقس احترافي يعتمد على بيانات دقيقة وتصميم تفاعلي.</p>
     </div>
 </div>
 
-<script>
-    const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
-
-    // تدرجات الألوان للطقس
-    const weatherThemes = {
-        Clear: "linear-gradient(-45deg, #f7b733, #fc4a1a)",
-        Clouds: "linear-gradient(-45deg, #606c88, #3f4c6b)",
-        Rain: "linear-gradient(-45deg, #203a43, #2c5364)",
-        Snow: "linear-gradient(-45deg, #83a4d4, #b6fbff)",
-        Default: "linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)"
-    };
-
-    // التبديل بين التبويبات
-    function changeTab(tabId, btn) {
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        btn.classList.add('active');
-    }
-
-    // البحث عن مدينة
-    document.getElementById("search-btn").addEventListener("click", () => {
-        const city = document.getElementById("city-input").value;
-        if(city) fetchWeather(city);
-    });
-
-    // البحث بالضغط على Enter
-    document.getElementById("city-input").addEventListener("keypress", (e) => {
-        if(e.key === "Enter") fetchWeather(e.target.value);
-    });
-
-    // البحث بالموقع الحالي
-    document.getElementById("loc-btn").addEventListener("click", () => {
-        navigator.geolocation.getCurrentPosition(p => fetchWeather(null, p.coords.latitude, p.coords.longitude));
-    });
-
-    async function fetchWeather(city, lat, lon) {
-        let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
-        if(city) url += `&q=${encodeURIComponent(city)}`;
-        else url += `&lat=${lat}&lon=${lon}`;
-
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            if(data.cod !== 200) throw new Error();
-
-            // تحديث الواجهة
-            document.getElementById("cityName").textContent = data.name;
-            const temp = Math.round(data.main.temp);
-            document.getElementById("temp-val").textContent = temp + "°";
-            document.getElementById("weather-desc").textContent = data.weather[0].description;
-            document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-            
-            // اقتراح الملابس
-            const sug = document.getElementById("suggestion-msg");
-            if(temp < 15) sug.textContent = "🧥 الجو بارد، البس ثقيل!";
-            else if(temp < 25) sug.textContent = "👕 الجو لطيف، ملابس خفيفة تكفي.";
-            else sug.textContent = "☀️ الجو حار، البس صيفي واشرب ماء.";
-
-            // تغيير الثيم
-            const mainWeather = data.weather[0].main;
-            document.body.style.background = weatherThemes[mainWeather] || weatherThemes.Default;
-            
-            // جلب التوقعات
-            fetchForecast(data.coord.lat, data.coord.lon);
-
-            document.getElementById("weather-display").style.display = "block";
-            document.getElementById("error-msg").textContent = "";
-            
-            // حفظ آخر مدينة
-            localStorage.setItem("lastWeatherCity", data.name);
-        } catch {
-            document.getElementById("error-msg").textContent = "لم نجد هذه المدينة!";
-            document.getElementById("weather-display").style.display = "none";
-        }
-    }
-
-    async function fetchForecast(lat, lon) {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`);
-        const data = await res.json();
-        const container = document.getElementById("forecast-box");
-        container.innerHTML = "";
-
-        // عرض يوم واحد من كل 8 قراءات
-        for(let i=0; i<data.list.length; i+=8) {
-            const d = data.list[i];
-            const dayName = new Date(d.dt_txt).toLocaleDateString('ar-EG', {weekday:'short'});
-            container.innerHTML += `
-                <div class="forecast-item">
-                    <div>${dayName}</div>
-                    <img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png">
-                    <div>${Math.round(d.main.temp)}°</div>
-                </div>`;
-        }
-    }
-
-    // تحميل البيانات عند فتح الصفحة
-    window.onload = () => {
-        const saved = localStorage.getItem("lastWeatherCity");
-        if(saved) fetchWeather(saved);
-    };
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
