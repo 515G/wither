@@ -1,52 +1,76 @@
-// تكملة دالة جلب التوقعات وتحديث الواجهة
-async function fetchForecast(lat, lon) {
-    try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`);
-        const data = await res.json();
-        
-        const container = document.getElementById("forecast");
-        container.innerHTML = ""; // مسح التوقعات القديمة
+const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-        // فلترة البيانات لعرض قراءة واحدة لكل يوم (كل 24 ساعة تقريباً)
-        for(let i = 0; i < data.list.length; i += 8) {
-            const dayData = data.list[i];
-            const date = new Date(dayData.dt_txt);
-            const dayName = date.toLocaleDateString('ar-EG', { weekday: 'short' });
-            const icon = dayData.weather[0].icon;
-            const temp = Math.round(dayData.main.temp);
+const themes = {
+    Clear: "linear-gradient(-45deg, #f7b733, #fc4a1a)",
+    Clouds: "linear-gradient(-45deg, #606c88, #3f4c6b)",
+    Rain: "linear-gradient(-45deg, #203a43, #2c5364)",
+    Default: "linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)"
+};
 
-            container.innerHTML += `
-                <div class="forecast-item">
-                    <div style="font-weight: bold; margin-bottom: 5px;">${dayName}</div>
-                    <img src="https://openweathermap.org/img/wn/${icon}.png" alt="icon">
-                    <div style="font-size: 14px;">${temp}°</div>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error("خطأ في جلب التوقعات:", error);
-    }
-}
-
-// دالة تغيير الأقسام (Tabs) لضمان عمل الصفحات الداخلية
+// التبديل بين الأقسام
 function changeTab(tabId, btn) {
-    // إخفاء جميع الأقسام
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
-    });
-    // إلغاء تفعيل جميع الأزرار
-    document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('active');
-    });
-    // إظهار القسم المطلوب وتفعيل زره
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     btn.classList.add('active');
 }
 
-// دالة لتحميل آخر بحث تلقائياً عند فتح الصفحة (اختياري)
-window.onload = () => {
-    const savedCity = localStorage.getItem("lastCity");
-    if (savedCity) {
-        fetchWeather(savedCity);
+// أحداث الأزرار
+document.getElementById("search-btn").addEventListener("click", () => {
+    const city = document.getElementById("city-input").value;
+    if(city) fetchWeather(city);
+});
+
+document.getElementById("loc-btn").addEventListener("click", () => {
+    navigator.geolocation.getCurrentPosition(p => fetchWeather(null, p.coords.latitude, p.coords.longitude));
+});
+
+async function fetchWeather(city, lat, lon) {
+    let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
+    if(city) url += `&q=${encodeURIComponent(city)}`;
+    else url += `&lat=${lat}&lon=${lon}`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.cod !== 200) throw new Error();
+
+        document.getElementById("cityName").textContent = data.name;
+        const temp = Math.round(data.main.temp);
+        document.getElementById("temp-val").textContent = temp + "°";
+        document.getElementById("weather-desc").textContent = data.weather[0].description;
+        document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        
+        // اقتراح الملابس
+        const sug = document.getElementById("suggestion-msg");
+        if(temp < 15) sug.textContent = "🧥 الجو بارد، البس ثقيل!";
+        else if(temp < 25) sug.textContent = "👕 الجو لطيف، ملابس خفيفة.";
+        else sug.textContent = "☀️ الجو حار، البس صيفي.";
+
+        document.body.style.background = themes[data.weather[0].main] || themes.Default;
+        fetchForecast(data.coord.lat, data.coord.lon);
+
+        document.getElementById("weather-display").style.display = "block";
+        document.getElementById("error-msg").textContent = "";
+    } catch {
+        document.getElementById("error-msg").textContent = "لم نجد المدينة!";
     }
-};
+}
+
+async function fetchForecast(lat, lon) {
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`);
+    const data = await res.json();
+    const container = document.getElementById("forecast-box");
+    container.innerHTML = "";
+
+    for(let i=0; i<data.list.length; i+=8) {
+        const d = data.list[i];
+        const day = new Date(d.dt_txt).toLocaleDateString('ar-EG', {weekday:'short'});
+        container.innerHTML += `
+            <div class="forecast-item">
+                <div>${day}</div>
+                <img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png">
+                <div>${Math.round(d.main.temp)}°</div>
+            </div>`;
+    }
+}
