@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>Weather App Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app-container">
-    <nav class="nav-bar">
-        <button onclick="changeTab('home', this)" class="nav-btn active"><i class="fas fa-cloud-sun"></i></button>
-        <button onclick="changeTab('tips', this)" class="nav-btn"><i class="fas fa-lightbulb"></i></button>
-        <button onclick="changeTab('about', this)" class="nav-btn"><i class="fas fa-info-circle"></i></button>
+<div class="app-card">
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'tips-tab')"><i class="fas fa-lightbulb"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'about-tab')"><i class="fas fa-info-circle"></i></button>
     </nav>
 
-    <div id="home" class="content-section active">
-        <div class="search-box">
-            <input id="city-input" type="text" placeholder="اكتب اسم المدينة...">
+    <div id="weather-tab" class="tab-content active">
+        <div class="search-area">
+            <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
             <button id="search-btn"><i class="fas fa-search"></i></button>
-            <button id="loc-btn"><i class="fas fa-location-arrow"></i></button>
+            <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
         </div>
-        
-        <div id="error-msg" class="error"></div>
 
-        <div id="weather-display" style="display: none;">
-            <h2 id="cityName"></h2>
-            <img id="weatherIcon" src="" alt="">
-            <div class="temp" id="temp-val"></div>
-            <div id="weather-desc"></div>
-            <div id="suggestion-msg" class="suggestion-box"></div>
+        <p id="msg-box" class="message"></p>
+
+        <div id="weather-info" class="weather-result" style="display: none;">
+            <h2 id="city-name"></h2>
+            <img id="main-icon" src="" alt="weather icon">
+            <h1 id="temp-display"></h1>
+            <p id="weather-desc"></p>
             
-            <div class="forecast-container" id="forecast-box"></div>
+            <div class="suggestion" id="outfit-msg"></div>
+
+            <div class="forecast" id="forecast-container">
+                </div>
         </div>
     </div>
 
-    <div id="tips" class="content-section">
-        <h3>نصائح الطقس</h3>
-        <div class="tip-item">🧥 الجو بارد؟ ارتدِ ملابس ثقيلة.</div>
-        <div class="tip-item">☀️ الشمس قوية؟ لا تنسَ واقي الشمس.</div>
-        <div class="tip-item">💧 اشرب الكثير من الماء دائماً.</div>
+    <div id="tips-tab" class="tab-content">
+        <h3>نصائح اليوم</h3>
+        <ul class="tips-list">
+            <li>🧥 إذا كانت الحرارة تحت 15، ارتدِ ملابس ثقيلة.</li>
+            <li>☀️ في الأيام المشمسة، لا تنسَ شرب الماء.</li>
+            <li>🌧️ إذا كان هناك احتمال مطر، خذ مظلتك معك.</li>
+        </ul>
     </div>
 
-    <div id="about" class="content-section">
+    <div id="about-tab" class="tab-content">
         <h3>حول التطبيق</h3>
-        <p>تطبيق طقس احترافي يعتمد على بيانات دقيقة وتصميم تفاعلي.</p>
+        <p>تطبيق طقس متطور يعرض البيانات الحقيقية لجميع مدن العالم.</p>
     </div>
 </div>
 
