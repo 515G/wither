@@ -4,7 +4,6 @@ const cityInput = document.getElementById("city");
 const locBtn = document.getElementById("location-btn");
 
 // قاموس لصور الخلفيات بناءً على حالة الطقس
-// قاموس الصور المطور ليشمل كافة حالات الطقس
 const bgImages = {
     Clear: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=1600&q=80",
     Clouds: "https://images.unsplash.com/photo-1534088568595-a066f7104218?auto=format&fit=crop&w=1600&q=80",
@@ -70,4 +69,5 @@ async function getWeather(city, lat = null, lon = null) {
         error.textContent = "خطأ في الاتصال!";
     }
 }
+
 
