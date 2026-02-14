@@ -13,7 +13,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 1.5s ease;
 }
 
 @keyframes gradientBG {
@@ -25,54 +24,32 @@ body {
 .app-container {
     background: var(--glass);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 35px;
-    width: 95%;
+    width: 90%;
     max-width: 420px;
     padding: 30px;
     color: white;
     box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-    text-align: center;
 }
 
-.nav-bar {
-    display: flex;
-    justify-content: space-around;
-    background: rgba(255,255,255,0.08);
-    padding: 10px;
-    border-radius: 20px;
-    margin-bottom: 25px;
-}
+.nav-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 10px; border-radius: 20px; margin-bottom: 25px; }
+.nav-link { background: none; border: none; color: white; font-size: 20px; cursor: pointer; opacity: 0.4; }
+.nav-link.active { opacity: 1; transform: scale(1.2); }
 
-.nav-link {
-    background: none; border: none; color: white;
-    font-size: 20px; cursor: pointer; opacity: 0.4; transition: 0.3s;
-}
-
-.nav-link.active { opacity: 1; transform: scale(1.2); color: #fff; }
-
-.page { display: none; animation: fadeIn 0.5s ease forwards; }
-.page.active { display: block; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page { display: none; text-align: center; }
+.page.active { display: block; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-.search-box input {
-    flex: 1; background: rgba(255,255,255,0.2); border: none;
-    padding: 12px 20px; border-radius: 15px; color: white; outline: none;
-}
-.search-box button {
-    width: 48px; height: 48px; border-radius: 15px; border: none;
-    background: rgba(255,255,255,0.25); color: white; cursor: pointer; transition: 0.3s;
-}
+.search-box input { flex: 1; background: rgba(255,255,255,0.2); border: none; padding: 12px; border-radius: 12px; color: white; outline: none; }
+.search-box button { width: 45px; height: 45px; border-radius: 12px; border: none; background: rgba(255,255,255,0.3); color: white; cursor: pointer; }
 
-.weather-card { display: none; }
-.temp { font-size: 70px; font-weight: 800; }
-.suggestion-box { background: rgba(255,255,255,0.18); padding: 12px; border-radius: 15px; margin-bottom: 20px; font-size: 14px; }
-.details { display: flex; justify-content: space-around; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-.forecast-container { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-.forecast-item { font-size: 12px; }
+.temp { font-size: 60px; font-weight: bold; }
+.suggestion-box { background: rgba(255,255,255,0.15); padding: 10px; border-radius: 12px; margin: 15px 0; font-size: 14px; }
+.details { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+.forecast-container { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+.forecast-item { font-size: 11px; }
 .forecast-item img { width: 35px; }
-.tip-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: right; }
-.error { color: #ffbaba; margin-bottom: 10px; }
+.tip-item { background: rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; margin-bottom: 8px; text-align: right; }
+.error { color: #ffbaba; font-size: 14px; margin-bottom: 10px; text-align: center; }
