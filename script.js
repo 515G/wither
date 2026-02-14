@@ -3,31 +3,30 @@ const btn = document.getElementById("btn");
 const cityInput = document.getElementById("city");
 const locBtn = document.getElementById("location-btn");
 
-// قاموس لصور الخلفيات بناءً على حالة الطقس
-const bgImages = {
-    Clear: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=1600&q=80",
-    Clouds: "https://images.unsplash.com/photo-1534088568595-a066f7104218?auto=format&fit=crop&w=1600&q=80",
-    Rain: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1600&q=80",
-    Drizzle: "https://images.unsplash.com/photo-1558486012-817176f84c6d?auto=format&fit=crop&w=1600&q=80",
-    Thunderstorm: "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?auto=format&fit=crop&w=1600&q=80",
-    Snow: "https://images.unsplash.com/photo-1478265409131-1f65c88f965c?auto=format&fit=crop&w=1600&q=80",
-    Mist: "https://images.unsplash.com/photo-1543968996-ee822b8176ba?auto=format&fit=crop&w=1600&q=80",
-    Smoke: "https://images.unsplash.com/photo-1536514498073-50e69d39c6cf?auto=format&fit=crop&w=1600&q=80",
-    Haze: "https://images.unsplash.com/photo-1423209086112-cf2c8acd502f?auto=format&fit=crop&w=1600&q=80",
-    Dust: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&w=1600&q=80",
-    Sand: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&w=1600&q=80",
-    Default: "https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?auto=format&fit=crop&w=1600&q=80"
+// قاموس التدرجات اللونية المتحركة حسب حالة الطقس
+const bgGradients = {
+    Clear: "linear-gradient(-45deg, #f7b733, #fc4a1a, #f7b733, #fc4a1a)", // مشمس
+    Clouds: "linear-gradient(-45deg, #606c88, #3f4c6b, #606c88, #3f4c6b)", // غيوم
+    Rain: "linear-gradient(-45deg, #203a43, #2c5364, #0f2027, #2c5364)", // مطر
+    Thunderstorm: "linear-gradient(-45deg, #1f1c2c, #928dab, #1f1c2c, #4b0082)", // عواصف
+    Snow: "linear-gradient(-45deg, #83a4d4, #b6fbff, #83a4d4, #ffffff)", // ثلج
+    Mist: "linear-gradient(-45deg, #bdc3c7, #2c3e50, #bdc3c7, #2c3e50)", // ضباب
+    Default: "linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)" // افتراضي ملوّن
 };
 
+// وظائف البحث
 btn.addEventListener("click", () => getWeather(cityInput.value));
 cityInput.addEventListener("keypress", (e) => { if (e.key === "Enter") getWeather(cityInput.value); });
 
-// جلب الطقس حسب الموقع الجغرافي
+// جلب الطقس حسب موقع المستخدم
 locBtn.addEventListener("click", () => {
-    navigator.geolocation.getCurrentPosition(pos => {
-        const { latitude, longitude } = pos.coords;
-        getWeather(null, latitude, longitude);
-    });
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            getWeather(null, pos.coords.latitude, pos.coords.longitude);
+        }, () => {
+            document.getElementById("error").textContent = "يرجى تفعيل صلاحية الموقع";
+        });
+    }
 });
 
 async function getWeather(city, lat = null, lon = null) {
@@ -43,12 +42,13 @@ async function getWeather(city, lat = null, lon = null) {
 
         if (data.cod !== 200) {
             error.textContent = "المدينة غير موجودة!";
+            card.style.display = "none";
             return;
         }
 
         error.textContent = "";
         
-        // تحديث الواجهة
+        // تحديث البيانات
         document.getElementById("cityName").textContent = data.name;
         document.getElementById("temp").textContent = Math.round(data.main.temp) + "°";
         document.getElementById("desc").textContent = data.weather[0].description;
@@ -56,18 +56,17 @@ async function getWeather(city, lat = null, lon = null) {
         document.getElementById("wind").textContent = data.wind.speed + " م/ث";
         document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
         
-        // تحديث التاريخ
+        // عرض التاريخ الحالي
         const options = { weekday: 'long', day: 'numeric', month: 'long' };
         document.getElementById("date").textContent = new Date().toLocaleDateString('ar-EG', options);
 
-        // تغيير الخلفية ديناميكياً
+        // تغيير التدرج اللوني المتحرك بناءً على الحالة
         const status = data.weather[0].main;
-        document.body.style.backgroundImage = `url('${bgImages[status] || bgImages.Default}')`;
+        document.body.style.background = bgGradients[status] || bgGradients.Default;
 
         card.style.display = "block";
     } catch {
-        error.textContent = "خطأ في الاتصال!";
+        error.textContent = "خطأ في الاتصال بالشبكة!";
     }
 }
-
 
