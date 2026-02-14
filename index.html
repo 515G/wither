@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Pro Max</title>
+    <title>Weather Pro Max | النسخة الكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -20,20 +20,23 @@
         <div class="search-box">
             <input id="city" type="text" placeholder="ابحث عن مدينة...">
             <button id="search-btn"><i class="fas fa-search"></i></button>
-            <button id="location-btn"><i class="fas fa-location-arrow"></i></button>
+            <button id="location-btn" title="موقعي الحالي"><i class="fas fa-location-arrow"></i></button>
         </div>
         <div class="error" id="error"></div>
-        <div class="weather-card" id="card" style="display: none;">
+        <div class="weather-card" id="card">
             <h2 id="cityName"></h2>
             <div id="date" style="opacity: 0.8; margin-bottom: 10px;"></div>
-            <img id="weatherIcon" src="" alt="weather icon">
+            <img id="weatherIcon" src="" alt="">
             <div class="temp" id="temp"></div>
             <div class="desc" id="desc"></div>
+            
             <div id="suggestion" class="suggestion-box"></div>
+
             <div class="details">
                 <div class="col"><i class="fas fa-droplet"></i> <span id="humidity"></span></div>
                 <div class="col"><i class="fas fa-wind"></i> <span id="wind"></span></div>
             </div>
+            
             <div class="forecast-container" id="forecast"></div>
         </div>
     </div>
@@ -43,17 +46,17 @@
         <div class="tips-list">
             <div class="tip-item">🧥 الجو بارد؟ لا تنسَ معطفك المفضل.</div>
             <div class="tip-item">☀️ الشمس قوية اليوم، واقي الشمس خيار ذكي.</div>
-            <div class="tip-item">💧 الرطوبة عالية، اشرب الكثير من الماء.</div>
-            <div class="tip-item">🚲 الرياح هادئة، وقت مثالي للرياضة!</div>
+            <div class="tip-item">💧 الرطوبة عالية، اشرب الكثير من الماء بانتظام.</div>
+            <div class="tip-item">🚲 الرياح هادئة، وقت مثالي لممارسة الرياضة الخارجية!</div>
         </div>
     </div>
 
     <div id="about" class="page">
         <h3 style="margin-bottom: 15px;">حول التطبيق</h3>
-        <p>تطبيق طقس متكامل يعتمد على بيانات حقيقية من OpenWeatherMap.</p>
+        <p style="line-height: 1.6; opacity: 0.9;">Weather Pro Max هو تطبيق طقس متطور يعتمد على بيانات حقيقية لحظية مع ميزة التوقعات وتصميم زجاجي تفاعلي بالكامل.</p>
         <div style="margin-top: 30px; font-size: 30px; display: flex; justify-content: center; gap: 20px;">
-            <i class="fab fa-github"></i>
-            <i class="fab fa-linkedin"></i>
+            <a href="#" style="color: white;"><i class="fab fa-github"></i></a>
+            <a href="#" style="color: white;"><i class="fab fa-linkedin"></i></a>
         </div>
     </div>
 </div>
