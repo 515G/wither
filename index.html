@@ -3,43 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Pro | بوصلة الطقس</title>
+    <title>Weather Pro Max | بوصلة الطقس</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
 <div class="app-container">
-    <div class="search-box">
-        <input id="city" type="text" placeholder="ابحث عن مدينة...">
-        <button id="btn"><i class="fas fa-search"></i></button>
-        <button id="location-btn" title="موقعي الحالي"><i class="fas fa-location-crosshairs"></i></button>
+    <nav class="nav-bar">
+        <button onclick="showPage('home', this)" class="nav-link active"><i class="fas fa-home"></i></button>
+        <button onclick="showPage('tips', this)" class="nav-link"><i class="fas fa-lightbulb"></i></button>
+        <button onclick="showPage('about', this)" class="nav-link"><i class="fas fa-info-circle"></i></button>
+    </nav>
+
+    <div id="home" class="page active">
+        <div class="search-box">
+            <input id="city" type="text" placeholder="ابحث عن مدينة...">
+            <button id="btn"><i class="fas fa-search"></i></button>
+            <button id="location-btn" title="موقعي الحالي"><i class="fas fa-location-arrow"></i></button>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="weather-card" id="card">
+            <h2 id="cityName"></h2>
+            <div id="date"></div>
+            <img id="weatherIcon" src="" alt="">
+            <div class="temp" id="temp"></div>
+            <div class="desc" id="desc"></div>
+
+            <div id="outfit-suggestion" class="suggestion-box"></div>
+
+            <div class="details">
+                <div class="col"><i class="fas fa-droplet"></i><span id="humidity"></span></div>
+                <div class="col"><i class="fas fa-wind"></i><span id="wind"></span></div>
+            </div>
+
+            <div class="forecast-container" id="forecast"></div>
+        </div>
     </div>
 
-    <div class="error" id="error"></div>
+    <div id="tips" class="page">
+        <h3>نصائح الطقس اليومية</h3>
+        <div class="tips-list">
+            <div class="tip-item">🧥 إذا كانت الحرارة أقل من 15°C، احرص على ارتداء ملابس ثقيلة.</div>
+            <div class="tip-item">☀️ في حال وجود شمس قوية، لا تنسَ واقي الشمس والنظارات.</div>
+            <div class="tip-item">💧 الرطوبة العالية تتطلب شرب كميات كافية من الماء بانتظام.</div>
+            <div class="tip-item">💨 الرياح القوية قد تجعل الجو يبدو أبرد مما هو عليه بالفعل.</div>
+        </div>
+    </div>
 
-    <div class="weather-card" id="card">
-        <h2 id="cityName"></h2>
-        <p id="date"></p>
-        <img id="weatherIcon" src="" alt="حالة الطقس">
-        <div class="temp" id="temp"></div>
-        <div class="desc" id="desc"></div>
-
-        <div class="details">
-            <div class="col">
-                <i class="fas fa-droplet"></i>
-                <div>
-                    <p id="humidity"></p>
-                    <span>الرطوبة</span>
-                </div>
-            </div>
-            <div class="col">
-                <i class="fas fa-wind"></i>
-                <div>
-                    <p id="wind"></p>
-                    <span>الرياح</span>
-                </div>
-            </div>
+    <div id="about" class="page">
+        <h3>حول Weather Pro Max</h3>
+        <p>تطبيق طقس متطور يستخدم بيانات دقيقة وخلفيات متحركة تفاعلية لتجربة مستخدم فريدة.</p>
+        <div class="socials">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
         </div>
     </div>
 </div>
