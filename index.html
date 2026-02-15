@@ -3,70 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>Weather App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="web-app">
-    <section id="page-weather" class="page active">
-        <div class="search-box">
-            <input type="text" id="city-input" placeholder="ابحث عن مدينة...">
+<div class="app-frame">
+    <div id="view-weather" class="page-container active">
+        <div class="search-wrapper">
+            <input type="text" id="city-input" placeholder="اكتب اسم المدينة هنا...">
             <button id="search-btn"><i class="fas fa-search"></i></button>
         </div>
-        <div class="content">
-            <div id="weather-info" style="display: none;">
+        <div class="display-area">
+            <div id="weather-box" class="hidden">
                 <h2 id="city-name"></h2>
-                <h1 id="temp-display"></h1>
+                <div id="temp-val"></div>
                 <p id="weather-desc"></p>
             </div>
-            <p id="start-msg">☁️ ابحث لتعرف حالة الطقس</p>
+            <p id="welcome-msg">🌟 ابحث عن مدينتك لعرض الطقس</p>
         </div>
-    </section>
+    </div>
 
-    <section id="page-prayer" class="page">
-        <h3>🕋 مواقيت الصلاة</h3>
-        <div id="prayer-list" class="list-container">
-            <p>يرجى البحث عن مدينة أولاً</p>
+    <div id="view-prayer" class="page-container">
+        <h2 class="title">🕋 مواقيت الصلاة</h2>
+        <div id="prayer-output" class="prayer-box">
+            <p style="opacity:0.6">بانتظار البحث عن مدينة...</p>
         </div>
-    </section>
+    </div>
 
-    <section id="page-azkar" class="page">
-        <h3>📿 أذكار المسلم</h3>
-        <div class="azkar-box">
-            <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-            <button onclick="nextZekr()" class="btn-next">الذكر التالي</button>
+    <div id="view-azkar" class="page-container">
+        <h2 class="title">📿 ذكر اليوم</h2>
+        <div class="azkar-display">
+            <p id="text-zekr">ألا بذكر الله تطمئن القلوب</p>
+            <button onclick="newZekr()" class="btn-refresh">تغيير الذكر</button>
         </div>
-    </section>
+    </div>
 
-    <section id="page-about" class="page">
-        <div class="dev-card">
-            <div class="avatar"></div>
-            <h2> J عبدالرحمن الشديفات</h2>
-            <p>مطور واجهات ويب</p>
-            <hr>
-            <p>تم تصميم هذا الموقع بواجهات منفصلة لتجربة مستخدم أفضل.</p>
+    <div id="view-dev" class="page-container">
+        <div class="dev-card-premium">
+            <div class="logo-j"></div>
+            <h3>عبدالرحمن الشديفات J</h3>
+            <span>Professional Web Developer</span>
+            <div class="bar"></div>
+            <p>تم تطوير هذا النظام بواجهات برمجية منفصلة لضمان أداء عالٍ واستقرار تام للمتصفح.</p>
         </div>
-    </section>
+    </div>
 
-    <nav class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('page-weather', this)">
-            <i class="fas fa-cloud"></i>
+    <nav class="footer-nav">
+        <div class="nav-link active" onclick="go('view-weather', this)">
+            <i class="fas fa-cloud-sun"></i>
             <span>الطقس</span>
-        </button>
-        <button class="tab-btn" onclick="switchTab('page-prayer', this)">
-            <i class="fas fa-clock"></i>
+        </div>
+        <div class="nav-link" onclick="go('view-prayer', this)">
+            <i class="fas fa-mosque"></i>
             <span>الصلاة</span>
-        </button>
-        <button class="tab-btn" onclick="switchTab('page-azkar', this)">
+        </div>
+        <div class="nav-link" onclick="newZekr(); go('view-azkar', this)">
             <i class="fas fa-book-open"></i>
             <span>الأذكار</span>
-        </button>
-        <button class="tab-btn" onclick="switchTab('page-about', this)">
-            <i class="fas fa-user"></i>
-            <span>عني</span>
-        </button>
+        </div>
+        <div class="nav-link" onclick="go('view-dev', this)">
+            <i class="fas fa-code"></i>
+            <span>المطور</span>
+        </div>
     </nav>
 </div>
 
