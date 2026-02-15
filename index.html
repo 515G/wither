@@ -10,43 +10,57 @@
 <body>
 
 <div class="app-card">
-    
-    <div class="search-section">
-        <div class="search-bar">
+    <div class="search-container">
+        <div class="search-box">
             <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
             <button id="search-btn"><i class="fas fa-search"></i></button>
         </div>
-        <p id="msg-box" class="error-msg"></p>
+        <p id="msg-box" class="msg"></p>
     </div>
 
-    <div class="content-box">
-        <div id="weather-info">
-            <h2 id="city-name">الطقس الآن</h2>
-            <h1 id="temp-display">--°</h1>
-            <p id="weather-desc">أدخل المدينة للبدء</p>
-            <div class="forecast" id="forecast-container"></div>
+    <div class="main-view">
+        <div id="weather-tab" class="tab-view active">
+            <div id="weather-content" style="display: none;">
+                <h2 id="city-name"></h2>
+                <h1 id="temp-display"></h1>
+                <p id="weather-desc"></p>
+                <div class="forecast" id="forecast-container"></div>
+            </div>
+            <div id="placeholder-text">ابحث عن مدينة لترى الطقس</div>
+        </div>
+
+        <div id="prayer-tab" class="tab-view">
+            <h3>مواقيت الصلاة</h3>
+            <div id="prayer-times" class="prayer-list">
+                <p>يرجى البحث عن مدينة أولاً</p>
+            </div>
+        </div>
+
+        <div id="azkar-tab" class="tab-view">
+            <h3>الأذكار اليومية</h3>
+            <div class="zekr-card">
+                <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
+                <button onclick="nextZekr()" class="next-btn">الذكر التالي</button>
+            </div>
         </div>
     </div>
 
-    <div class="content-box">
-        <h3><i class="fas fa-mosque"></i> مواقيت الصلاة</h3>
-        <div id="prayer-times" class="prayer-grid">
-            <p style="grid-column: span 3; opacity: 0.6;">بانتظار تحديد المدينة</p>
-        </div>
-    </div>
-
-    <div class="content-box azkar-box">
-        <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-        <button onclick="nextZekr()" class="zekr-btn">ذكر آخر</button>
-    </div>
-
-    <div class="footer">
-        بواسطة: عبدالرحمن الشديفات
-    </div>
-
+    <nav class="bottom-bar">
+        <button class="nav-item active" onclick="switchTab(event, 'weather-tab')">
+            <i class="fas fa-cloud"></i>
+            <span>الطقس</span>
+        </button>
+        <button class="nav-item" onclick="switchTab(event, 'prayer-tab')">
+            <i class="fas fa-mosque"></i>
+            <span>الصلاة</span>
+        </button>
+        <button class="nav-item" onclick="switchTab(event, 'azkar-tab')">
+            <i class="fas fa-heart"></i>
+            <span>الأذكار</span>
+        </button>
+    </nav>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
