@@ -3,59 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>Weather | عبد الرحمن الشديفات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-card">
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
-            <button id="search-btn"><i class="fas fa-search"></i></button>
-        </div>
-        <p id="msg-box" class="msg"></p>
+    <div class="header">
+        <h1>Weather</h1>
+        <p class="designer">تصميم: عبد الرحمن الشديفات</p>
     </div>
 
-    <div class="main-view">
+    <div class="search-area">
+        <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+    <p id="msg-box" class="error-msg"></p>
+
+    <div class="tabs-content">
         <div id="weather-tab" class="tab-view active">
-            <div id="weather-content" style="display: none;">
+            <div id="weather-info" style="display: none;">
                 <h2 id="city-name"></h2>
                 <h1 id="temp-display"></h1>
                 <p id="weather-desc"></p>
                 <div class="forecast" id="forecast-container"></div>
             </div>
-            <div id="placeholder-text">ابحث عن مدينة لترى الطقس</div>
+            <div class="placeholder-msg">ابحث عن مدينة لعرض الطقس</div>
         </div>
 
         <div id="prayer-tab" class="tab-view">
             <h3>مواقيت الصلاة</h3>
-            <div id="prayer-times" class="prayer-list">
-                <p>يرجى البحث عن مدينة أولاً</p>
+            <div id="prayer-times" class="prayer-grid">
+                <p>يرجى البحث أولاً</p>
             </div>
         </div>
 
         <div id="azkar-tab" class="tab-view">
-            <h3>الأذكار اليومية</h3>
-            <div class="zekr-card">
+            <h3>أذكار اليوم</h3>
+            <div class="azkar-card">
                 <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-                <button onclick="nextZekr()" class="next-btn">الذكر التالي</button>
+                <button onclick="nextZekr()" class="zekr-btn">ذكر آخر</button>
             </div>
         </div>
     </div>
 
-    <nav class="bottom-bar">
-        <button class="nav-item active" onclick="switchTab(event, 'weather-tab')">
-            <i class="fas fa-cloud"></i>
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchView(event, 'weather-tab')">
+            <i class="fas fa-cloud-sun"></i>
             <span>الطقس</span>
         </button>
-        <button class="nav-item" onclick="switchTab(event, 'prayer-tab')">
+        <button class="nav-btn" onclick="switchView(event, 'prayer-tab')">
             <i class="fas fa-mosque"></i>
             <span>الصلاة</span>
         </button>
-        <button class="nav-item" onclick="switchTab(event, 'azkar-tab')">
-            <i class="fas fa-heart"></i>
+        <button class="nav-btn" onclick="switchView(event, 'azkar-tab')">
+            <i class="fas fa-book-open"></i>
             <span>الأذكار</span>
         </button>
     </nav>
