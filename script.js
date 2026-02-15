@@ -1,51 +1,75 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
-const azkar = ["سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه", "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد", "سبحان الله العظيم", "لا إله إلا الله وحده لا شريك له"];
+
+const azkar = [
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
+    "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+    "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه",
+    "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد",
+    "سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلا إِلَهَ إِلا اللَّهُ"
+];
+let zekrIndex = 0;
 
 function nextZekr() {
-    document.getElementById("azkar-text").innerText = azkar[Math.floor(Math.random() * azkar.length)];
+    zekrIndex = (zekrIndex + 1) % azkar.length;
+    document.getElementById("azkar-text").innerText = azkar[zekrIndex];
 }
 
-function switchView(evt, tabId) {
-    document.querySelectorAll(".tab-view").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById(tabId).classList.add("active");
+function openTab(evt, tabName) {
+    document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(tabName).style.display = "block";
     evt.currentTarget.classList.add("active");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const cityInput = document.getElementById("city-input");
-    document.getElementById("search-btn").onclick = () => fetchAll(cityInput.value);
-    cityInput.onkeydown = (e) => e.key === "Enter" && fetchAll(cityInput.value);
+    document.getElementById("search-btn").onclick = () => getWeatherData(cityInput.value);
+    cityInput.onkeydown = (e) => e.key === "Enter" && getWeatherData(cityInput.value);
+    document.getElementById("geo-btn").onclick = () => navigator.geolocation.getCurrentPosition(p => 
+        getWeatherData(null, p.coords.latitude, p.coords.longitude));
 });
 
-async function fetchAll(city) {
-    if(!city) return;
-    try {
-        const wRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
-        const wData = await wRes.json();
-        if(wData.cod !== 200) throw new Error();
+async function getWeatherData(city, lat = null, lon = null) {
+    const msg = document.getElementById("msg-box");
+    let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
+    url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
 
-        document.getElementById("city-name").innerText = wData.name;
-        document.getElementById("temp-display").innerText = Math.round(wData.main.temp) + "°";
-        document.getElementById("weather-desc").innerText = wData.weather[0].description;
-        document.getElementById("weather-info").style.display = "block";
-        document.querySelectorAll(".placeholder-msg").forEach(p => p.style.display = "none");
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.cod !== 200) throw new Error();
+
+        msg.innerText = "";
+        document.getElementById("city-name").innerText = data.name;
+        document.getElementById("temp-display").innerText = Math.round(data.main.temp) + "°";
+        document.getElementById("weather-desc").innerText = data.weather[0].description;
+        document.getElementById("main-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
         
-        getForecast(wData.coord.lat, wData.coord.lon);
-        getPrayers(city);
-    } catch { document.getElementById("msg-box").innerText = "⚠️ المدينة غير موجودة!"; }
+        const t = data.main.temp;
+        document.getElementById("outfit-msg").innerText = t < 15 ? "🧥 البس ثقيل" : t < 25 ? "👕 ملابس خفيفة" : "☀️ ملابس صيفية";
+
+        document.getElementById("weather-info").style.display = "block";
+        getForecast(data.coord.lat, data.coord.lon);
+        getPrayerTimes(data.name); // جلب المواقيت لنفس المدينة
+    } catch {
+        msg.innerText = "تعذر العثور على البيانات!";
+    }
 }
 
-async function getPrayers(city) {
-    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
-    const d = await res.json();
-    const t = d.data.timings;
-    document.getElementById("prayer-times").innerHTML = `
-        <div class="prayer-item">الفجر <b>${t.Fajr}</b></div>
-        <div class="prayer-item">الظهر <b>${t.Dhuhr}</b></div>
-        <div class="prayer-item">العصر <b>${t.Asr}</b></div>
-        <div class="prayer-item">المغرب <b>${t.Maghrib}</b></div>
-        <div class="prayer-item">العشاء <b>${t.Isha}</b></div>`;
+async function getPrayerTimes(city) {
+    try {
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=&method=4`);
+        const data = await res.json();
+        const t = data.data.timings;
+        document.getElementById("prayer-times").innerHTML = `
+            <div class="prayer-item"><span>الفجر</span> <span>${t.Fajr}</span></div>
+            <div class="prayer-item"><span>الظهر</span> <span>${t.Dhuhr}</span></div>
+            <div class="prayer-item"><span>العصر</span> <span>${t.Asr}</span></div>
+            <div class="prayer-item"><span>المغرب</span> <span>${t.Maghrib}</span></div>
+            <div class="prayer-item"><span>العشاء</span> <span>${t.Isha}</span></div>`;
+    } catch {
+        document.getElementById("prayer-times").innerHTML = "<p>فشل جلب مواقيت الصلاة</p>";
+    }
 }
 
 async function getForecast(lat, lon) {
@@ -55,8 +79,9 @@ async function getForecast(lat, lon) {
     container.innerHTML = "";
     const seen = new Set();
     data.list.forEach(item => {
-        const day = new Date(item.dt_txt).toLocaleDateString('ar-EG', {weekday: 'short'});
-        if (!seen.has(day) && seen.size < 4) {
+        const d = new Date(item.dt_txt);
+        const day = d.toLocaleDateString('ar-EG', {weekday: 'short'});
+        if (!seen.has(day) && d.getHours() >= 12 && seen.size < 4) {
             seen.add(day);
             container.innerHTML += `<div class="forecast-day"><p>${day}</p><img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png"><p>${Math.round(item.main.temp)}°</p></div>`;
         }
