@@ -1,53 +1,60 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-function openTab(evt, tabName) {
-    const contents = document.querySelectorAll(".tab-content");
-    contents.forEach(c => c.style.display = "none");
-    const buttons = document.querySelectorAll(".tab-btn");
-    buttons.forEach(b => b.classList.remove("active"));
-    document.getElementById(tabName).style.display = "block";
+const azkar = [
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "أَسْتَغْفِرُ اللَّهَ وَأَتوبُ إِلَيْهِ", 
+    "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه", "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد",
+    "لا إله إلا الله وحده لا شريك له", "سبحان الله العظيم", "الحمد لله حمداً كثيراً",
+    "يا حي يا قيوم برحمتك أستغيث", "حسبنا الله ونعم الوكيل", "اللهم إنك عفو تحب العفو فاعف عني"
+];
+
+function nextZekr() {
+    document.getElementById("azkar-text").innerText = azkar[Math.floor(Math.random() * azkar.length)];
+}
+
+function openTab(evt, tabId) {
+    document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
     evt.currentTarget.classList.add("active");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const searchBtn = document.getElementById("search-btn");
     const cityInput = document.getElementById("city-input");
-    const geoBtn = document.getElementById("geo-btn");
-
-    searchBtn.onclick = () => getWeatherData(cityInput.value);
-    cityInput.onkeydown = (e) => { if(e.key === "Enter") getWeatherData(cityInput.value); };
-    geoBtn.onclick = () => navigator.geolocation.getCurrentPosition(p => 
-        getWeatherData(null, p.coords.latitude, p.coords.longitude));
+    document.getElementById("search-btn").onclick = () => getData(cityInput.value);
+    cityInput.onkeydown = (e) => e.key === "Enter" && getData(cityInput.value);
+    setTimeout(() => cityInput.focus(), 500);
 });
 
-async function getWeatherData(city, lat = null, lon = null) {
-    if (!city && lat === null) return;
+async function getData(city) {
+    if(!city) return;
     const msg = document.getElementById("msg-box");
-    const info = document.getElementById("weather-info");
-    let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
-    url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
-
     try {
-        const res = await fetch(url);
-        const data = await res.json();
-        if(data.cod !== 200) throw new Error();
+        const wRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
+        const wData = await wRes.json();
+        if(wData.cod !== 200) throw new Error();
 
         msg.innerText = "";
-        document.getElementById("city-name").innerText = data.name;
-        document.getElementById("temp-display").innerText = Math.round(data.main.temp) + "°";
-        document.getElementById("weather-desc").innerText = data.weather[0].description;
-        document.getElementById("main-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        document.getElementById("city-name").innerText = wData.name;
+        document.getElementById("temp-display").innerText = Math.round(wData.main.temp) + "°";
+        document.getElementById("weather-desc").innerText = wData.weather[0].description;
+        document.getElementById("weather-info").style.display = "block";
+        document.getElementById("weather-placeholder").style.display = "none";
         
-        const outfit = document.getElementById("outfit-msg");
-        const t = data.main.temp;
-        outfit.innerText = t < 15 ? "🧥 البس ثقيل" : t < 25 ? "👕 ملابس خفيفة" : "☀️ ملابس صيفية";
+        getForecast(wData.coord.lat, wData.coord.lon);
+        getPrayers(city);
+    } catch { msg.innerText = "المدينة غير صحيحة!"; }
+}
 
-        getForecast(data.coord.lat, data.coord.lon);
-        info.style.display = "block";
-    } catch {
-        msg.innerText = "تعذر العثور على المدينة!";
-        info.style.display = "none";
-    }
+async function getPrayers(city) {
+    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
+    const d = await res.json();
+    const t = d.data.timings;
+    document.getElementById("prayer-times").innerHTML = `
+        <div class="prayer-item">الفجر <span>${t.Fajr}</span></div>
+        <div class="prayer-item">الظهر <span>${t.Dhuhr}</span></div>
+        <div class="prayer-item">العصر <span>${t.Asr}</span></div>
+        <div class="prayer-item">المغرب <span>${t.Maghrib}</span></div>
+        <div class="prayer-item">العشاء <span>${t.Isha}</span></div>`;
 }
 
 async function getForecast(lat, lon) {
