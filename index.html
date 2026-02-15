@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather | عبد الرحمن الشديفات</title>
+    <title>Weather</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,16 +11,18 @@
 <div class="app-card">
     <div class="header">
         <h1>Weather ☁️</h1>
-        <p class="designer">تصميم: عبد الرحمن الشديفات</p>
+        <p class="designer">تصميم: J عبد الرحمن الشديفات</p>
     </div>
 
     <div class="search-area">
         <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
         <button id="search-btn">🔍</button>
     </div>
+    
     <p id="msg-box" class="error-msg"></p>
 
     <div class="tabs-content">
+        
         <div id="weather-tab" class="tab-view active">
             <div id="weather-info" style="display: none;">
                 <h2 id="city-name"></h2>
@@ -45,9 +47,8 @@
                 <button onclick="nextZekr()" class="zekr-btn">الذكر التالي ➡️</button>
             </div>
         </div>
-    </div>
 
-    <nav class="bottom-nav">
+    </div> <nav class="bottom-nav">
         <button class="nav-btn active" onclick="switchView(event, 'weather-tab')">
             <span class="emoji">☁️</span>
             <span>الطقس</span>
@@ -61,8 +62,7 @@
             <span>الأذكار</span>
         </button>
     </nav>
-</div>
 
-<script src="script.js"></script>
+</div> <script src="script.js"></script>
 </body>
 </html>
