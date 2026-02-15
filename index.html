@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>Weather App | عبدالرحمن الشديفات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- CSS المصلح والشامل --- */
         :root {
             --primary: #38bdf8;
             --bg: #0f172a;
@@ -34,17 +33,17 @@
             flex-direction: column;
         }
 
-        /* التحكم بالواجهات - السر هنا */
         .page {
-            display: none; /* مخفي تماماً */
+            display: none;
             flex: 1;
-            padding: 40px 20px;
+            padding: 20px;
             overflow-y: auto;
             text-align: center;
+            padding-bottom: 90px;
         }
 
         .page.active {
-            display: block; /* يظهر فقط عند النقر */
+            display: block;
             animation: fadeIn 0.3s ease-in-out;
         }
 
@@ -53,10 +52,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* شريط التنقل السفلي */
         .nav-bar {
+            position: absolute; bottom: 0; width: 100%;
             height: 75px;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
@@ -65,28 +64,15 @@
             z-index: 100;
         }
 
-        .nav-item {
-            color: white;
-            opacity: 0.4;
-            text-align: center;
-            cursor: pointer;
-            flex: 1;
-            transition: 0.3s;
-        }
-
-        .nav-item.active {
-            opacity: 1;
-            color: var(--primary);
-        }
-
+        .nav-item { color: white; opacity: 0.4; text-align: center; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--primary); }
         .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
         .nav-item span { font-size: 11px; font-weight: bold; }
 
-        /* تنسيق المحتويات */
-        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         .search-box input { 
             flex: 1; padding: 12px; border-radius: 12px; border: none; 
-            background: var(--card); color: white; outline: none; 
+            background: var(--card); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1);
         }
         .search-box button { 
             background: var(--primary); border: none; width: 50px; 
@@ -94,22 +80,34 @@
         }
 
         .info-card { 
-            background: var(--card); padding: 25px; border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1); margin-top: 20px;
+            background: var(--card); padding: 20px; border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); margin-top: 15px;
         }
+
+        /* تنسيق قسم الـ 5 أيام */
+        .forecast-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+        .forecast-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 5px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .forecast-item img { width: 30px; }
+        .forecast-item b { display: block; color: var(--primary); margin-top: 5px; }
+
+        h1 { font-size: 50px; color: var(--primary); margin: 5px 0; }
+        .prayer-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         .dev-badge {
-            width: 80px; height: 80px; background: var(--primary); 
+            width: 70px; height: 70px; background: var(--primary); 
             border-radius: 50%; display: flex; align-items: center; 
             justify-content: center; margin: 0 auto 15px;
-            font-size: 35px; font-weight: bold; color: #000;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-        }
-
-        h1 { font-size: 60px; color: var(--primary); margin: 10px 0; }
-        .prayer-row {
-            display: flex; justify-content: space-between; 
-            padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 30px; font-weight: bold; color: #000;
         }
     </style>
 </head>
@@ -127,19 +125,22 @@
             <h1 id="out-temp">--°</h1>
             <p id="out-desc">ابحث لترى النتائج</p>
         </div>
+
+        <div id="forecast-section" style="display: none; margin-top: 25px;">
+            <p style="text-align: right; color: var(--primary); font-size: 13px; margin-bottom: 10px;">توقعات 5 أيام:</p>
+            <div id="out-forecast" class="forecast-container"></div>
+        </div>
     </section>
 
     <section id="prayer" class="page">
         <h2 style="margin-bottom:20px;">🕋 مواقيت الصلاة</h2>
-        <div id="prayer-output" class="info-card">
-            <p>يرجى البحث عن مدينة أولاً</p>
-        </div>
+        <div id="prayer-output" class="info-card"><p>يرجى البحث عن مدينة أولاً</p></div>
     </section>
 
     <section id="azkar" class="page">
         <h2>📿 أذكار المسلم</h2>
         <div class="info-card">
-            <p id="zekr-text" style="font-size: 18px; line-height: 1.6;">ألا بذكر الله تطمئن القلوب</p>
+            <p id="zekr-text">ألا بذكر الله تطمئن القلوب</p>
             <button onclick="nextZekr()" style="margin-top:20px; padding:10px 20px; border-radius:10px; border:none; background:var(--primary); cursor:pointer; font-weight:bold;">الذكر التالي</button>
         </div>
     </section>
@@ -148,56 +149,36 @@
         <div class="info-card">
             <div class="dev-badge">J</div>
             <h2 style="color:var(--primary)">عبدالرحمن الشديفات</h2>
-            <p style="margin: 10px 0; opacity: 0.8;">Full-Stack Developer</p>
+            <p>Full-Stack Developer</p>
             <hr style="opacity:0.1; margin: 15px 0;">
-            <p>تم بناء هذا التطبيق بنظام الواجهات المستقلة لضمان سرعة الأداء وسهولة التنقل.</p>
+            <p>تطبيق محدث بميزة توقعات 5 أيام.</p>
         </div>
     </section>
 
     <nav class="nav-bar">
-        <div class="nav-item active" onclick="showPage('weather', this)">
-            <i class="fas fa-sun"></i>
-            <span>الطقس</span>
-        </div>
-        <div class="nav-item" onclick="showPage('prayer', this)">
-            <i class="fas fa-mosque"></i>
-            <span>الصلاة</span>
-        </div>
-        <div class="nav-item" onclick="showPage('azkar', this)">
-            <i class="fas fa-book-open"></i>
-            <span>الأذكار</span>
-        </div>
-        <div class="nav-item" onclick="showPage('about', this)">
-            <i class="fas fa-user-circle"></i>
-            <span>المطور</span>
-        </div>
+        <div class="nav-item active" onclick="showPage('weather', this)"><i class="fas fa-sun"></i><span>الطقس</span></div>
+        <div class="nav-item" onclick="showPage('prayer', this)"><i class="fas fa-mosque"></i><span>الصلاة</span></div>
+        <div class="nav-item" onclick="showPage('azkar', this)"><i class="fas fa-book-open"></i><span>الأذكار</span></div>
+        <div class="nav-item" onclick="showPage('about', this)"><i class="fas fa-user-circle"></i><span>المطور</span></div>
     </nav>
 </div>
 
 <script>
-    // --- JS المصلح والذكي ---
+    const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-    // 1. تبديل الواجهات - شغال 100%
     function showPage(pageId, element) {
-        // إخفاء كل الصفحات
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        // إلغاء تفعيل الأزرار
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
-        // إظهار الصفحة المختارة
         document.getElementById(pageId).classList.add('active');
-        // تفعيل الزر
         element.classList.add('active');
     }
-
-    // 2. جلب البيانات
-    const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
     async function getWeather() {
         const city = document.getElementById("city-input").value;
         if(!city) return;
 
         try {
+            // 1. جلب طقس اليوم اللحظي
             const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
             const data = await res.json();
             
@@ -205,8 +186,37 @@
             document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
             document.getElementById("out-desc").innerText = data.weather[0].description;
             
+            // 2. جلب توقعات 5 أيام (الميزة الجديدة)
+            getFiveDayForecast(city);
+            
             getPrayers(city);
         } catch { alert("خطأ في اسم المدينة!"); }
+    }
+
+    async function getFiveDayForecast(city) {
+        try {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
+            const data = await res.json();
+            
+            const forecastDiv = document.getElementById("out-forecast");
+            forecastDiv.innerHTML = "";
+
+            // فلترة البيانات لأخذ قراءة واحدة لكل يوم (كل 8 قراءات لأن التوقع كل 3 ساعات)
+            for (let i = 0; i < data.list.length; i += 8) {
+                const day = data.list[i];
+                const date = new Date(day.dt * 1000);
+                const dayName = date.toLocaleDateString('ar-JO', { weekday: 'short' });
+                
+                forecastDiv.innerHTML += `
+                    <div class="forecast-item">
+                        <div>${dayName}</div>
+                        <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
+                        <b>${Math.round(day.main.temp)}°</b>
+                    </div>
+                `;
+            }
+            document.getElementById("forecast-section").style.display = "block";
+        } catch (e) { console.error("Forecast Error", e); }
     }
 
     async function getPrayers(city) {
@@ -215,7 +225,6 @@
         const t = d.data.timings;
         const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
         const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
-        
         let html = '';
         times.forEach((time, i) => {
             html += `<div class="prayer-row"><span>${names[i]}</span><b>${t[time]}</b></div>`;
@@ -223,8 +232,7 @@
         document.getElementById("prayer-output").innerHTML = html;
     }
 
-    // 3. الأذكار
-    const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لا إِلَهَ إِلا اللَّهُ", "اللَّهُ أَكْبَرُ"];
+    const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لا إِلَهَ إِلا اللَّهُ", "اللَّهُ أَكْبَرُ"];
     function nextZekr() {
         document.getElementById("zekr-text").innerText = azkar[Math.floor(Math.random()*azkar.length)];
     }
@@ -232,4 +240,3 @@
 
 </body>
 </html>
-
