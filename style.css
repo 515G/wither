@@ -1,48 +1,50 @@
 :root {
-    --primary: #38bdf8;
-    --bg: #0f172a;
+    --main-blue: #38bdf8;
+    --dark-bg: #0f172a;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-body { background: var(--bg); color: white; height: 100vh; overflow: hidden; }
+body { background: var(--dark-bg); color: white; height: 100vh; overflow: hidden; }
 
-.web-app { max-width: 450px; margin: 0 auto; height: 100vh; position: relative; }
+.main-wrapper { max-width: 480px; margin: 0 auto; height: 100vh; position: relative; }
 
-/* إخفاء الصفحات */
-.page {
-    display: none; /* هذا الأمر يخفي كل شيء */
-    height: calc(100vh - 70px);
-    padding: 30px 20px;
+/* الحل النهائي لإخفاء الواجهات */
+.page-view {
+    display: none; /* مخفي تماماً */
+    height: calc(100vh - 75px);
+    padding: 40px 20px;
     overflow-y: auto;
     text-align: center;
 }
 
-/* إظهار الصفحة النشطة فقط */
-.page.active { 
-    display: block; /* هذا يظهر الصفحة التي تضغط عليها فقط */
-    animation: fadeIn 0.3s ease;
+/* إظهار الواجهة النشطة فقط */
+.page-view.active {
+    display: block; 
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* شريط التنقل */
-.tab-bar {
-    position: absolute; bottom: 0; width: 100%; height: 70px;
-    background: rgba(15, 23, 42, 0.95); display: flex; 
-    justify-content: space-around; align-items: center;
+/* شريط التنقل السفلي */
+.bottom-nav {
+    position: absolute; bottom: 0; width: 100%; height: 75px;
+    display: flex; justify-content: space-around; align-items: center;
+    background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.tab-btn { background: none; border: none; color: white; opacity: 0.4; cursor: pointer; }
-.tab-btn.active { opacity: 1; color: var(--primary); }
-.tab-btn i { display: block; font-size: 20px; margin-bottom: 4px; }
-.tab-btn span { font-size: 11px; }
+.nav-item { cursor: pointer; opacity: 0.4; text-align: center; transition: 0.3s; }
+.nav-item.active { opacity: 1; color: var(--main-blue); transform: translateY(-3px); }
+.nav-item i { display: block; font-size: 22px; margin-bottom: 5px; }
+.nav-item span { font-size: 11px; }
 
-/* تنسيقات أخرى */
-.search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-.search-box input { flex: 1; padding: 12px; border-radius: 10px; border: none; outline: none; }
-.search-box button { background: var(--primary); border: none; width: 45px; border-radius: 10px; cursor: pointer; }
-.azkar-box, .dev-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
-.avatar { width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; color: var(--bg); }
-#temp-display { font-size: 60px; color: var(--primary); margin: 15px 0; }
+/* تنسيقات المحتوى */
+.search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+.search-box input { flex: 1; padding: 12px; border-radius: 12px; border: none; outline: none; background: rgba(255,255,255,0.1); color: white; }
+.search-box button { background: var(--main-blue); border: none; width: 50px; border-radius: 12px; cursor: pointer; }
+
+.azkar-box, .dev-profile, .info-box { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); }
+.dev-avatar { width: 70px; height: 70px; background: var(--main-blue); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #000; font-weight: bold; }
+.section-title { font-size: 22px; margin-bottom: 25px; color: var(--main-blue); }
+#temp-display { font-size: 60px; color: var(--main-blue); margin: 20px 0; }
