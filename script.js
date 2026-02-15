@@ -1,56 +1,53 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-const azkar = [
-    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", 
-    "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه", "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد",
-    "لا إله إلا الله وحده لا شريك له", "سبحان الله العظيم", "الحمد لله حمداً كثيراً"
-];
-
-function nextZekr() {
-    const text = azkar[Math.floor(Math.random() * azkar.length)];
-    document.getElementById("azkar-text").innerText = text;
+function openTab(evt, tabName) {
+    const contents = document.querySelectorAll(".tab-content");
+    contents.forEach(c => c.style.display = "none");
+    const buttons = document.querySelectorAll(".tab-btn");
+    buttons.forEach(b => b.classList.remove("active"));
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    const searchBtn = document.getElementById("search-btn");
     const cityInput = document.getElementById("city-input");
-    document.getElementById("search-btn").onclick = () => getFullData(cityInput.value);
-    cityInput.onkeydown = (e) => e.key === "Enter" && getFullData(cityInput.value);
-    cityInput.focus();
+    const geoBtn = document.getElementById("geo-btn");
+
+    searchBtn.onclick = () => getWeatherData(cityInput.value);
+    cityInput.onkeydown = (e) => { if(e.key === "Enter") getWeatherData(cityInput.value); };
+    geoBtn.onclick = () => navigator.geolocation.getCurrentPosition(p => 
+        getWeatherData(null, p.coords.latitude, p.coords.longitude));
 });
 
-async function getFullData(city) {
-    if(!city) return;
+async function getWeatherData(city, lat = null, lon = null) {
+    if (!city && lat === null) return;
     const msg = document.getElementById("msg-box");
-    
+    const info = document.getElementById("weather-info");
+    let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
+    url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
+
     try {
-        const wRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
-        const wData = await wRes.json();
-        if(wData.cod !== 200) throw new Error();
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.cod !== 200) throw new Error();
 
         msg.innerText = "";
-        document.getElementById("city-name").innerText = wData.name;
-        document.getElementById("temp-display").innerText = Math.round(wData.main.temp) + "°";
-        document.getElementById("weather-desc").innerText = wData.weather[0].description;
+        document.getElementById("city-name").innerText = data.name;
+        document.getElementById("temp-display").innerText = Math.round(data.main.temp) + "°";
+        document.getElementById("weather-desc").innerText = data.weather[0].description;
+        document.getElementById("main-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
         
-        getForecast(wData.coord.lat, wData.coord.lon);
-        getPrayers(city);
-    } catch {
-        msg.innerText = "تأكد من كتابة اسم المدينة بشكل صحيح";
-    }
-}
+        const outfit = document.getElementById("outfit-msg");
+        const t = data.main.temp;
+        outfit.innerText = t < 15 ? "🧥 البس ثقيل" : t < 25 ? "👕 ملابس خفيفة" : "☀️ ملابس صيفية";
 
-async function getPrayers(city) {
-    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
-    const d = await res.json();
-    const t = d.data.timings;
-    document.getElementById("prayer-city-label").innerText = `في ${city}`;
-    document.getElementById("prayer-times").innerHTML = `
-        <div class="prayer-item">الفجر<span>${t.Fajr}</span></div>
-        <div class="prayer-item">الظهر<span>${t.Dhuhr}</span></div>
-        <div class="prayer-item">العصر<span>${t.Asr}</span></div>
-        <div class="prayer-item">المغرب<span>${t.Maghrib}</span></div>
-        <div class="prayer-item">العشاء<span>${t.Isha}</span></div>
-        <div class="prayer-item">الشروق<span>${t.Sunrise}</span></div>`;
+        getForecast(data.coord.lat, data.coord.lon);
+        info.style.display = "block";
+    } catch {
+        msg.innerText = "تعذر العثور على المدينة!";
+        info.style.display = "none";
+    }
 }
 
 async function getForecast(lat, lon) {
@@ -64,12 +61,7 @@ async function getForecast(lat, lon) {
         const day = d.toLocaleDateString('ar-EG', {weekday: 'short'});
         if (!seen.has(day) && d.getHours() >= 12 && seen.size < 4) {
             seen.add(day);
-            container.innerHTML += `
-                <div class="forecast-day">
-                    <p>${day}</p>
-                    <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png">
-                    <p>${Math.round(item.main.temp)}°</p>
-                </div>`;
+            container.innerHTML += `<div class="forecast-day"><p>${day}</p><img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png"><p>${Math.round(item.main.temp)}°</p></div>`;
         }
     });
 }
