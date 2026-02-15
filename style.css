@@ -1,53 +1,73 @@
 :root {
-    --glass: rgba(255, 255, 255, 0.15);
-    --border: rgba(255, 255, 255, 0.25);
-    --text: #ffffff;
+    --accent: #38bdf8;
+    --glass: rgba(255, 255, 255, 0.1);
+    --border: rgba(255, 255, 255, 0.2);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
 body {
-    background: linear-gradient(-45deg, #1e3c72, #2a5298, #2c3e50);
-    background-size: 400% 400%;
+    background: #0f172a;
+    background: radial-gradient(circle at top, #1e293b, #0f172a);
     min-height: 100vh;
     display: flex; justify-content: center; align-items: center;
-    color: var(--text);
+    color: white; overflow: hidden;
 }
 
 .app-card {
     background: var(--glass);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(15px);
     width: 95%; max-width: 400px;
-    padding: 25px; border-radius: 30px;
+    height: 600px;
+    border-radius: 30px;
     border: 1px solid var(--border);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+    display: flex; flex-direction: column;
     position: relative;
 }
 
-/* صندوق البحث - تأكدنا أنه فوق كل شيء */
-.search-area { 
-    display: flex; gap: 8px; margin-bottom: 15px;
-    position: relative; z-index: 999; 
+/* منطقة البحث - الأولوية القصوى */
+.search-section { padding: 20px; z-index: 1000; position: relative; }
+.search-bar { 
+    display: flex; gap: 10px; background: rgba(255,255,255,0.15); 
+    padding: 5px; border-radius: 15px; border: 1px solid var(--border);
 }
-.search-area input { 
-    flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); 
-    background: rgba(255,255,255,0.2); color: white; outline: none;
-    pointer-events: auto !important; 
+.search-bar input { 
+    flex: 1; background: none; border: none; color: white; padding: 10px; 
+    outline: none; font-size: 16px; pointer-events: auto !important;
+}
+.search-bar button { 
+    background: var(--accent); border: none; width: 40px; border-radius: 10px; cursor: pointer;
 }
 
-.tabs { display: flex; background: rgba(0,0,0,0.1); padding: 5px; border-radius: 15px; margin-bottom: 15px; }
-.tab-btn { flex: 1; padding: 10px; background: none; border: none; color: white; cursor: pointer; opacity: 0.5; }
-.tab-btn.active { opacity: 1; background: rgba(255,255,255,0.1); border-radius: 10px; }
+/* التبويبات */
+.content-area { flex: 1; padding: 0 20px; overflow-y: auto; text-align: center; }
+.tab-content { display: none; animation: fadeIn 0.3s; }
+.tab-content.active { display: block; }
 
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.4s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.weather-result h1 { font-size: 55px; }
-.forecast { display: flex; justify-content: space-around; margin-top: 15px; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 15px; }
-.forecast-day { text-align: center; font-size: 11px; }
+/* الطقس */
+#temp-display { font-size: 60px; color: var(--accent); margin: 10px 0; }
+.forecast { display: flex; justify-content: space-around; margin-top: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; }
 .forecast-day img { width: 30px; }
 
-.tips-list li { margin-bottom: 8px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; text-align: right; list-style: none; }
-.message { color: #ff7675; font-size: 14px; margin-bottom: 10px; min-height: 20px; }
+/* الصلاة */
+.prayer-grid { display: grid; gap: 8px; margin-top: 15px; }
+.prayer-item { display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid var(--border); }
+.prayer-item span { color: var(--accent); font-weight: bold; }
+
+/* الأذكار */
+.azkar-container { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; margin-top: 20px; }
+#azkar-text { min-height: 80px; line-height: 1.6; font-size: 17px; }
+.zekr-btn { background: var(--accent); border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+
+/* الشريط السفلي */
+.bottom-nav { 
+    display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); 
+    padding: 10px 0; border-radius: 0 0 30px 30px; border-top: 1px solid var(--border);
+}
+.nav-item { background: none; border: none; color: white; opacity: 0.4; cursor: pointer; font-size: 11px; transition: 0.3s; }
+.nav-item i { display: block; font-size: 20px; margin-bottom: 5px; }
+.nav-item.active { opacity: 1; color: var(--accent); }
+
+.message { color: #f87171; font-size: 12px; margin-top: 5px; height: 15px; }
