@@ -1,59 +1,53 @@
 :root {
-    --bg: #0f172a;
-    --accent: #38bdf8;
-    --glass: rgba(255, 255, 255, 0.05);
-    --border: rgba(255, 255, 255, 0.1);
+    --glass: rgba(255, 255, 255, 0.15);
+    --border: rgba(255, 255, 255, 0.25);
+    --text: #ffffff;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
 body {
-    background-color: var(--bg);
-    background-image: radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%), 
-                      radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0px, transparent 50%);
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #2c3e50);
+    background-size: 400% 400%;
     min-height: 100vh;
-    display: flex; justify-content: center;
-    color: white; padding: 20px 0;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--text);
 }
 
-.main-container { width: 90%; max-width: 420px; }
-
-.app-logo { text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: var(--accent); letter-spacing: 2px; }
-
-.header-section { margin-bottom: 20px; }
-.search-bar { 
-    display: flex; background: var(--glass); 
-    padding: 6px; border-radius: 18px; border: 1px solid var(--border);
-    position: relative; z-index: 1000; backdrop-filter: blur(10px);
-}
-.search-bar input { 
-    flex: 1; background: none; border: none; color: white; 
-    padding: 12px; outline: none; font-size: 16px;
-}
-.search-bar button { 
-    background: var(--accent); border: none; width: 45px; 
-    height: 45px; border-radius: 14px; cursor: pointer; color: #0f172a; transition: 0.3s;
+.app-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    width: 95%; max-width: 400px;
+    padding: 25px; border-radius: 30px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+    position: relative;
 }
 
-.card {
-    background: var(--glass); backdrop-filter: blur(20px);
-    border-radius: 24px; border: 1px solid var(--border);
-    padding: 24px; margin-bottom: 16px;
+/* صندوق البحث - تأكدنا أنه فوق كل شيء */
+.search-area { 
+    display: flex; gap: 8px; margin-bottom: 15px;
+    position: relative; z-index: 999; 
+}
+.search-area input { 
+    flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); 
+    background: rgba(255,255,255,0.2); color: white; outline: none;
+    pointer-events: auto !important; 
 }
 
-.weather-main { text-align: center; margin-bottom: 20px; }
-.weather-main h1 { font-size: 64px; color: var(--accent); font-weight: 200; }
-.forecast-strip { display: flex; justify-content: space-around; border-top: 1px solid var(--border); padding-top: 20px; }
-.forecast-day { text-align: center; font-size: 12px; }
-.forecast-day img { width: 32px; }
+.tabs { display: flex; background: rgba(0,0,0,0.1); padding: 5px; border-radius: 15px; margin-bottom: 15px; }
+.tab-btn { flex: 1; padding: 10px; background: none; border: none; color: white; cursor: pointer; opacity: 0.5; }
+.tab-btn.active { opacity: 1; background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-.prayer-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
-.prayer-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.prayer-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; text-align: center; font-size: 12px; border: 1px solid var(--border); }
-.prayer-item span { display: block; color: var(--accent); font-weight: bold; margin-top: 4px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.4s; }
 
-.zekr-box { margin-top: 20px; padding: 15px; border-radius: 16px; background: rgba(0,0,0,0.2); text-align: center; }
-.btn-zekr { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 6px 16px; border-radius: 10px; cursor: pointer; margin-top: 12px; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.error-msg { color: #f87171; font-size: 12px; text-align: center; margin-top: 8px; height: 16px; }
-.footer { text-align: center; font-size: 11px; opacity: 0.4; margin-top: 30px; }
+.weather-result h1 { font-size: 55px; }
+.forecast { display: flex; justify-content: space-around; margin-top: 15px; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 15px; }
+.forecast-day { text-align: center; font-size: 11px; }
+.forecast-day img { width: 30px; }
+
+.tips-list li { margin-bottom: 8px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; text-align: right; list-style: none; }
+.message { color: #ff7675; font-size: 14px; margin-bottom: 10px; min-height: 20px; }
