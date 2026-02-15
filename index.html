@@ -9,61 +9,61 @@
 </head>
 <body>
 
-<div class="web-container">
-    <section id="weather-tab" class="tab-view active">
-        <div class="search-area">
+<div class="web-app">
+    <section id="page-weather" class="page active">
+        <div class="search-box">
             <input type="text" id="city-input" placeholder="ابحث عن مدينة...">
             <button id="search-btn"><i class="fas fa-search"></i></button>
         </div>
-        <div class="content-body">
-            <div id="weather-result" style="display: none;">
+        <div class="content">
+            <div id="weather-info" style="display: none;">
                 <h2 id="city-name"></h2>
                 <h1 id="temp-display"></h1>
                 <p id="weather-desc"></p>
             </div>
-            <p class="hint-text">☁️ ابحث لترى حالة الطقس</p>
+            <p id="start-msg">☁️ ابحث لتعرف حالة الطقس</p>
         </div>
     </section>
 
-    <section id="prayer-tab" class="tab-view">
-        <h2 class="view-title">🕋 مواقيت الصلاة</h2>
-        <div id="prayer-times" class="prayer-list">
+    <section id="page-prayer" class="page">
+        <h3>🕋 مواقيت الصلاة</h3>
+        <div id="prayer-list" class="list-container">
             <p>يرجى البحث عن مدينة أولاً</p>
         </div>
     </section>
 
-    <section id="azkar-tab" class="tab-view">
-        <h2 class="view-title">📿 الأذكار</h2>
-        <div class="azkar-card">
+    <section id="page-azkar" class="page">
+        <h3>📿 أذكار المسلم</h3>
+        <div class="azkar-box">
             <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-            <button onclick="nextZekr()" class="btn-action">الذكر التالي</button>
+            <button onclick="nextZekr()" class="btn-next">الذكر التالي</button>
         </div>
     </section>
 
-    <section id="about-tab" class="tab-view">
+    <section id="page-about" class="page">
         <div class="dev-card">
-            <div class="avatar">J</div>
-            <h2>عبدالرحمن الشديفات</h2>
+            <div class="avatar"></div>
+            <h2> J عبدالرحمن الشديفات</h2>
             <p>مطور واجهات ويب</p>
-            <div class="line"></div>
-            <p class="bio">هذا التطبيق مقسم لواجهات منفصلة لتسهيل تجربة المستخدم.</p>
+            <hr>
+            <p>تم تصميم هذا الموقع بواجهات منفصلة لتجربة مستخدم أفضل.</p>
         </div>
     </section>
 
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="showTab(event, 'weather-tab')">
-            <i class="fas fa-sun"></i>
+    <nav class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('page-weather', this)">
+            <i class="fas fa-cloud"></i>
             <span>الطقس</span>
         </button>
-        <button class="nav-item" onclick="showTab(event, 'prayer-tab')">
-            <i class="fas fa-mosque"></i>
+        <button class="tab-btn" onclick="switchTab('page-prayer', this)">
+            <i class="fas fa-clock"></i>
             <span>الصلاة</span>
         </button>
-        <button class="nav-item" onclick="showTab(event, 'azkar-tab')">
+        <button class="tab-btn" onclick="switchTab('page-azkar', this)">
             <i class="fas fa-book-open"></i>
             <span>الأذكار</span>
         </button>
-        <button class="nav-item" onclick="showTab(event, 'about-tab')">
+        <button class="tab-btn" onclick="switchTab('page-about', this)">
             <i class="fas fa-user"></i>
             <span>عني</span>
         </button>
