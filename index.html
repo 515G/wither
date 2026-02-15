@@ -3,73 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <title>Weather | عبدالرحمن الشديفات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CSS المصلح والشامل --- */
+        :root {
+            --primary: #38bdf8;
+            --bg: #0f172a;
+            --card: rgba(255, 255, 255, 0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body { 
+            background: var(--bg); 
+            color: white; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            position: relative;
+            background: radial-gradient(circle at top, #1e293b, #0f172a);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* التحكم بالواجهات - السر هنا */
+        .page {
+            display: none; /* مخفي تماماً */
+            flex: 1;
+            padding: 40px 20px;
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .page.active {
+            display: block; /* يظهر فقط عند النقر */
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* شريط التنقل السفلي */
+        .nav-bar {
+            height: 75px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: white;
+            opacity: 0.4;
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.3s;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-item span { font-size: 11px; font-weight: bold; }
+
+        /* تنسيق المحتويات */
+        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        .search-box input { 
+            flex: 1; padding: 12px; border-radius: 12px; border: none; 
+            background: var(--card); color: white; outline: none; 
+        }
+        .search-box button { 
+            background: var(--primary); border: none; width: 50px; 
+            border-radius: 12px; cursor: pointer; color: #000;
+        }
+
+        .info-card { 
+            background: var(--card); padding: 25px; border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); margin-top: 20px;
+        }
+
+        .dev-badge {
+            width: 80px; height: 80px; background: var(--primary); 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; margin: 0 auto 15px;
+            font-size: 35px; font-weight: bold; color: #000;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+        }
+
+        h1 { font-size: 60px; color: var(--primary); margin: 10px 0; }
+        .prayer-row {
+            display: flex; justify-content: space-between; 
+            padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
 </head>
 <body>
 
-<div class="app-frame">
-    <div id="view-weather" class="page-container active">
-        <div class="search-wrapper">
-            <input type="text" id="city-input" placeholder="اكتب اسم المدينة هنا...">
-            <button id="search-btn"><i class="fas fa-search"></i></button>
+<div class="app-container">
+    
+    <section id="weather" class="page active">
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
+            <button onclick="getWeather()"><i class="fas fa-search"></i></button>
         </div>
-        <div class="display-area">
-            <div id="weather-box" class="hidden">
-                <h2 id="city-name"></h2>
-                <div id="temp-val"></div>
-                <p id="weather-desc"></p>
-            </div>
-            <p id="welcome-msg">🌟 ابحث عن مدينتك لعرض الطقس</p>
+        <div id="weather-result">
+            <h2 id="out-city">--</h2>
+            <h1 id="out-temp">--°</h1>
+            <p id="out-desc">ابحث لترى النتائج</p>
         </div>
-    </div>
+    </section>
 
-    <div id="view-prayer" class="page-container">
-        <h2 class="title">🕋 مواقيت الصلاة</h2>
-        <div id="prayer-output" class="prayer-box">
-            <p style="opacity:0.6">بانتظار البحث عن مدينة...</p>
+    <section id="prayer" class="page">
+        <h2 style="margin-bottom:20px;">🕋 مواقيت الصلاة</h2>
+        <div id="prayer-output" class="info-card">
+            <p>يرجى البحث عن مدينة أولاً</p>
         </div>
-    </div>
+    </section>
 
-    <div id="view-azkar" class="page-container">
-        <h2 class="title">📿 ذكر اليوم</h2>
-        <div class="azkar-display">
-            <p id="text-zekr">ألا بذكر الله تطمئن القلوب</p>
-            <button onclick="newZekr()" class="btn-refresh">تغيير الذكر</button>
+    <section id="azkar" class="page">
+        <h2>📿 أذكار المسلم</h2>
+        <div class="info-card">
+            <p id="zekr-text" style="font-size: 18px; line-height: 1.6;">ألا بذكر الله تطمئن القلوب</p>
+            <button onclick="nextZekr()" style="margin-top:20px; padding:10px 20px; border-radius:10px; border:none; background:var(--primary); cursor:pointer; font-weight:bold;">الذكر التالي</button>
         </div>
-    </div>
+    </section>
 
-    <div id="view-dev" class="page-container">
-        <div class="dev-card-premium">
-            <div class="logo-j"></div>
-            <h3>عبدالرحمن الشديفات J</h3>
-            <span>Professional Web Developer</span>
-            <div class="bar"></div>
-            <p>تم تطوير هذا النظام بواجهات برمجية منفصلة لضمان أداء عالٍ واستقرار تام للمتصفح.</p>
+    <section id="about" class="page">
+        <div class="info-card">
+            <div class="dev-badge">J</div>
+            <h2 style="color:var(--primary)">عبدالرحمن الشديفات</h2>
+            <p style="margin: 10px 0; opacity: 0.8;">Full-Stack Developer</p>
+            <hr style="opacity:0.1; margin: 15px 0;">
+            <p>تم بناء هذا التطبيق بنظام الواجهات المستقلة لضمان سرعة الأداء وسهولة التنقل.</p>
         </div>
-    </div>
+    </section>
 
-    <nav class="footer-nav">
-        <div class="nav-link active" onclick="go('view-weather', this)">
-            <i class="fas fa-cloud-sun"></i>
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="showPage('weather', this)">
+            <i class="fas fa-sun"></i>
             <span>الطقس</span>
         </div>
-        <div class="nav-link" onclick="go('view-prayer', this)">
+        <div class="nav-item" onclick="showPage('prayer', this)">
             <i class="fas fa-mosque"></i>
             <span>الصلاة</span>
         </div>
-        <div class="nav-link" onclick="newZekr(); go('view-azkar', this)">
+        <div class="nav-item" onclick="showPage('azkar', this)">
             <i class="fas fa-book-open"></i>
             <span>الأذكار</span>
         </div>
-        <div class="nav-link" onclick="go('view-dev', this)">
-            <i class="fas fa-code"></i>
+        <div class="nav-item" onclick="showPage('about', this)">
+            <i class="fas fa-user-circle"></i>
             <span>المطور</span>
         </div>
     </nav>
 </div>
 
-<script src="script.js"></script>
+<script>
+    // --- JS المصلح والذكي ---
+
+    // 1. تبديل الواجهات - شغال 100%
+    function showPage(pageId, element) {
+        // إخفاء كل الصفحات
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // إلغاء تفعيل الأزرار
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        // إظهار الصفحة المختارة
+        document.getElementById(pageId).classList.add('active');
+        // تفعيل الزر
+        element.classList.add('active');
+    }
+
+    // 2. جلب البيانات
+    const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
+
+    async function getWeather() {
+        const city = document.getElementById("city-input").value;
+        if(!city) return;
+
+        try {
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
+            const data = await res.json();
+            
+            document.getElementById("out-city").innerText = data.name;
+            document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
+            document.getElementById("out-desc").innerText = data.weather[0].description;
+            
+            getPrayers(city);
+        } catch { alert("خطأ في اسم المدينة!"); }
+    }
+
+    async function getPrayers(city) {
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
+        const d = await res.json();
+        const t = d.data.timings;
+        const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
+        
+        let html = '';
+        times.forEach((time, i) => {
+            html += `<div class="prayer-row"><span>${names[i]}</span><b>${t[time]}</b></div>`;
+        });
+        document.getElementById("prayer-output").innerHTML = html;
+    }
+
+    // 3. الأذكار
+    const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لا إِلَهَ إِلا اللَّهُ", "اللَّهُ أَكْبَرُ"];
+    function nextZekr() {
+        document.getElementById("zekr-text").innerText = azkar[Math.floor(Math.random()*azkar.length)];
+    }
+</script>
+
 </body>
 </html>
