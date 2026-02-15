@@ -1,137 +1,50 @@
 :root {
     --glass: rgba(255, 255, 255, 0.15);
     --border: rgba(255, 255, 255, 0.25);
-    --text: #ffffff;
+    --accent: #ffd700;
 }
 
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    font-family: 'Segoe UI', Tahoma, sans-serif; 
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
 
 body {
     background: linear-gradient(-45deg, #1e3c72, #2a5298, #2c3e50);
     background-size: 400% 400%;
     min-height: 100vh;
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-    color: var(--text);
-    overflow: hidden; /* لمنع التمرير غير الضروري */
+    display: flex; justify-content: center; align-items: center;
+    color: white;
 }
 
 .app-card {
     background: var(--glass);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    width: 95%; 
-    max-width: 400px;
-    padding: 25px; 
-    border-radius: 30px;
+    width: 95%; max-width: 400px;
+    padding: 25px; border-radius: 30px;
     border: 1px solid var(--border);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.2);
-    position: relative;
-    z-index: 1;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.3);
 }
 
-/* حل مشكلة الكتابة: جعل منطقة البحث في أعلى طبقة */
-.search-area { 
-    display: flex; 
-    gap: 8px; 
-    margin-bottom: 15px;
-    position: relative; 
-    z-index: 9999 !important; /* لضمان أنه فوق كل شيء */
-}
-
+.search-area { display: flex; gap: 8px; margin-bottom: 15px; position: relative; z-index: 1000; }
 .search-area input { 
-    flex: 1; 
-    padding: 12px; 
-    border-radius: 12px; 
-    border: 1px solid var(--border); 
-    background: rgba(255,255,255,0.2) !important; 
-    color: white !important; 
-    outline: none;
-    pointer-events: auto !important; /* للسماح بالضغط والكتابة */
-    position: relative;
+    flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); 
+    background: rgba(255,255,255,0.2); color: white; outline: none; pointer-events: auto !important;
 }
 
-.search-area button { 
-    width: 45px; 
-    height: 45px; 
-    border-radius: 12px; 
-    border: none; 
-    cursor: pointer; 
-    background: var(--glass); 
-    color: white; 
-    pointer-events: auto !important;
-}
+.tabs { display: flex; background: rgba(0,0,0,0.1); padding: 5px; border-radius: 15px; margin-bottom: 20px; }
+.tab-btn { flex: 1; padding: 10px; background: none; border: none; color: white; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+.tab-btn.active { opacity: 1; background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-/* التنسيقات الأخرى */
-.tabs { 
-    display: flex; 
-    background: rgba(0,0,0,0.1); 
-    padding: 5px; 
-    border-radius: 15px; 
-    margin-bottom: 15px;
-    position: relative;
-    z-index: 10;
-}
+.tab-content { display: none; min-height: 250px; text-align: center; }
+.tab-content.active { display: block; animation: fadeIn 0.4s; }
 
-.tab-btn { 
-    flex: 1; 
-    padding: 10px; 
-    background: none; 
-    border: none; 
-    color: white; 
-    cursor: pointer; 
-    opacity: 0.5; 
-}
-
-.tab-btn.active { 
-    opacity: 1; 
-    background: rgba(255,255,255,0.1); 
-    border-radius: 10px; 
-}
-
-.tab-content { 
-    display: none; 
-}
-
-.tab-content.active { 
-    display: block; 
-    animation: fadeIn 0.4s; 
-}
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.weather-result h1 { font-size: 55px; margin: 10px 0; }
-
-.forecast { 
-    display: flex; 
-    justify-content: space-around; 
-    margin-top: 15px; 
-    background: rgba(0,0,0,0.1); 
-    padding: 10px; 
-    border-radius: 15px; 
-}
-
-.forecast-day { text-align: center; font-size: 11px; }
+.weather-result h1 { font-size: 50px; }
+.forecast { display: flex; justify-content: space-around; margin-top: 15px; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 15px; }
 .forecast-day img { width: 30px; }
 
-.tips-list li { 
-    margin-bottom: 8px; 
-    background: rgba(255,255,255,0.1); 
-    padding: 10px; 
-    border-radius: 10px; 
-    text-align: right; 
-    list-style: none; 
-}
+.prayer-grid { display: grid; gap: 8px; margin-top: 15px; }
+.prayer-item { display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-.message { 
-    color: #ff7675; 
-    font-size: 14px; 
-    margin-bottom: 10px; 
-    min-height: 20px; 
-}
+.azkar-box { padding: 20px; background: rgba(0,0,0,0.2); border-radius: 15px; margin-top: 15px; }
+.next-btn { background: var(--accent); border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.message { color: #ff7675; font-size: 14px; margin-bottom: 10px; height: 20px; text-align: center; }
