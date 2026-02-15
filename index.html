@@ -18,47 +18,56 @@
 
     <p id="msg-box" class="message"></p>
 
-    <nav class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'prayer-tab')"><i class="fas fa-mosque"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'azkar-tab')"><i class="fas fa-book-open"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'about-tab')"><i class="fas fa-info-circle"></i></button>
-    </nav>
-
-    <div id="weather-tab" class="tab-content active">
+    <div id="weather-tab" class="view active">
         <div id="weather-info" style="display: none;">
             <h2 id="city-name"></h2>
-            <img id="main-icon" src="" alt="">
             <h1 id="temp-display"></h1>
             <p id="weather-desc"></p>
-            <div class="suggestion" id="outfit-msg"></div>
             <div class="forecast" id="forecast-container"></div>
         </div>
     </div>
 
-    <div id="prayer-tab" class="tab-content">
-        <h3>مواقيت الصلاة</h3>
-        <div id="prayer-times" class="prayer-grid">
-            <p style="margin-top:20px; opacity:0.7">يرجى البحث عن مدينة لعرض المواقيت</p>
+    <div id="islamic-tab" class="view">
+        <div class="prayer-section">
+            <h4 id="prayer-city">مواقيت الصلاة</h4>
+            <div id="prayer-times" class="prayer-grid"></div>
         </div>
-    </div>
-
-    <div id="azkar-tab" class="tab-content">
-        <h3>أذكار المسلم</h3>
-        <div class="azkar-box">
+        <hr class="separator">
+        <div class="azkar-section">
             <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-            <button onclick="nextZekr()" class="next-btn">الذكر التالي</button>
+            <button onclick="nextZekr()" class="action-btn">ذكر آخر</button>
         </div>
     </div>
 
-    <div id="about-tab" class="tab-content">
-        <p style="margin-top:20px;">تم التطوير بواسطة:<br><b>عبدالرحمن الشديفات J</b></p>
+    <div id="tasks-tab" class="view">
+        <h4>قائمة المهام</h4>
+        <div class="todo-area">
+            <input type="text" id="todo-input" placeholder="أضف مهمة جديدة...">
+            <button onclick="addTodo()"><i class="fas fa-plus"></i></button>
+        </div>
+        <ul id="todo-list"></ul>
     </div>
+
+    <div id="about-tab" class="view">
+        <div class="profile">
+            <i class="fas fa-user-circle fa-4x"></i>
+            <h3>عبدالرحمن الشديفات</h3>
+            <p>مطور برمجيات</p>
+            <div class="social-links">
+                <i class="fab fa-github"></i>
+                <i class="fab fa-linkedin"></i>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchView(event, 'weather-tab')"><i class="fas fa-cloud-sun"></i><span>الطقس</span></button>
+        <button class="nav-btn" onclick="switchView(event, 'islamic-tab')"><i class="fas fa-kaaba"></i><span>إسلاميات</span></button>
+        <button class="nav-btn" onclick="switchView(event, 'tasks-tab')"><i class="fas fa-list-check"></i><span>مهامي</span></button>
+        <button class="nav-btn" onclick="switchView(event, 'about-tab')"><i class="fas fa-id-card"></i><span>عني</span></button>
+    </nav>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
-
-
