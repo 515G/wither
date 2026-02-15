@@ -1,7 +1,7 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
 const azkar = [
-    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
     "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
     "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه",
     "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد",
@@ -23,13 +23,25 @@ function openTab(evt, tabName) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const cityInput = document.getElementById("city-input");
-    document.getElementById("search-btn").onclick = () => getWeatherData(cityInput.value);
-    cityInput.onkeydown = (e) => e.key === "Enter" && getWeatherData(cityInput.value);
-    document.getElementById("geo-btn").onclick = () => navigator.geolocation.getCurrentPosition(p => 
-        getWeatherData(null, p.coords.latitude, p.coords.longitude));
+    const searchBtn = document.getElementById("search-btn");
+
+    // إجبار المتصفح على التركيز على صندوق النص
+    setTimeout(() => cityInput.focus(), 600);
+
+    searchBtn.onclick = () => getWeatherData(cityInput.value);
+    cityInput.onkeydown = (e) => {
+        if(e.key === "Enter") getWeatherData(cityInput.value);
+    };
+
+    document.getElementById("geo-btn").onclick = () => {
+        navigator.geolocation.getCurrentPosition(p => 
+            getWeatherData(null, p.coords.latitude, p.coords.longitude)
+        );
+    };
 });
 
 async function getWeatherData(city, lat = null, lon = null) {
+    if(!city && lat === null) return;
     const msg = document.getElementById("msg-box");
     let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
     url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
@@ -50,7 +62,7 @@ async function getWeatherData(city, lat = null, lon = null) {
 
         document.getElementById("weather-info").style.display = "block";
         getForecast(data.coord.lat, data.coord.lon);
-        getPrayerTimes(data.name); // جلب المواقيت لنفس المدينة
+        getPrayerTimes(data.name);
     } catch {
         msg.innerText = "تعذر العثور على البيانات!";
     }
