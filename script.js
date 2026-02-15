@@ -1,39 +1,58 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// دالة التبديل بين الواجهات
-function switchTab(pageId, btnElement) {
-    // 1. إخفاء كل الصفحات
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
+// دالة التنقل - السر في إخفاء وإظهار الواجهات
+function navigate(tabId, element) {
+    // إخفاء كل الواجهات
+    const pages = document.querySelectorAll('.page-view');
+    pages.forEach(p => p.classList.remove('active'));
 
-    // 2. إزالة تفعيل كل الأزرار
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
+    // إزالة اللون الأزرق من كل الأزرار
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(n => n.classList.remove('active'));
 
-    // 3. إظهار الصفحة المطلوبة وتفعيل زرها
-    document.getElementById(pageId).classList.add('active');
-    btnElement.classList.add('active');
+    // إظهار الواجهة المختارة وتفعيل زرها
+    document.getElementById(tabId).classList.add('active');
+    element.classList.add('active');
 }
 
-// الأذكار
-const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لَا إِلَهَ إِلَّا اللَّهُ", "اللَّهُ أَكْبَرُ"];
+// نظام الأذكار
+const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لا إِلَهَ إِلا اللَّهُ", "اللَّهُ أَكْبَرُ"];
 function nextZekr() {
-    document.getElementById("azkar-text").innerText = azkar[Math.floor(Math.random()*azkar.length)];
+    const text = document.getElementById("azkar-text");
+    text.innerText = azkar[Math.floor(Math.random() * azkar.length)];
 }
 
-// الطقس
-document.getElementById("search-btn").onclick = async () => {
+// الطقس والصلاة
+document.getElementById("search-btn").onclick = async function() {
     const city = document.getElementById("city-input").value;
     if(!city) return;
+
     try {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
+        
         document.getElementById("city-name").innerText = data.name;
         document.getElementById("temp-display").innerText = Math.round(data.main.temp) + "°";
         document.getElementById("weather-desc").innerText = data.weather[0].description;
-        document.getElementById("weather-info").style.display = "block";
-        document.getElementById("start-msg").style.display = "none";
-    } catch { alert("خطأ في اسم المدينة"); }
+        
+        document.getElementById("weather-result").style.display = "block";
+        document.getElementById("initial-msg").style.display = "none";
+        
+        getPrayers(city);
+    } catch (e) {
+        alert("تأكد من اسم المدينة!");
+    }
 };
+
+async function getPrayers(city) {
+    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
+    const d = await res.json();
+    const t = d.data.timings;
+    document.getElementById("prayer-times").innerHTML = `
+        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05)">الفجر <b>${t.Fajr}</b></div>
+        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05)">الظهر <b>${t.Dhuhr}</b></div>
+        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05)">العصر <b>${t.Asr}</b></div>
+        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05)">المغرب <b>${t.Maghrib}</b></div>
+        <div style="display:flex; justify-content:space-between; padding:10px;">العشاء <b>${t.Isha}</b></div>
+    `;
+}
