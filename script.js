@@ -1,5 +1,5 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
-const azkar = ["سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه", "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد", "سبحان الله العظيم", "لا إله إلا الله"];
+const azkar = ["سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه", "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد", "سبحان الله العظيم", "لا إله إلا الله وحده لا شريك له"];
 
 function nextZekr() {
     document.getElementById("azkar-text").innerText = azkar[Math.floor(Math.random() * azkar.length)];
@@ -33,7 +33,7 @@ async function fetchAll(city) {
         
         getForecast(wData.coord.lat, wData.coord.lon);
         getPrayers(city);
-    } catch { document.getElementById("msg-box").innerText = "خطأ في اسم المدينة!"; }
+    } catch { document.getElementById("msg-box").innerText = "⚠️ المدينة غير موجودة!"; }
 }
 
 async function getPrayers(city) {
