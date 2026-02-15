@@ -1,66 +1,132 @@
+/* الألوان الأساسية */
 :root {
-    --bg: #0f172a;
-    --accent: #38bdf8;
-    --glass: rgba(255, 255, 255, 0.1);
+    --bg-color: #0f172a;
+    --accent-color: #38bdf8;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.2);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Tahoma, sans-serif; 
+}
 
 body {
-    background: var(--bg);
+    background: var(--bg-color);
     background: radial-gradient(circle at top, #1e293b, #0f172a);
     min-height: 100vh;
-    display: flex; justify-content: center; align-items: center;
-    color: white; overflow: hidden;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    color: white;
+    overflow: hidden; /* يمنع التمرير الخارجي المزعج */
 }
 
+/* بطاقة التطبيق الرئيسية */
 .app-card {
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    width: 95%; max-width: 400px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    width: 95%; 
+    max-width: 400px;
     height: 620px;
     border-radius: 35px;
-    border: 1px solid rgba(255,255,255,0.2);
-    display: flex; flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    border: 1px solid var(--border-color);
+    display: flex; 
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
+/* الرأس */
 .header { text-align: center; padding-top: 25px; }
-.header h1 { color: var(--accent); font-size: 30px; }
-.designer { font-size: 11px; opacity: 0.7; margin-top: 5px; }
+.header h1 { color: var(--accent-color); font-size: 28px; }
+.designer { font-size: 10px; opacity: 0.7; margin-top: 4px; }
 
-.search-area { padding: 20px; display: flex; gap: 10px; z-index: 100; }
+/* منطقة البحث - حل مشكلة الكتابة */
+.search-area { 
+    padding: 20px; 
+    display: flex; 
+    gap: 10px; 
+    z-index: 1000; 
+}
 .search-area input { 
-    flex: 1; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
-    padding: 12px; border-radius: 15px; color: white; outline: none; font-size: 16px;
+    flex: 1; 
+    background: rgba(255, 255, 255, 0.15); 
+    border: 1px solid var(--border-color);
+    padding: 12px; 
+    border-radius: 15px; 
+    color: white; 
+    outline: none; 
+    font-size: 16px;
 }
 .search-area button { 
-    background: var(--accent); border: none; width: 48px; border-radius: 15px; cursor: pointer; font-size: 18px;
+    background: var(--accent-color); 
+    border: none; 
+    width: 48px; 
+    border-radius: 15px; 
+    cursor: pointer; 
+    font-size: 18px;
 }
 
-.tabs-content { flex: 1; padding: 10px 25px; overflow-y: auto; text-align: center; }
-.tab-view { display: none; animation: fadeIn 0.3s ease-in-out; }
-.tab-view.active { display: block; }
+/* محتوى الأقسام */
+.tabs-content { 
+    flex: 1; 
+    padding: 10px 25px; 
+    overflow-y: auto; 
+    text-align: center; 
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+/* إخفاء الأقسام غير النشطة وإظهار النشط */
+.tab-view { 
+    display: none; 
+}
+.tab-view.active { 
+    display: block; 
+    animation: fadeIn 0.3s ease-in-out; 
+}
 
-#temp-display { font-size: 60px; color: var(--accent); font-weight: bold; }
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* تنسيقات داخلية */
+#temp-display { font-size: 60px; color: var(--accent-color); margin: 10px 0; }
 .forecast { display: flex; justify-content: space-around; margin-top: 20px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 20px; }
 
-.prayer-grid { display: grid; gap: 10px; margin-top: 20px; }
-.prayer-item { display: flex; justify-content: space-between; padding: 14px; background: rgba(255,255,255,0.07); border-radius: 15px; }
-.prayer-item b { color: var(--accent); }
+.prayer-grid { display: grid; gap: 8px; margin-top: 15px; }
+.prayer-item { display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+.prayer-item b { color: var(--accent-color); }
 
-.azkar-card { background: rgba(0,0,0,0.25); padding: 25px; border-radius: 25px; margin-top: 20px; }
-.zekr-btn { background: var(--accent); border: none; color: #0f172a; padding: 10px 20px; border-radius: 12px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+.azkar-card { background: rgba(0,0,0,0.25); padding: 25px; border-radius: 25px; margin-top: 15px; }
+.zekr-btn { background: var(--accent-color); border: none; padding: 10px 20px; border-radius: 12px; cursor: pointer; margin-top: 15px; font-weight: bold; color: #0f172a; }
 
+/* شريط التنقل السفلي */
 .bottom-nav { 
-    display: flex; justify-content: space-around; background: rgba(0,0,0,0.35); 
-    padding: 15px 0; border-radius: 0 0 35px 35px; border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; 
+    justify-content: space-around; 
+    background: rgba(0,0,0,0.3); 
+    padding: 15px 0; 
+    border-radius: 0 0 35px 35px; 
+    border-top: 1px solid var(--border-color);
 }
-.nav-btn { background: none; border: none; color: white; opacity: 0.4; cursor: pointer; transition: 0.3s; }
-.nav-btn .emoji { display: block; font-size: 24px; margin-bottom: 5px; }
-.nav-btn span:last-child { font-size: 12px; }
-.nav-btn.active { opacity: 1; color: var(--accent); transform: translateY(-5px); }
+.nav-btn { 
+    background: none; 
+    border: none; 
+    color: white; 
+    opacity: 0.4; 
+    cursor: pointer; 
+    transition: 0.3s;
+    text-align: center;
+}
+.nav-btn .emoji { display: block; font-size: 22px; margin-bottom: 4px; }
+.nav-btn span { font-size: 11px; }
+.nav-btn.active { 
+    opacity: 1; 
+    color: var(--accent-color); 
+}
 
-.error-msg { color: #ff5e5e; font-size: 12px; text-align: center; height: 15px; margin-bottom: 5px; }
+.error-msg { color: #ff6b6b; font-size: 12px; height: 15px; margin-top: -10px; margin-bottom: 10px; text-align: center; }
