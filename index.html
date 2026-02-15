@@ -3,69 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>weather</title>
+    <title>Weather | عبدالرحمن الشديفات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app-card">
-    <div class="search-area">
-        <input type="text" id="city-input" placeholder="ابحث عن مدينة..." autocomplete="off">
-        <button id="search-btn"><i class="fas fa-search"></i></button>
-        <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
+<div class="main-container">
+    <div class="header-section">
+        <h1 class="app-logo">Weather</h1>
+        <div class="search-bar">
+            <input type="text" id="city-input" placeholder="اكتب اسم المدينة هنا..." autocomplete="off">
+            <button id="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <p id="msg-box" class="error-msg"></p>
     </div>
 
-    <p id="msg-box" class="message"></p>
-
-    <div id="weather-tab" class="view active">
-        <div id="weather-info" style="display: none;">
-            <h2 id="city-name"></h2>
-            <h1 id="temp-display"></h1>
-            <p id="weather-desc"></p>
-            <div class="forecast" id="forecast-container"></div>
+    <section class="card weather-card">
+        <div class="weather-main">
+            <h2 id="city-name">ابحث عن مدينتك</h2>
+            <h1 id="temp-display">--°</h1>
+            <p id="weather-desc">اكتشف حالة الجو وتوقعات الأيام</p>
         </div>
-    </div>
+        <div class="forecast-strip" id="forecast-container"></div>
+    </section>
 
-    <div id="islamic-tab" class="view">
-        <div class="prayer-section">
-            <h4 id="prayer-city">مواقيت الصلاة</h4>
-            <div id="prayer-times" class="prayer-grid"></div>
+    <section class="card islamic-card">
+        <div class="prayer-header">
+            <h3><i class="fas fa-mosque"></i> مواقيت الصلاة</h3>
+            <span id="prayer-city-label"></span>
         </div>
-        <hr class="separator">
-        <div class="azkar-section">
+        <div id="prayer-times" class="prayer-list">
+            <p class="placeholder">تظهر المواقيت عند البحث</p>
+        </div>
+        <div class="zekr-box">
             <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-            <button onclick="nextZekr()" class="action-btn">ذكر آخر</button>
+            <button onclick="nextZekr()" class="btn-zekr">ذكر آخر</button>
         </div>
-    </div>
+    </section>
 
-    <div id="tasks-tab" class="view">
-        <h4>قائمة المهام</h4>
-        <div class="todo-area">
-            <input type="text" id="todo-input" placeholder="أضف مهمة جديدة...">
-            <button onclick="addTodo()"><i class="fas fa-plus"></i></button>
-        </div>
-        <ul id="todo-list"></ul>
-    </div>
-
-    <div id="about-tab" class="view">
-        <div class="profile">
-            <i class="fas fa-user-circle fa-4x"></i>
-            <h3>عبدالرحمن الشديفات</h3>
-            <p>مطور برمجيات</p>
-            <div class="social-links">
-                <i class="fab fa-github"></i>
-                <i class="fab fa-linkedin"></i>
-            </div>
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchView(event, 'weather-tab')"><i class="fas fa-cloud-sun"></i><span>الطقس</span></button>
-        <button class="nav-btn" onclick="switchView(event, 'islamic-tab')"><i class="fas fa-kaaba"></i><span>إسلاميات</span></button>
-        <button class="nav-btn" onclick="switchView(event, 'tasks-tab')"><i class="fas fa-list-check"></i><span>مهامي</span></button>
-        <button class="nav-btn" onclick="switchView(event, 'about-tab')"><i class="fas fa-id-card"></i><span>عني</span></button>
-    </nav>
+    <footer class="footer">
+        <p>تم التطوير بواسطة <b>عبدالرحمن الشديفات</b></p>
+    </footer>
 </div>
 
 <script src="script.js"></script>
