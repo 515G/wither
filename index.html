@@ -3,66 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>مساعدك اليومي | عبدالرحمن الشديفات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-card">
-    <div class="header">
-        <h1>Weather ☁️</h1>
-        <p class="designer">تصميم: J عبد الرحمن الشديفات</p>
-    </div>
-
     <div class="search-area">
-        <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
-        <button id="search-btn">🔍</button>
+        <input type="text" id="city-input" placeholder="ابحث عن مدينة..." autocomplete="off">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+        <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
     </div>
-    
-    <p id="msg-box" class="error-msg"></p>
 
-    <div class="tabs-content">
-        
-        <div id="weather-tab" class="tab-view active">
-            <div id="weather-info" style="display: none;">
-                <h2 id="city-name"></h2>
-                <h1 id="temp-display"></h1>
-                <p id="weather-desc"></p>
-                <div class="forecast" id="forecast-container"></div>
-            </div>
-            <div class="placeholder-msg">📍 ابحث عن مدينتك الآن</div>
-        </div>
+    <p id="msg-box" class="message"></p>
 
-        <div id="prayer-tab" class="tab-view">
-            <h3>🕋 مواقيت الصلاة</h3>
-            <div id="prayer-times" class="prayer-grid">
-                <p>قم بالبحث أولاً لتظهر المواقيت</p>
-            </div>
-        </div>
-
-        <div id="azkar-tab" class="tab-view">
-            <h3>📿 أذكار المسلم</h3>
-            <div class="azkar-card">
-                <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-                <button onclick="nextZekr()" class="zekr-btn">الذكر التالي ➡️</button>
-            </div>
-        </div>
-
-    </div> <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchView(event, 'weather-tab')">
-            <span class="emoji">☁️</span>
-            <span>الطقس</span>
-        </button>
-        <button class="nav-btn" onclick="switchView(event, 'prayer-tab')">
-            <span class="emoji">🕋</span>
-            <span>الصلاة</span>
-        </button>
-        <button class="nav-btn" onclick="switchView(event, 'azkar-tab')">
-            <span class="emoji">📿</span>
-            <span>الأذكار</span>
-        </button>
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'prayer-tab')"><i class="fas fa-mosque"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'azkar-tab')"><i class="fas fa-book-open"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'about-tab')"><i class="fas fa-info-circle"></i></button>
     </nav>
 
-</div> <script src="script.js"></script>
+    <div id="weather-tab" class="tab-content active">
+        <div id="weather-info" style="display: none;">
+            <h2 id="city-name"></h2>
+            <img id="main-icon" src="" alt="">
+            <h1 id="temp-display"></h1>
+            <p id="weather-desc"></p>
+            <div class="suggestion" id="outfit-msg"></div>
+            <div class="forecast" id="forecast-container"></div>
+        </div>
+    </div>
+
+    <div id="prayer-tab" class="tab-content">
+        <h3>مواقيت الصلاة</h3>
+        <div id="prayer-times" class="prayer-grid">
+            <p style="margin-top:20px; opacity:0.7">يرجى البحث عن مدينة لعرض المواقيت</p>
+        </div>
+    </div>
+
+    <div id="azkar-tab" class="tab-content">
+        <h3>أذكار المسلم</h3>
+        <div class="azkar-box">
+            <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
+            <button onclick="nextZekr()" class="next-btn">الذكر التالي</button>
+        </div>
+    </div>
+
+    <div id="about-tab" class="tab-content">
+        <p style="margin-top:20px;">تم التطوير بواسطة:<br><b>عبدالرحمن الشديفات</b></p>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
