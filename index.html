@@ -9,70 +9,48 @@
 </head>
 <body>
 
-<div class="app-card">
-    <div class="search-area">
-        <input type="text" id="city-input" placeholder="ابحث عن مدينة..." autocomplete="off">
-        <button id="search-btn"><i class="fas fa-search"></i></button>
-        <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
-    </div>
+<div class="container">
+    <header class="main-header">
+        <h1>Weather ☁️</h1>
+    </header>
 
-    <p id="msg-box" class="message"></p>
-
-    <div class="main-content">
-        <div id="weather-tab" class="tab-content active">
-            <div id="weather-info" style="display: none;">
-                <h2 id="city-name"></h2>
-                <h1 id="temp-display"></h1>
-                <p id="weather-desc"></p>
-                <div class="forecast" id="forecast-container"></div>
-            </div>
-            <p class="placeholder-msg">☁️ ابحث عن مدينتك لعرض حالة الجو</p>
+    <section class="search-card">
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="ابحث عن مدينتك..." autocomplete="off">
+            <button id="search-btn"><i class="fas fa-search"></i></button>
         </div>
+        <p id="msg-box" class="error-msg"></p>
+    </section>
 
-        <div id="prayer-tab" class="tab-content">
-            <h3>مواقيت الصلاة</h3>
-            <div id="prayer-times" class="prayer-grid">
-                <p style="opacity:0.7; margin-top:20px;">بانتظار تحديد الموقع...</p>
-            </div>
+    <section id="weather-section" class="app-section">
+        <div id="weather-info" style="display: none;">
+            <h2 id="city-name">--</h2>
+            <h1 id="temp-display">--°</h1>
+            <p id="weather-desc">--</p>
+            <div class="forecast" id="forecast-container"></div>
         </div>
+        <div id="weather-placeholder">أدخل المدينة لعرض الطقس</div>
+    </section>
 
-        <div id="azkar-tab" class="tab-content">
-            <h3>أذكار المسلم</h3>
-            <div class="azkar-box">
-                <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
-                <button onclick="nextZekr()" class="next-btn">الذكر التالي</button>
-            </div>
+    <section class="app-section">
+        <h3><i class="fas fa-mosque"></i> مواقيت الصلاة</h3>
+        <div id="prayer-times" class="prayer-grid">
+            <p>بانتظار البحث...</p>
         </div>
+    </section>
 
-        <div id="about-tab" class="tab-content">
-            <div class="dev-card">
-                <i class="fas fa-user-shield dev-icon"></i>
-                <p class="dev-label">تم التطوير بواسطة</p>
-                <h2 class="dev-name">عبدالرحمن الشديفات J<span class="j-badge">J</span></h2>
-                <p class="dev-bio">مطور واجهات برمجية ، أهتم بتقديم تجربة مستخدم فريدة وبسيطة.</p>
-                <div class="dev-footer">إصدار 2026.1.0</div>
-            </div>
+    <section class="app-section azkar-card">
+        <h3><i class="fas fa-book-open"></i> أذكار المسلم</h3>
+        <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
+        <button onclick="nextZekr()" class="btn-next">الذكر التالي</button>
+    </section>
+
+    <footer class="dev-section">
+        <div class="dev-badge">
+            <p>تم التطوير بواسطة</p>
+            <h2>عبدالرحمن الشديفات J<span class="j-mark">J</span></h2>
         </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="openTab(event, 'weather-tab')">
-            <i class="fas fa-cloud-sun"></i>
-            <span>الطقس</span>
-        </button>
-        <button class="nav-btn" onclick="openTab(event, 'prayer-tab')">
-            <i class="fas fa-mosque"></i>
-            <span>الصلاة</span>
-        </button>
-        <button class="nav-btn" onclick="openTab(event, 'azkar-tab')">
-            <i class="fas fa-book-open"></i>
-            <span>الأذكار</span>
-        </button>
-        <button class="nav-btn" onclick="openTab(event, 'about-tab')">
-            <i class="fas fa-info-circle"></i>
-            <span>المطور</span>
-        </button>
-    </nav>
+    </footer>
 </div>
 
 <script src="script.js"></script>
