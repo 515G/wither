@@ -1,29 +1,36 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
+const azkar = [
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
+    "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+    "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه",
+    "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد",
+    "سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلا إِلَهَ إِلا اللَّهُ"
+];
+let zekrIndex = 0;
+
+function nextZekr() {
+    zekrIndex = (zekrIndex + 1) % azkar.length;
+    document.getElementById("azkar-text").innerText = azkar[zekrIndex];
+}
+
 function openTab(evt, tabName) {
-    const contents = document.querySelectorAll(".tab-content");
-    contents.forEach(c => c.style.display = "none");
-    const buttons = document.querySelectorAll(".tab-btn");
-    buttons.forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.classList.add("active");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const searchBtn = document.getElementById("search-btn");
     const cityInput = document.getElementById("city-input");
-    const geoBtn = document.getElementById("geo-btn");
-
-    searchBtn.onclick = () => getWeatherData(cityInput.value);
-    cityInput.onkeydown = (e) => { if(e.key === "Enter") getWeatherData(cityInput.value); };
-    geoBtn.onclick = () => navigator.geolocation.getCurrentPosition(p => 
+    document.getElementById("search-btn").onclick = () => getWeatherData(cityInput.value);
+    cityInput.onkeydown = (e) => e.key === "Enter" && getWeatherData(cityInput.value);
+    document.getElementById("geo-btn").onclick = () => navigator.geolocation.getCurrentPosition(p => 
         getWeatherData(null, p.coords.latitude, p.coords.longitude));
 });
 
 async function getWeatherData(city, lat = null, lon = null) {
-    if (!city && lat === null) return;
     const msg = document.getElementById("msg-box");
-    const info = document.getElementById("weather-info");
     let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
     url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
 
@@ -38,15 +45,30 @@ async function getWeatherData(city, lat = null, lon = null) {
         document.getElementById("weather-desc").innerText = data.weather[0].description;
         document.getElementById("main-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
         
-        const outfit = document.getElementById("outfit-msg");
         const t = data.main.temp;
-        outfit.innerText = t < 15 ? "🧥 البس ثقيل" : t < 25 ? "👕 ملابس خفيفة" : "☀️ ملابس صيفية";
+        document.getElementById("outfit-msg").innerText = t < 15 ? "🧥 البس ثقيل" : t < 25 ? "👕 ملابس خفيفة" : "☀️ ملابس صيفية";
 
+        document.getElementById("weather-info").style.display = "block";
         getForecast(data.coord.lat, data.coord.lon);
-        info.style.display = "block";
+        getPrayerTimes(data.name); // جلب المواقيت لنفس المدينة
     } catch {
-        msg.innerText = "تعذر العثور على المدينة!";
-        info.style.display = "none";
+        msg.innerText = "تعذر العثور على البيانات!";
+    }
+}
+
+async function getPrayerTimes(city) {
+    try {
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=&method=4`);
+        const data = await res.json();
+        const t = data.data.timings;
+        document.getElementById("prayer-times").innerHTML = `
+            <div class="prayer-item"><span>الفجر</span> <span>${t.Fajr}</span></div>
+            <div class="prayer-item"><span>الظهر</span> <span>${t.Dhuhr}</span></div>
+            <div class="prayer-item"><span>العصر</span> <span>${t.Asr}</span></div>
+            <div class="prayer-item"><span>المغرب</span> <span>${t.Maghrib}</span></div>
+            <div class="prayer-item"><span>العشاء</span> <span>${t.Isha}</span></div>`;
+    } catch {
+        document.getElementById("prayer-times").innerHTML = "<p>فشل جلب مواقيت الصلاة</p>";
     }
 }
 
