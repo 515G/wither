@@ -1,42 +1,48 @@
-:root { --primary: #38bdf8; --bg: #0f172a; }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+:root {
+    --primary: #38bdf8;
+    --bg: #0f172a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
 body { background: var(--bg); color: white; height: 100vh; overflow: hidden; }
 
-.web-container { max-width: 450px; margin: 0 auto; height: 100vh; position: relative; }
+.web-app { max-width: 450px; margin: 0 auto; height: 100vh; position: relative; }
 
-/* إخفاء كل الأقسام بشكل افتراضي */
-.tab-view { 
-    display: none; 
-    padding: 30px 20px; 
-    height: calc(100vh - 70px); 
-    overflow-y: auto; 
+/* إخفاء الصفحات */
+.page {
+    display: none; /* هذا الأمر يخفي كل شيء */
+    height: calc(100vh - 70px);
+    padding: 30px 20px;
+    overflow-y: auto;
+    text-align: center;
 }
 
-/* إظهار القسم الذي لديه كلاس active فقط */
-.tab-view.active { 
-    display: block; 
+/* إظهار الصفحة النشطة فقط */
+.page.active { 
+    display: block; /* هذا يظهر الصفحة التي تضغط عليها فقط */
     animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* شريط التنقل السفلي */
-.bottom-nav {
+/* شريط التنقل */
+.tab-bar {
     position: absolute; bottom: 0; width: 100%; height: 70px;
-    display: flex; justify-content: space-around; align-items: center;
-    background: rgba(15, 23, 42, 0.9); border-top: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15, 23, 42, 0.95); display: flex; 
+    justify-content: space-around; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.nav-item { background: none; border: none; color: white; opacity: 0.4; cursor: pointer; text-align: center; }
-.nav-item.active { opacity: 1; color: var(--primary); }
-.nav-item i { display: block; font-size: 20px; }
-.nav-item span { font-size: 11px; }
+.tab-btn { background: none; border: none; color: white; opacity: 0.4; cursor: pointer; }
+.tab-btn.active { opacity: 1; color: var(--primary); }
+.tab-btn i { display: block; font-size: 20px; margin-bottom: 4px; }
+.tab-btn span { font-size: 11px; }
 
-/* تنسيقات إضافية */
-.search-area { display: flex; gap: 10px; margin-bottom: 20px; }
-.search-area input { flex: 1; padding: 10px; border-radius: 8px; border: none; outline: none; }
-.search-area button { padding: 10px 15px; border-radius: 8px; border: none; background: var(--primary); cursor: pointer; }
-.azkar-card, .dev-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; text-align: center; }
-.avatar { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; color: var(--bg); }
-.view-title { text-align: center; margin-bottom: 20px; color: var(--primary); }
+/* تنسيقات أخرى */
+.search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-box input { flex: 1; padding: 12px; border-radius: 10px; border: none; outline: none; }
+.search-box button { background: var(--primary); border: none; width: 45px; border-radius: 10px; cursor: pointer; }
+.azkar-box, .dev-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+.avatar { width: 70px; height: 70px; background: var(--primary); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; color: var(--bg); }
+#temp-display { font-size: 60px; color: var(--primary); margin: 15px 0; }
