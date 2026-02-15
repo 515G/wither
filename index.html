@@ -10,46 +10,57 @@
 <body>
 
 <div class="app-card">
-    <div class="search-area">
-        <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
-        <button id="search-btn"><i class="fas fa-search"></i></button>
-        <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
+    <div class="search-section">
+        <div class="search-bar">
+            <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
+            <button id="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <p id="msg-box" class="message"></p>
     </div>
 
-    <p id="msg-box" class="message"></p>
+    <div class="content-area">
+        <div id="weather-tab" class="tab-content active">
+            <div id="weather-info" style="display: none;">
+                <h2 id="city-name"></h2>
+                <h1 id="temp-display"></h1>
+                <p id="weather-desc"></p>
+                <div class="forecast" id="forecast-container"></div>
+            </div>
+            <div id="weather-placeholder">ابحث عن مدينة لعرض حالة الطقس</div>
+        </div>
 
-    <nav class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'tips-tab')"><i class="fas fa-lightbulb"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'about-tab')"><i class="fas fa-info-circle"></i></button>
-    </nav>
+        <div id="prayer-tab" class="tab-content">
+            <h3 class="tab-title">مواقيت الصلاة</h3>
+            <div id="prayer-times" class="prayer-grid">
+                <p>يرجى البحث عن مدينة أولاً</p>
+            </div>
+        </div>
 
-    <div id="weather-tab" class="tab-content active">
-        <div id="weather-info" class="weather-result" style="display: none;">
-            <h2 id="city-name"></h2>
-            <img id="main-icon" src="" alt="حالة الطقس">
-            <h1 id="temp-display"></h1>
-            <p id="weather-desc"></p>
-            <div class="suggestion" id="outfit-msg"></div>
-            <div class="forecast" id="forecast-container"></div>
+        <div id="azkar-tab" class="tab-content">
+            <h3 class="tab-title">أذكار المسلم</h3>
+            <div class="azkar-container">
+                <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
+                <button onclick="nextZekr()" class="zekr-btn">الذكر التالي</button>
+            </div>
         </div>
     </div>
 
-    <div id="tips-tab" class="tab-content">
-        <h3>نصائح الطقس</h3>
-        <ul class="tips-list">
-            <li>🧥 إذا كانت الحرارة تحت 15، ارتدِ ملابس ثقيلة.</li>
-            <li>☀️ في الأيام المشمسة، لا تنسَ شرب الماء.</li>
-        </ul>
-    </div>
-
-    <div id="about-tab" class="tab-content">
-        <h3>حول التطبيق</h3>
-        <p>تم التطوير بواسطة: <b>عبدالرحمن الشديفات</b></p>
-    </div>
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="openTab(event, 'weather-tab')">
+            <i class="fas fa-cloud-sun"></i>
+            <span>الطقس</span>
+        </button>
+        <button class="nav-item" onclick="openTab(event, 'prayer-tab')">
+            <i class="fas fa-mosque"></i>
+            <span>الصلاة</span>
+        </button>
+        <button class="nav-item" onclick="openTab(event, 'azkar-tab')">
+            <i class="fas fa-book-open"></i>
+            <span>الأذكار</span>
+        </button>
+    </nav>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
