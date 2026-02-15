@@ -1,114 +1,63 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// قائمة الأذكار الموسعة
-const azkar = [
-    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)",
-    "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
-    "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه",
-    "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد",
-    "سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلا إِلَهَ إِلا اللَّهُ، وَاللَّهُ أَكْبَر",
-    "أستغفر الله العظيم الذي لا إله إلا هو الحي القيوم وأتوب إليه",
-    "يا حي يا قيوم برحمتك أستغيث أصلح لي شأني كله ولا تكلني إلى نفسي طرفة عين",
-    "رضيت بالله رباً، وبالإسلام ديناً، وبمحمد صلى الله عليه وسلم نبياً",
-    "حسبنا الله ونعم الوكيل",
-    "لا إله إلا أنت سبحانك إني كنت من الظالمين",
-    "اللهم إنك عفو كريم تحب العفو فاعفُ عني",
-    "سُبْحَانَ اللهِ العَظِيمِ وَبِحَمْدِهِ",
-    "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
-    "اللهم إني أسألك علماً نافعاً، ورزقاً طيباً، وعملاً متقبلاً"
-];
-
-let zekrIndex = 0;
-
-// دالة الانتقال للذكر التالي
-function nextZekr() {
-    // نختار ذكر عشوائي في كل مرة ليكون التنوع أكبر
-    zekrIndex = Math.floor(Math.random() * azkar.length);
-    document.getElementById("azkar-text").innerText = azkar[zekrIndex];
-}
-function openTab(evt, tabName) {
-    document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById(tabName).style.display = "block";
+// 1. نظام تبديل الواجهات
+function switchView(evt, viewId) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(viewId).classList.add("active");
     evt.currentTarget.classList.add("active");
 }
 
+// 2. نظام الأذكار (قائمة كبيرة)
+const azkar = ["سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", "لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّه", "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد", "لا إله إلا أنت سبحانك إني كنت من الظالمين"];
+function nextZekr() {
+    const text = azkar[Math.floor(Math.random() * azkar.length)];
+    document.getElementById("azkar-text").innerText = text;
+}
+
+// 3. نظام المهام (Todo List)
+function addTodo() {
+    const input = document.getElementById("todo-input");
+    if (!input.value) return;
+    const li = document.createElement("li");
+    li.innerHTML = `${input.value} <i class="fas fa-trash" onclick="this.parentElement.remove()"></i>`;
+    document.getElementById("todo-list").appendChild(li);
+    input.value = "";
+}
+
+// 4. نظام الطقس والصلاة (الدمج)
 document.addEventListener("DOMContentLoaded", () => {
     const cityInput = document.getElementById("city-input");
-    const searchBtn = document.getElementById("search-btn");
-
-    // إجبار المتصفح على التركيز على صندوق النص
-    setTimeout(() => cityInput.focus(), 600);
-
-    searchBtn.onclick = () => getWeatherData(cityInput.value);
-    cityInput.onkeydown = (e) => {
-        if(e.key === "Enter") getWeatherData(cityInput.value);
-    };
-
-    document.getElementById("geo-btn").onclick = () => {
-        navigator.geolocation.getCurrentPosition(p => 
-            getWeatherData(null, p.coords.latitude, p.coords.longitude)
-        );
-    };
+    document.getElementById("search-btn").onclick = () => getWeatherData(cityInput.value);
+    cityInput.onkeydown = (e) => e.key === "Enter" && getWeatherData(cityInput.value);
+    cityInput.focus();
 });
 
-async function getWeatherData(city, lat = null, lon = null) {
-    if(!city && lat === null) return;
-    const msg = document.getElementById("msg-box");
-    let url = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&units=metric&lang=ar`;
-    url += city ? `&q=${encodeURIComponent(city)}` : `&lat=${lat}&lon=${lon}`;
-
+async function getWeatherData(city) {
+    if (!city) return;
     try {
-        const res = await fetch(url);
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
-        if(data.cod !== 200) throw new Error();
+        if(data.cod !== 200) return;
 
-        msg.innerText = "";
         document.getElementById("city-name").innerText = data.name;
         document.getElementById("temp-display").innerText = Math.round(data.main.temp) + "°";
         document.getElementById("weather-desc").innerText = data.weather[0].description;
-        document.getElementById("main-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-        
-        const t = data.main.temp;
-        document.getElementById("outfit-msg").innerText = t < 15 ? "🧥 البس ثقيل" : t < 25 ? "👕 ملابس خفيفة" : "☀️ ملابس صيفية";
-
         document.getElementById("weather-info").style.display = "block";
-        getForecast(data.coord.lat, data.coord.lon);
+        
         getPrayerTimes(data.name);
-    } catch {
-        msg.innerText = "تعذر العثور على البيانات!";
-    }
+    } catch { alert("خطأ في البيانات"); }
 }
 
 async function getPrayerTimes(city) {
-    try {
-        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=&method=4`);
-        const data = await res.json();
-        const t = data.data.timings;
-        document.getElementById("prayer-times").innerHTML = `
-            <div class="prayer-item"><span>الفجر</span> <span>${t.Fajr}</span></div>
-            <div class="prayer-item"><span>الظهر</span> <span>${t.Dhuhr}</span></div>
-            <div class="prayer-item"><span>العصر</span> <span>${t.Asr}</span></div>
-            <div class="prayer-item"><span>المغرب</span> <span>${t.Maghrib}</span></div>
-            <div class="prayer-item"><span>العشاء</span> <span>${t.Isha}</span></div>`;
-    } catch {
-        document.getElementById("prayer-times").innerHTML = "<p>فشل جلب مواقيت الصلاة</p>";
-    }
-}
-
-async function getForecast(lat, lon) {
-    const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`);
+    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
     const data = await res.json();
-    const container = document.getElementById("forecast-container");
-    container.innerHTML = "";
-    const seen = new Set();
-    data.list.forEach(item => {
-        const d = new Date(item.dt_txt);
-        const day = d.toLocaleDateString('ar-EG', {weekday: 'short'});
-        if (!seen.has(day) && d.getHours() >= 12 && seen.size < 4) {
-            seen.add(day);
-            container.innerHTML += `<div class="forecast-day"><p>${day}</p><img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png"><p>${Math.round(item.main.temp)}°</p></div>`;
-        }
-    });
+    const t = data.data.timings;
+    document.getElementById("prayer-city").innerText = `مواقيت الصلاة في ${city}`;
+    document.getElementById("prayer-times").innerHTML = `
+        <div class="prayer-item"><span>الفجر</span> <span>${t.Fajr}</span></div>
+        <div class="prayer-item"><span>الظهر</span> <span>${t.Dhuhr}</span></div>
+        <div class="prayer-item"><span>العصر</span> <span>${t.Asr}</span></div>
+        <div class="prayer-item"><span>المغرب</span> <span>${t.Maghrib}</span></div>
+        <div class="prayer-item"><span>العشاء</span> <span>${t.Isha}</span></div>`;
 }
-
