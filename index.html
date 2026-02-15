@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>مساعدك اليومي | عبدالرحمن الشديفات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,7 @@
 
 <div class="app-card">
     <div class="search-area">
-        <input type="text" id="city-input" placeholder="اكتب اسم المدينة..." autocomplete="off">
+        <input type="text" id="city-input" placeholder="ابحث عن مدينة..." autocomplete="off">
         <button id="search-btn"><i class="fas fa-search"></i></button>
         <button id="geo-btn"><i class="fas fa-location-arrow"></i></button>
     </div>
@@ -20,14 +20,15 @@
 
     <nav class="tabs">
         <button class="tab-btn active" onclick="openTab(event, 'weather-tab')"><i class="fas fa-sun"></i></button>
-        <button class="tab-btn" onclick="openTab(event, 'tips-tab')"><i class="fas fa-lightbulb"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'prayer-tab')"><i class="fas fa-mosque"></i></button>
+        <button class="tab-btn" onclick="openTab(event, 'azkar-tab')"><i class="fas fa-book-open"></i></button>
         <button class="tab-btn" onclick="openTab(event, 'about-tab')"><i class="fas fa-info-circle"></i></button>
     </nav>
 
     <div id="weather-tab" class="tab-content active">
-        <div id="weather-info" class="weather-result" style="display: none;">
+        <div id="weather-info" style="display: none;">
             <h2 id="city-name"></h2>
-            <img id="main-icon" src="" alt="حالة الطقس">
+            <img id="main-icon" src="" alt="">
             <h1 id="temp-display"></h1>
             <p id="weather-desc"></p>
             <div class="suggestion" id="outfit-msg"></div>
@@ -35,17 +36,23 @@
         </div>
     </div>
 
-    <div id="tips-tab" class="tab-content">
-        <h3>نصائح الطقس</h3>
-        <ul class="tips-list">
-            <li>🧥 إذا كانت الحرارة تحت 15، ارتدِ ملابس ثقيلة.</li>
-            <li>☀️ في الأيام المشمسة، لا تنسَ شرب الماء.</li>
-        </ul>
+    <div id="prayer-tab" class="tab-content">
+        <h3>مواقيت الصلاة</h3>
+        <div id="prayer-times" class="prayer-grid">
+            <p style="margin-top:20px; opacity:0.7">يرجى البحث عن مدينة لعرض المواقيت</p>
+        </div>
+    </div>
+
+    <div id="azkar-tab" class="tab-content">
+        <h3>أذكار المسلم</h3>
+        <div class="azkar-box">
+            <p id="azkar-text">ألا بذكر الله تطمئن القلوب</p>
+            <button onclick="nextZekr()" class="next-btn">الذكر التالي</button>
+        </div>
     </div>
 
     <div id="about-tab" class="tab-content">
-        <h3>حول التطبيق</h3>
-        <p>تم التطوير بواسطة: <b>عبدالرحمن الشديفات</b></p>
+        <p style="margin-top:20px;">تم التطوير بواسطة:<br><b>عبدالرحمن الشديفات</b></p>
     </div>
 </div>
 
