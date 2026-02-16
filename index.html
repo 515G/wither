@@ -3,113 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>نَسيم | Naseem</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #38bdf8;
-            --bg: #0f172a;
-            --card: rgba(255, 255, 255, 0.06);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-
-        body { 
-            background: var(--bg); 
-            color: white; 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            overflow: hidden; 
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            position: relative;
-            background: radial-gradient(circle at top, #1e293b, #0f172a);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .page {
-            display: none;
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            text-align: center;
-            padding-bottom: 90px;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .nav-bar {
-            position: absolute; bottom: 0; width: 100%;
-            height: 75px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-        }
-
-        .nav-item { color: white; opacity: 0.4; text-align: center; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--primary); }
-        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
-        .nav-item span { font-size: 11px; font-weight: bold; }
-
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-box input { 
-            flex: 1; padding: 12px; border-radius: 12px; border: none; 
-            background: var(--card); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .search-box button { 
-            background: var(--primary); border: none; width: 50px; 
-            border-radius: 12px; cursor: pointer; color: #000;
-        }
-
-        .info-card { 
-            background: var(--card); padding: 20px; border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1); margin-top: 15px;
-        }
-
-        /* تنسيق قسم الـ 5 أيام */
-        .forecast-container {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin-top: 15px;
-        }
-        .forecast-item {
-            background: rgba(255,255,255,0.05);
-            padding: 10px 5px;
-            border-radius: 10px;
-            font-size: 11px;
-        }
-        .forecast-item img { width: 30px; }
-        .forecast-item b { display: block; color: var(--primary); margin-top: 5px; }
-
-        h1 { font-size: 50px; color: var(--primary); margin: 5px 0; }
-        .prayer-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        .dev-badge {
-            width: 70px; height: 70px; background: var(--primary); 
-            border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; margin: 0 auto 15px;
-            font-size: 30px; font-weight: bold; color: #000;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -125,33 +21,39 @@
             <h1 id="out-temp">--°</h1>
             <p id="out-desc">ابحث لترى النتائج</p>
         </div>
-
         <div id="forecast-section" style="display: none; margin-top: 25px;">
-            <p style="text-align: right; color: var(--primary); font-size: 13px; margin-bottom: 10px;">توقعات 5 أيام:</p>
+            <p class="section-label">توقعات 5 أيام:</p>
             <div id="out-forecast" class="forecast-container"></div>
         </div>
     </section>
 
     <section id="prayer" class="page">
-        <h2 style="margin-bottom:20px;">🕋 مواقيت الصلاة</h2>
+        <h2 class="page-title">🕋 مواقيت الصلاة</h2>
         <div id="prayer-output" class="info-card"><p>يرجى البحث عن مدينة أولاً</p></div>
     </section>
 
     <section id="azkar" class="page">
-        <h2>📿 أذكار المسلم</h2>
+        <h2 class="page-title">📿 الذاكر</h2>
         <div class="info-card">
             <p id="zekr-text">ألا بذكر الله تطمئن القلوب</p>
-            <button onclick="nextZekr()" style="margin-top:20px; padding:10px 20px; border-radius:10px; border:none; background:var(--primary); cursor:pointer; font-weight:bold;">الذكر التالي</button>
+            <div class="counter-box">
+                <span id="zekr-count">0</span>
+                <button class="sebha-btn" onclick="incrementCount()">تسبيح</button>
+            </div>
+            <div class="control-btns">
+                <button onclick="resetZekr()" class="btn-icon"><i class="fas fa-redo"></i></button>
+                <button onclick="nextZekr()" class="btn-main">الذكر التالي</button>
+            </div>
         </div>
     </section>
 
     <section id="about" class="page">
         <div class="info-card">
             <div class="dev-badge">J A</div>
-            <h2 style="color:var(--primary)">عبدالرحمن الشديفات</h2>
-            <p>Full-Stack Developer</p>
-            <hr style="opacity:0.1; margin: 15px 0;">
-            <p>.هذا التطبيق يعمل بنظام الواجهات المنفصلة (Single Page Application) لضمان سرعة التنقل دون الحاجة لإعادة تحميل الصفحة."</p>
+            <h2 class="dev-name">عبدالرحمن الشديفات</h2>
+            <p class="dev-title">Full-Stack Developer</p>
+            <hr class="divider">
+            <p class="dev-text">"هذا التطبيق يعمل بنظام الواجهات المنفصلة (Single Page Application) لضمان سرعة التنقل دون الحاجة لإعادة تحميل الصفحة."</p>
         </div>
     </section>
 
@@ -163,81 +65,6 @@
     </nav>
 </div>
 
-<script>
-    const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
-
-    function showPage(pageId, element) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        element.classList.add('active');
-    }
-
-    async function getWeather() {
-        const city = document.getElementById("city-input").value;
-        if(!city) return;
-
-        try {
-            // 1. جلب طقس اليوم اللحظي
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
-            const data = await res.json();
-            
-            document.getElementById("out-city").innerText = data.name;
-            document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
-            document.getElementById("out-desc").innerText = data.weather[0].description;
-            
-            // 2. جلب توقعات 5 أيام (الميزة الجديدة)
-            getFiveDayForecast(city);
-            
-            getPrayers(city);
-        } catch { alert("خطأ في اسم المدينة!"); }
-    }
-
-    async function getFiveDayForecast(city) {
-        try {
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
-            const data = await res.json();
-            
-            const forecastDiv = document.getElementById("out-forecast");
-            forecastDiv.innerHTML = "";
-
-            // فلترة البيانات لأخذ قراءة واحدة لكل يوم (كل 8 قراءات لأن التوقع كل 3 ساعات)
-            for (let i = 0; i < data.list.length; i += 8) {
-                const day = data.list[i];
-                const date = new Date(day.dt * 1000);
-                const dayName = date.toLocaleDateString('ar-JO', { weekday: 'short' });
-                
-                forecastDiv.innerHTML += `
-                    <div class="forecast-item">
-                        <div>${dayName}</div>
-                        <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
-                        <b>${Math.round(day.main.temp)}°</b>
-                    </div>
-                `;
-            }
-            document.getElementById("forecast-section").style.display = "block";
-        } catch (e) { console.error("Forecast Error", e); }
-    }
-
-    async function getPrayers(city) {
-        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
-        const d = await res.json();
-        const t = d.data.timings;
-        const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-        const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
-        let html = '';
-        times.forEach((time, i) => {
-            html += `<div class="prayer-row"><span>${names[i]}</span><b>${t[time]}</b></div>`;
-        });
-        document.getElementById("prayer-output").innerHTML = html;
-    }
-
-    const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لا إِلَهَ إِلا اللَّهُ", "اللَّهُ أَكْبَرُ"];
-    function nextZekr() {
-        document.getElementById("zekr-text").innerText = azkar[Math.floor(Math.random()*azkar.length)];
-    }
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
-
