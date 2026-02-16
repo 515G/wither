@@ -1,53 +1,194 @@
 :root {
     --primary: #38bdf8;
     --bg: #0f172a;
-    --card: rgba(255, 255, 255, 0.06);
+    --card: rgba(255, 255, 255, 0.08);
+    --text: #f8fafc;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+/* إعدادات عامة */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
 
-body { background: var(--bg); color: white; height: 100vh; display: flex; justify-content: center; overflow: hidden; }
+body { 
+    background: var(--bg); 
+    color: var(--text); 
+    height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    overflow: hidden; 
+}
 
+/* الحاوية الرئيسية */
 .app-container {
-    width: 100%; max-width: 450px; height: 100vh; position: relative;
+    width: 100%; 
+    max-width: 450px; 
+    height: 100vh; 
+    position: relative;
     background: radial-gradient(circle at top, #1e293b, #0f172a);
-    display: flex; flex-direction: column;
+    display: flex; 
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
 }
 
-.page { display: none; flex: 1; padding: 20px; overflow-y: auto; text-align: center; padding-bottom: 90px; }
-.page.active { display: block; animation: fadeIn 0.4s ease-out; }
+/* الصفحات والأنيميشن */
+.page { 
+    display: none; 
+    flex: 1; 
+    padding: 25px; 
+    overflow-y: auto; 
+    text-align: center; 
+    padding-bottom: 100px; 
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+.page.active { 
+    display: block; 
+    animation: slideUp 0.4s ease-out; 
+}
 
+@keyframes slideUp { 
+    from { opacity: 0; transform: translateY(15px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* شريط البحث */
+.search-box { 
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 25px; 
+}
+
+.search-box input { 
+    flex: 1; 
+    padding: 14px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    background: var(--card); 
+    color: white; 
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-box input:focus {
+    border-color: var(--primary);
+    background: rgba(255,255,255,0.12);
+}
+
+.search-box button { 
+    background: var(--primary); 
+    border: none; 
+    width: 55px; 
+    border-radius: 15px; 
+    cursor: pointer; 
+    color: #0f172a;
+    font-size: 1.1rem;
+    transition: 0.3s;
+}
+
+.search-box button:hover { opacity: 0.9; transform: scale(1.05); }
+
+/* كروت المعلومات */
+.info-card { 
+    background: var(--card); 
+    padding: 25px; 
+    border-radius: 25px; 
+    border: 1px solid rgba(255,255,255,0.05); 
+    margin-top: 15px;
+    backdrop-filter: blur(10px);
+}
+
+/* الطقس والـ 5 أيام */
+#out-temp { font-size: 4rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
+
+.forecast-container { 
+    display: grid; 
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 8px; 
+    margin-top: 20px; 
+}
+
+.forecast-item { 
+    background: rgba(255,255,255,0.04); 
+    padding: 12px 5px; 
+    border-radius: 15px; 
+    font-size: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+.forecast-item img { width: 35px; }
+.forecast-item b { display: block; color: var(--primary); margin-top: 5px; }
+
+/* الأذكار والسبحة */
+#zekr-text { font-size: 1.2rem; min-height: 80px; display: flex; align-items: center; justify-content: center; line-height: 1.6; }
+
+.counter-box { margin: 25px 0; }
+#zekr-count { font-size: 3.5rem; font-weight: bold; color: var(--primary); display: block; margin-bottom: 15px; }
+
+.sebha-btn { 
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    border: 4px solid var(--primary); 
+    background: transparent; 
+    color: white; 
+    font-weight: bold; 
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.sebha-btn:active { transform: scale(0.9); background: rgba(56, 189, 248, 0.1); }
+
+/* أزرار التحكم السفلى داخل الكرت */
+.control-btns { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+.btn-main { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--primary); font-weight: bold; cursor: pointer; color: #0f172a; }
+.btn-icon { padding: 14px; border-radius: 12px; border: 1px solid var(--primary); background: transparent; color: var(--primary); cursor: pointer; }
+
+/* مواقيت الصلاة */
+.prayer-row { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 14px 10px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+}
+.prayer-row:last-child { border-bottom: none; }
+.prayer-row b { color: var(--primary); }
+
+/* واجهة المطور */
+.dev-badge { 
+    width: 80px; 
+    height: 80px; 
+    background: var(--primary); 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin: 0 auto 15px; 
+    font-size: 28px; 
+    font-weight: bold; 
+    color: #0f172a; 
+}
+
+.divider { opacity: 0.1; margin: 20px 0; border: 0.5px solid #fff; }
+
+/* شريط الملاحة السفلي (Nav Bar) */
 .nav-bar {
-    position: absolute; bottom: 0; width: 100%; height: 75px;
-    background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
-    display: flex; justify-content: space-around; align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100;
+    position: absolute; 
+    bottom: 0; 
+    width: 100%; 
+    height: 85px;
+    background: rgba(15, 23, 42, 0.98); 
+    backdrop-filter: blur(15px);
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08); 
+    z-index: 100;
 }
-.nav-item { color: white; opacity: 0.4; text-align: center; cursor: pointer; flex: 1; transition: 0.3s; }
-.nav-item.active { opacity: 1; color: var(--primary); }
-.nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
-.nav-item span { font-size: 11px; font-weight: bold; }
 
-.search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-.search-box input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: var(--card); color: white; outline: none; }
-.search-box button { background: var(--primary); border: none; width: 50px; border-radius: 12px; cursor: pointer; color: #000; }
-
-.forecast-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 15px; }
-.forecast-item { background: rgba(255,255,255,0.05); padding: 10px 5px; border-radius: 10px; font-size: 11px; }
-.forecast-item img { width: 30px; }
-
-.info-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-top: 15px; }
-#zekr-count { font-size: 45px; font-weight: bold; color: var(--primary); display: block; margin-bottom: 10px; }
-.sebha-btn { width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--primary); background: transparent; color: white; font-weight: bold; cursor: pointer; }
-.sebha-btn:active { transform: scale(0.9); }
-
-.control-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-.btn-main { padding: 10px 20px; border-radius: 10px; border: none; background: var(--primary); font-weight: bold; cursor: pointer; }
-.btn-icon { padding: 10px; border-radius: 10px; border: 1px solid var(--primary); background: transparent; color: white; cursor: pointer; }
-
-.prayer-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.dev-badge { width: 75px; height: 75px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold; color: #000; }
-.divider { opacity: 0.1; margin: 15px 0; }
-.dev-text { line-height: 1.6; }
+.nav-item { color: white; opacity: 0.4; text-align: center; cursor: pointer; flex: 1; transition: 0.3s; padding: 10px 0; }
+.nav-item.active {
