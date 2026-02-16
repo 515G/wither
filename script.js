@@ -1,5 +1,13 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
-
+// دالة تحويل الوقت لنظام 12 ساعة
+function formatTime12(time) {
+    if (!time) return "--:--";
+    let [hours, minutes] = time.split(':');
+    hours = parseInt(hours);
+    const ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12 || 12; // تحويل الساعة 0 لـ 12
+    return `${hours}:${minutes} ${ampm}`;
+}
 // 1. التبديل بين الواجهات (Tabs)
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -87,3 +95,4 @@ const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلّ
 function nextZekr() {
     document.getElementById("zekr-text").innerText = azkar[Math.floor(Math.random()*azkar.length)];
 }
+
