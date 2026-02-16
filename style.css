@@ -1,52 +1,53 @@
 :root {
-    --cyan: #00d2ff;
-    --dark: #0a0e17;
-    --glass: rgba(255, 255, 255, 0.05);
+    --primary: #38bdf8;
+    --bg: #0f172a;
+    --card: rgba(255, 255, 255, 0.06);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
-body { background: var(--dark); color: white; height: 100vh; overflow: hidden; }
+body { background: var(--bg); color: white; height: 100vh; display: flex; justify-content: center; overflow: hidden; }
 
-.app-frame { max-width: 480px; margin: 0 auto; height: 100vh; position: relative; background: radial-gradient(circle at top, #16213e, #0a0e17); }
-
-/* --- الواجهات المنفصلة --- */
-.page-container {
-    display: none; /* مخفي تماماً بشكل افتراضي */
-    height: calc(100vh - 80px);
-    padding: 30px 20px;
-    overflow-y: auto;
+.app-container {
+    width: 100%; max-width: 450px; height: 100vh; position: relative;
+    background: radial-gradient(circle at top, #1e293b, #0f172a);
+    display: flex; flex-direction: column;
 }
 
-.page-container.active { 
-    display: flex; /* يظهر فقط عند الضغط */
-    flex-direction: column;
-    align-items: center;
-    animation: fadeIn 0.4s ease;
-}
+.page { display: none; flex: 1; padding: 20px; overflow-y: auto; text-align: center; padding-bottom: 90px; }
+.page.active { display: block; animation: fadeIn 0.4s ease-out; }
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-/* --- شريط التنقل --- */
-.footer-nav {
-    position: absolute; bottom: 0; width: 100%; height: 80px;
+.nav-bar {
+    position: absolute; bottom: 0; width: 100%; height: 75px;
+    background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
     display: flex; justify-content: space-around; align-items: center;
-    background: rgba(10, 14, 23, 0.95); border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100;
 }
+.nav-item { color: white; opacity: 0.4; text-align: center; cursor: pointer; flex: 1; transition: 0.3s; }
+.nav-item.active { opacity: 1; color: var(--primary); }
+.nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+.nav-item span { font-size: 11px; font-weight: bold; }
 
-.nav-link { text-align: center; cursor: pointer; color: #fff; opacity: 0.3; transition: 0.3s; }
-.nav-link.active { opacity: 1; color: var(--cyan); transform: translateY(-5px); }
-.nav-link i { font-size: 24px; display: block; margin-bottom: 5px; }
-.nav-link span { font-size: 12px; font-weight: bold; }
+.search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-box input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: var(--card); color: white; outline: none; }
+.search-box button { background: var(--primary); border: none; width: 50px; border-radius: 12px; cursor: pointer; color: #000; }
 
-/* --- تصميم المكونات --- */
-.search-wrapper { display: flex; width: 100%; gap: 10px; margin-bottom: 40px; }
-.search-wrapper input { flex: 1; padding: 15px; border-radius: 15px; border: none; background: var(--glass); color: white; outline: none; border: 1px solid rgba(255,255,255,0.1); }
-.search-wrapper button { width: 55px; border-radius: 15px; border: none; background: var(--cyan); color: #000; font-size: 18px; cursor: pointer; }
+.forecast-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 15px; }
+.forecast-item { background: rgba(255,255,255,0.05); padding: 10px 5px; border-radius: 10px; font-size: 11px; }
+.forecast-item img { width: 30px; }
 
-#temp-val { font-size: 70px; font-weight: bold; color: var(--cyan); margin: 20px 0; }
-.prayer-box, .azkar-display, .dev-card-premium { background: var(--glass); width: 100%; padding: 25px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+.info-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-top: 15px; }
+#zekr-count { font-size: 45px; font-weight: bold; color: var(--primary); display: block; margin-bottom: 10px; }
+.sebha-btn { width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--primary); background: transparent; color: white; font-weight: bold; cursor: pointer; }
+.sebha-btn:active { transform: scale(0.9); }
 
-.logo-j { width: 80px; height: 80px; background: var(--cyan); color: #000; font-size: 40px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 20px rgba(0,210,255,0.4); }
-.btn-refresh { background: var(--cyan); border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-.hidden { display: none; }
+.control-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+.btn-main { padding: 10px 20px; border-radius: 10px; border: none; background: var(--primary); font-weight: bold; cursor: pointer; }
+.btn-icon { padding: 10px; border-radius: 10px; border: 1px solid var(--primary); background: transparent; color: white; cursor: pointer; }
+
+.prayer-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.dev-badge { width: 75px; height: 75px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold; color: #000; }
+.divider { opacity: 0.1; margin: 15px 0; }
+.dev-text { line-height: 1.6; }
