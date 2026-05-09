@@ -17,11 +17,12 @@ function formatTime12(time) {
 }
 
 async function getWeather() {
-    const city = document.getElementById("city-input").value;
+    const city = document.getElementById("city-input").value.trim();
     if (!city) return;
     try {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
+        if (data.cod !== 200) { alert("المدينة غير موجودة!"); return; }
         document.getElementById("out-city").innerText = "📍 " + data.name;
         document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
         document.getElementById("out-desc").innerText = data.weather[0].description;
@@ -32,7 +33,10 @@ async function getWeather() {
         localStorage.setItem('lastCity', city);
         getFiveDayForecast(city);
         getPrayers(city);
-    } catch { alert("خطأ في اسم المدينة!"); }
+    } catch (e) {
+        alert("حدث خطأ، تحقق من اتصالك بالإنترنت!");
+        console.error(e);
+    }
 }
 
 async function getFiveDayForecast(city) {
@@ -64,19 +68,16 @@ async function getPrayers(city) {
         const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
         const now = new Date();
         const currentMins = now.getHours() * 60 + now.getMinutes();
-        let nextIndex = -1;
         const prayerMins = times.map(p => {
             const [h, m] = t[p].split(':').map(Number);
             return h * 60 + m;
         });
-        for (let i = 0; i < prayerMins.length; i++) {
-            if (prayerMins[i] > currentMins) { nextIndex = i; break; }
-        }
+        let nextIndex = prayerMins.findIndex(m => m > currentMins);
         let html = '';
         times.forEach((time, i) => {
             const isNext = i === nextIndex;
             html += `<div class="prayer-row${isNext ? ' next-prayer' : ''}">
-                <span>${names[i]} ${isNext ? '🔔' : ''}</span>
+                <span>${names[i]}${isNext ? ' 🔔' : ''}</span>
                 <b>${formatTime12(t[time])}</b>
             </div>`;
         });
