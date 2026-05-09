@@ -18,13 +18,18 @@ function formatTime12(time) {
 
 async function getWeather() {
     const city = document.getElementById("city-input").value;
-    if(!city) return;
+    if (!city) return;
     try {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
-        document.getElementById("out-city").innerText = data.name;
+        document.getElementById("out-city").innerText = "📍 " + data.name;
         document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
         document.getElementById("out-desc").innerText = data.weather[0].description;
+        document.getElementById("out-humidity").innerText = data.main.humidity + "%";
+        document.getElementById("out-wind").innerText = Math.round(data.wind.speed * 3.6) + " كم/س";
+        document.getElementById("out-feels").innerText = Math.round(data.main.feels_like) + "°";
+        document.getElementById("out-details").style.display = "flex";
+        localStorage.setItem('lastCity', city);
         getFiveDayForecast(city);
         getPrayers(city);
     } catch { alert("خطأ في اسم المدينة!"); }
@@ -51,20 +56,44 @@ async function getFiveDayForecast(city) {
 }
 
 async function getPrayers(city) {
-    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
-    const d = await res.json();
-    const t = d.data.timings;
-    const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-    const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
-    let html = '';
-    times.forEach((time, i) => {
-        html += `<div class="prayer-row"><span>${names[i]}</span><b>${formatTime12(t[time])}</b></div>`;
-    });
-    document.getElementById("prayer-output").innerHTML = html;
+    try {
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
+        const d = await res.json();
+        const t = d.data.timings;
+        const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
+        const now = new Date();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        let nextIndex = -1;
+        const prayerMins = times.map(p => {
+            const [h, m] = t[p].split(':').map(Number);
+            return h * 60 + m;
+        });
+        for (let i = 0; i < prayerMins.length; i++) {
+            if (prayerMins[i] > currentMins) { nextIndex = i; break; }
+        }
+        let html = '';
+        times.forEach((time, i) => {
+            const isNext = i === nextIndex;
+            html += `<div class="prayer-row${isNext ? ' next-prayer' : ''}">
+                <span>${names[i]} ${isNext ? '🔔' : ''}</span>
+                <b>${formatTime12(t[time])}</b>
+            </div>`;
+        });
+        document.getElementById("prayer-output").innerHTML = html;
+    } catch (e) { console.error(e); }
 }
 
 let count = 0;
-const azkar = ["سُبْحَانَ اللَّهِ", "الْحَمْدُ لِلَّهِ", "لَا إِلَهَ إِلَّا اللَّهُ", "اللَّهُ أَكْبَرُ", "أستغفر الله"];
+const azkar = [
+    "سُبْحَانَ اللَّهِ",
+    "الْحَمْدُ لِلَّهِ",
+    "لَا إِلَهَ إِلَّا اللَّهُ",
+    "اللَّهُ أَكْبَرُ",
+    "أستغفر الله العظيم",
+    "سبحان الله وبحمده",
+    "لا حول ولا قوة إلا بالله"
+];
 
 function incrementCount() {
     count++;
@@ -73,7 +102,7 @@ function incrementCount() {
 }
 
 function nextZekr() {
-    document.getElementById("zekr-text").innerText = azkar[Math.floor(Math.random()*azkar.length)];
+    document.getElementById("zekr-text").innerText = azkar[Math.floor(Math.random() * azkar.length)];
     resetZekr();
 }
 
@@ -81,3 +110,14 @@ function resetZekr() {
     count = 0;
     document.getElementById("zekr-count").innerText = count;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('city-input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') getWeather();
+    });
+    const saved = localStorage.getItem('lastCity');
+    if (saved) {
+        document.getElementById('city-input').value = saved;
+        getWeather();
+    }
+});
