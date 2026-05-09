@@ -62,7 +62,6 @@ async function getFiveDayForecast(city) {
 }
 
 // ===== الصلاة والعداد التنازلي =====
-let prayerTimesData = null;
 let countdownInterval = null;
 
 async function getPrayers(city) {
@@ -70,7 +69,6 @@ async function getPrayers(city) {
         const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
         const d = await res.json();
         const t = d.data.timings;
-        prayerTimesData = t;
         const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
         const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
         const now = new Date();
@@ -90,11 +88,11 @@ async function getPrayers(city) {
             </div>`;
         });
         document.getElementById("prayer-output").innerHTML = html;
-        startCountdown(times, names, prayerMins, nextIndex);
+        startCountdown(names, prayerMins);
     } catch (e) { console.error(e); }
 }
 
-function startCountdown(times, names, prayerMins, nextIndex) {
+function startCountdown(names, prayerMins) {
     if (countdownInterval) clearInterval(countdownInterval);
     document.getElementById("prayer-countdown").style.display = "block";
 
@@ -102,21 +100,26 @@ function startCountdown(times, names, prayerMins, nextIndex) {
         const now = new Date();
         const currentMins = now.getHours() * 60 + now.getMinutes();
         const currentSecs = now.getSeconds();
-        let targetMins = prayerMins[nextIndex];
-        let diffSecs = (targetMins - currentMins) * 60 - currentSecs;
-        if (diffSecs < 0) {
-            let newNext = prayerMins.findIndex(m => m > currentMins);
-            if (newNext === -1) newNext = 0;
-            nextIndex = newNext;
-            targetMins = prayerMins[nextIndex];
-            diffSecs = (targetMins - currentMins) * 60 - currentSecs;
+
+        let idx = prayerMins.findIndex(m => m > currentMins);
+
+        let diffSecs;
+        if (idx === -1) {
+            // كل الصلوات انتهت، باقي على فجر الغد
+            idx = 0;
+            const minsToMidnight = 1440 - currentMins;
+            const minsFromMidnight = prayerMins[0];
+            diffSecs = (minsToMidnight + minsFromMidnight) * 60 - currentSecs;
+        } else {
+            diffSecs = (prayerMins[idx] - currentMins) * 60 - currentSecs;
         }
+
         const h = Math.floor(diffSecs / 3600);
         const m = Math.floor((diffSecs % 3600) / 60);
         const s = diffSecs % 60;
-        const pad = n => String(n).padStart(2, '0');
+        const pad = n => String(Math.abs(n)).padStart(2, '0');
         document.getElementById("countdown-timer").innerText = `${pad(h)}:${pad(m)}:${pad(s)}`;
-        document.getElementById("countdown-next").innerText = `الصلاة القادمة: ${names[nextIndex]}`;
+        document.getElementById("countdown-next").innerText = `الصلاة القادمة: ${names[idx]}`;
     }
 
     update();
