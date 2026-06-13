@@ -85,7 +85,7 @@
             <p class="dev-title">Full-Stack Developer</p>
             <hr class="divider">
             <p class="dev-text">"هذا التطبيق يعمل بنظام الواجهات المنفصلة (Single Page Application) لضمان سرعة التنقل دون الحاجة لإعادة تحميل الصفحة."</p>
-            <p class="dev-title">v2.10</p>
+            <p class="dev-title">v2.09</p>
         </div>
     </section>
 
@@ -95,6 +95,14 @@
         <div class="nav-item" onclick="showPage('azkar', this)"><i class="fas fa-book-open"></i><span>الأذكار</span></div>
         <div class="nav-item" onclick="showPage('about', this)"><i class="fas fa-user-circle"></i><span>المطور</span></div>
     </nav>
+
+    <div id="ayah-overlay" class="ayah-overlay"></div>
+    <div id="ayah-banner" class="ayah-banner">
+        <i class="fas fa-xmark ayah-close" onclick="dismissAyah()"></i>
+        <i class="fas fa-feather ayah-icon"></i>
+        <span class="ayah-label" id="ayah-label">آية كريمة</span>
+        <p id="ayah-text"></p>
+    </div>
 
 </div>
 <script src="script.js"></script>
