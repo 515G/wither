@@ -29,8 +29,6 @@ body {
     height: 100vh;
     position: relative;
     background: radial-gradient(ellipse at 30% 10%, #1a3a5c 0%, #0a1628 40%, #060d1f 100%);
-    display: flex;
-    flex-direction: column;
     box-shadow: 0 0 80px rgba(30,100,200,0.25);
     overflow: hidden;
 }
@@ -385,7 +383,6 @@ body {
 .nav-item i    { font-size: 1.3rem; display: block; margin-bottom: 3px; }
 .nav-item span { font-size: 11px; font-family: 'Amiri', serif; }
 
-/* الأذكار - التبويبات */
 .azkar-tabs {
     display: flex;
     gap: 8px;
@@ -468,4 +465,77 @@ body {
     font-size: 14px;
     color: rgba(255,255,255,0.6);
     margin-top: 6px;
+}
+
+/* بانر الآية / الحديث */
+.ayah-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 250;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.ayah-overlay.show { opacity: 1; }
+
+.ayah-banner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 82%;
+    max-width: 360px;
+    transform: translate(-50%, -50%) scale(0.92);
+    background: rgba(10, 22, 45, 0.92);
+    border: 1px solid rgba(56,189,248,0.3);
+    border-radius: 22px;
+    padding: 26px 22px 22px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 50px rgba(56,189,248,0.2), 0 15px 40px rgba(0,0,0,0.5);
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.ayah-banner.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+
+.ayah-close {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.ayah-close:hover { color: rgba(255,255,255,0.7); }
+
+.ayah-icon {
+    color: #38bdf8;
+    font-size: 1.4rem;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.85;
+}
+
+.ayah-label {
+    display: block;
+    font-size: 11px;
+    color: rgba(56,189,248,0.75);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+#ayah-text {
+    font-size: 1.15rem;
+    line-height: 2;
+    color: rgba(255,255,255,0.92);
 }
