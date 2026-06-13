@@ -6,6 +6,12 @@ function showPage(pageId, element) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     element.classList.add('active');
+
+    if (pageId === 'azkar') {
+        startAyahBanner();
+    } else {
+        stopAyahBanner();
+    }
 }
 
 // ===== الطقس =====
@@ -105,7 +111,6 @@ function startCountdown(names, prayerMins) {
 
         let diffSecs;
         if (idx === -1) {
-            // كل الصلوات انتهت، باقي على فجر الغد
             idx = 0;
             const minsToMidnight = 1440 - currentMins;
             const minsFromMidnight = prayerMins[0];
@@ -216,6 +221,58 @@ function resetZekr() {
     const zekr = azkarData[currentCategory][currentZekrIndex];
     document.getElementById("zekr-count").innerText = 0;
     updateProgress(0, zekr.count);
+}
+
+// ===== بانر آية/حديث دوري (صفحة الأذكار فقط) =====
+const ayahHadithList = [
+    { type: "آية كريمة", text: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ" },
+    { type: "آية كريمة", text: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ" },
+    { type: "آية كريمة", text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا" },
+    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا" },
+    { type: "آية كريمة", text: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ" },
+    { type: "حديث شريف", text: "الدُّعَاءُ هُوَ الْعِبَادَةُ" },
+    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" },
+    { type: "حديث شريف", text: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
+    { type: "حديث شريف", text: "الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
+    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحَمْ لَا يُرْحَمْ" },
+];
+
+let ayahTimeout = null;
+let ayahIndex = 0;
+
+function ayahCycle() {
+    const overlay = document.getElementById('ayah-overlay');
+    const banner = document.getElementById('ayah-banner');
+    const item = ayahHadithList[ayahIndex % ayahHadithList.length];
+    ayahIndex++;
+
+    document.getElementById('ayah-label').innerText = item.type;
+    document.getElementById('ayah-text').innerText = item.text;
+    overlay.classList.add('show');
+    banner.classList.add('show');
+
+    ayahTimeout = setTimeout(() => {
+        overlay.classList.remove('show');
+        banner.classList.remove('show');
+        ayahTimeout = setTimeout(ayahCycle, 5000);
+    }, 20000);
+}
+
+function startAyahBanner() {
+    stopAyahBanner();
+    ayahTimeout = setTimeout(ayahCycle, 1500);
+}
+
+function stopAyahBanner() {
+    if (ayahTimeout) clearTimeout(ayahTimeout);
+    ayahTimeout = null;
+    document.getElementById('ayah-overlay').classList.remove('show');
+    document.getElementById('ayah-banner').classList.remove('show');
+}
+
+function dismissAyah() {
+    document.getElementById('ayah-overlay').classList.remove('show');
+    document.getElementById('ayah-banner').classList.remove('show');
 }
 
 // ===== تحميل التطبيق =====
