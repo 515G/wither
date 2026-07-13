@@ -38,6 +38,7 @@ async function getWeather() {
         localStorage.setItem('lastCity', city);
         getFiveDayForecast(city);
         getPrayers(city);
+        showSuhailCard();
     } catch (e) {
         alert("حدث خطأ، تحقق من اتصالك بالإنترنت!");
         console.error(e);
@@ -123,30 +124,30 @@ function startCountdown(names, prayerMins) {
 const azkarData = {
     sabah: [
         { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَصْبَحْنا وَبِكَ أَمْسَيْنَا وَبِكَ نحْيَا وَبِكَ نَمُوتُ وَإلَيْكَ النُّشُورُ", count: 1 },
-        { text: "سبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
+        { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ", count: 1 },
+        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
         { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
-        { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نبِيِّنَا مُحَمَّدٍ", count: 10 },
+        { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
     ],
     masa: [
-        { text: "أَمْسَيْنَا وَأَمسَى الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصيرُ", count: 1 },
+        { text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
+        { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ", count: 1 },
         { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
-        { text: "أعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ", count: 3 },
+        { text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ", count: 3 },
         { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
     ],
     nawm: [
-        { text: "بِاسْمِك اللَّهُمَّ أَمُوتُ وَأَحْيَا", count: 1 },
-        { text: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبعَثُ عِبَادَكَ", count: 3 },
+        { text: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا", count: 1 },
+        { text: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ", count: 3 },
         { text: "سُبْحَانَ اللَّهِ", count: 33 },
-        { text: "الْحمْدُ لِلَّهِ", count: 33 },
+        { text: "الْحَمْدُ لِلَّهِ", count: 33 },
         { text: "اللَّهُ أَكْبَرُ", count: 34 },
     ],
     istiqaz: [
-        { text: "الْحمْدُ لِلَّهِ الَّذِي أَحْيَانَا بعْدَ مَا أَمَاتَنا وَإِلَيْهِ النُّشُورُ", count: 1 },
+        { text: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ", count: 1 },
         { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
         { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 10 },
-        { text: "أسْتَغْفِرُ اللَّهَ الْعَظِيمَ وأَتُوبُ إِلَيْهِ", count: 3 },
+        { text: "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ", count: 3 },
     ],
 };
 
@@ -212,16 +213,16 @@ function resetZekr() {
 }
 
 const ayahHadithList = [
-    { type: "آية كريمة", text: "أَلا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ" },
-    { type: "آية كريمة", text: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لي وَلَا تَكْفُرُونِ" },
+    { type: "آية كريمة", text: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ" },
+    { type: "آية كريمة", text: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ" },
     { type: "آية كريمة", text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا" },
-    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّه يَجْعَل لَّهُ مَخرَجًا" },
-    { type: "آية كريمة", text: "حَسْبُنا اللَّهُ وَنِعْمَ الْوكِيلُ" },
-    { type: "حديث شريف", text: "الدُّعَاء هُوَ الْعِبَادَةُ" },
-    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِّبةُ صَدَقَةٌ" },
-    { type: "حديث شريف", text: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقرْآنَ وَعَلَّمَهُ" },
-    { type: "حديث شريف", text: "الْمُسْلِمُ مَنْ سَلِم الْمُسْلِمُونَ مِنْ لِسانِهِ وَيَدِهِ" },
-    { type: "حديث شريف", text: "منْ لَمْ يَرْحَمْ لَا يُرْحَمْ" },
+    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا" },
+    { type: "آية كريمة", text: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ" },
+    { type: "حديث شريف", text: "الدُّعَاءُ هُوَ الْعِبَادَةُ" },
+    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" },
+    { type: "حديث شريف", text: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
+    { type: "حديث شريف", text: "الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
+    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحَمْ لَا يُرْحَمْ" },
 ];
 
 let ayahTimeout = null;
@@ -274,12 +275,8 @@ function getSuhailDate(lat) {
     return date;
 }
 
-let suhailShown = false;
-
-function showSuhailBanner() {
-    if (suhailShown) return;
+function showSuhailCard() {
     navigator.geolocation.getCurrentPosition(pos => {
-        suhailShown = true;
         const lat = pos.coords.latitude;
         const suhailDate = getSuhailDate(lat);
         const now = new Date();
@@ -288,29 +285,20 @@ function showSuhailBanner() {
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         let countdownText = '';
         if (days > 0) {
-            countdownText = `${days} يوم و ${hours} ساعة`;
+            countdownText = `باقي ${days} يوم و ${hours} ساعة`;
         } else if (hours > 0) {
-            countdownText = `${hours} ساعة فقط!`;
+            countdownText = `باقي ${hours} ساعة فقط!`;
         } else {
             countdownText = '🌟 سهيل يطلع الليلة!';
         }
         const dateStr = suhailDate.toLocaleDateString('ar-JO', { day: 'numeric', month: 'long' });
         document.getElementById('suhail-countdown-text').innerText = countdownText;
         document.getElementById('suhail-info').innerText =
-            `نجم سهيل (Canopus) ثاني أضيأ نجم في السماء 🌌\n` +
-            `موعد ظهوره المتوقع: ${dateStr}\n` +
-            `عند ظهوره تنتهي موجات الحر ويبدأ انكسار الصيف 🍂`;
-        document.getElementById('suhail-overlay').classList.add('show');
-        document.getElementById('suhail-banner').classList.add('show');
-        setTimeout(dismissSuhail, 20000);
+            `ثاني أضيأ نجم في السماء • يظهر ${dateStr} • عند ظهوره ينكسر الصيف 🍂`;
+        document.getElementById('suhail-card').style.display = 'flex';
     }, () => {
         console.log('GPS غير متاح');
     });
-}
-
-function dismissSuhail() {
-    document.getElementById('suhail-overlay').classList.remove('show');
-    document.getElementById('suhail-banner').classList.remove('show');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -323,5 +311,4 @@ document.addEventListener('DOMContentLoaded', () => {
         getWeather();
     }
     loadZekr();
-    setTimeout(showSuhailBanner, 3000);
 });
