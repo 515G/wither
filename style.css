@@ -1,21 +1,683 @@
-/* حل مشكلة النقرات وتداخل العناصر */
+/* ==========================================================================
+   1. الإعدادات العامة والمتغيرات (Global Styles & Variables)
+   ========================================================================== */
+:root {
+    --bg-gradient: radial-gradient(ellipse at 30% 10%, #1a3a5c 0%, #0a1628 40%, #060d1f 100%);
+    --card-bg: rgba(255, 255, 255, 0.06);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --accent-color: #38bdf8;
+    --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+    --font-main: 'Amiri', serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: #020617;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   2. حاوية التطبيق الأساسية (App Container)
+   ========================================================================== */
 .app-container {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    background: var(--bg-gradient);
     position: relative;
-    isolation: isolate; /* فصل خلفية الـ Canvas عن أزرار التحكم تماماً */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 25px 20px 100px 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: background 1s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    isolation: isolate; /* فصل طبقة الخلفية والـ Canvas عن المحتوى التفاعلي */
 }
 
+/* إخفاء شريط التمرير الافتراضي */
+.app-container::-webkit-scrollbar {
+    width: 0px;
+}
+
+/* ==========================================================================
+   3. هيكلية الصفحات وأنظمة العرض (Pages & Structure)
+   ========================================================================== */
 .page {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    flex-direction: column;
+    gap: 15px;
     position: relative;
-    z-index: 2; /* رفع محتوى الصفحات فوق طبقة الـ Canvas */
+    z-index: 2; /* رفع الصفحات بالكامل فوق الـ Canvas */
 }
 
-.nav-bar {
-    position: fixed;
-    z-index: 10; /* شريط التنقل دائماً في المقدمة لاستقبال اللمس */
+.page.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* لضمان وصول النقرات لصندوق البحث وأزرار التسبيح */
-.search-box, .azkar-tabs, .counter-box, .control-btns, .tab-btn, .sebha-btn {
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* تصميم الكروت المشتركة */
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 15px 0;
+}
+
+/* ==========================================================================
+   4. قسم الطقس والبحث (Weather Section)
+   ========================================================================== */
+.search-box {
+    display: flex;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 6px 6px 6px 12px;
+    backdrop-filter: blur(10px);
     position: relative;
     z-index: 3;
+}
+
+.search-box input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    padding-right: 5px;
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.search-box button {
+    background: var(--accent-gradient);
+    border: none;
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.search-box button:active {
+    transform: scale(0.95);
+}
+
+#weather-result {
+    text-align: center;
+    padding: 20px 0;
+}
+
+#out-city {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+#out-temp {
+    font-size: 5rem;
+    font-weight: 400;
+    margin: 10px 0;
+    font-family: sans-serif;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#out-desc {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+/* تفاصيل الطقس (الرطوبة، الرياح) */
+.weather-details {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.detail-pill {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-pill .label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.detail-pill .val {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* التوقعات الخمسية */
+.section-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,0.9);
+}
+
+.forecast-container {
+    display: flex;
+    justify-content: space-between;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 22px;
+    padding: 15px 10px;
+    backdrop-filter: blur(10px);
+}
+
+.forecast-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.95rem;
+}
+
+.forecast-item img {
+    width: 40px;
+    height: 40px;
+}
+
+/* كرت سهيل الصغير بالرئيسية */
+.suhail-card {
+    background: linear-gradient(135deg, rgba(254, 240, 138, 0.08) 0%, rgba(251, 146, 60, 0.04) 100%);
+    border: 1px solid rgba(254, 240, 138, 0.15);
+    border-radius: 22px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.suhail-star {
+    font-size: 2rem;
+    animation: twinkle 2s infinite ease-in-out;
+}
+
+.suhail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.suhail-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fef08a;
+}
+
+.suhail-count {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.suhail-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   5. قسم مواقيت الصلاة (Prayer Times)
+   ========================================================================== */
+.countdown-card {
+    background: var(--accent-gradient);
+    border-radius: 24px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.countdown-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.countdown-timer {
+    font-size: 2.4rem;
+    font-weight: 700;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+.countdown-next {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: 12px;
+    width: fit-content;
+    margin: 5px auto 0 auto;
+}
+
+.prayer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 1.15rem;
+}
+
+.prayer-row:last-child {
+    border-bottom: none;
+}
+
+.prayer-row.next-prayer {
+    color: var(--accent-color);
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   6. قسم السماء والفلك الكبير (Sky Section)
+   ========================================================================== */
+.sky-canvas-container {
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    background: rgba(0,0,0,0.2);
+}
+
+.suhail-big-card {
+    background: linear-gradient(180deg, rgba(254, 240, 138, 0.06) 0%, rgba(0,0,0,0) 100%);
+    border: 1px solid rgba(254, 240, 138, 0.1);
+}
+
+.suhail-big-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.suhail-big-star {
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px #fef08a;
+}
+
+.suhail-big-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fef08a;
+}
+
+.suhail-big-sub {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.suhail-big-countdown {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 15px 0 5px 0;
+    text-align: center;
+    background: linear-gradient(to right, #ffffff, #fef08a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.suhail-big-date {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.suhail-big-desc {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+}
+
+.stars-info {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    background: rgba(0,0,0,0.15);
+    padding: 12px;
+    border-radius: 16px;
+}
+
+.star-item {
+    text-align: center;
+}
+
+.star-item span {
+    font-size: 1.3rem;
+}
+
+.star-item p {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 2px 0;
+}
+
+.star-item small {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   7. قسم الأذكار والمسبحة الإلكترونية (Azkar Section)
+   ========================================================================== */
+.daily-ayah-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.daily-ayah-icon {
+    font-size: 1.8rem;
+}
+
+.daily-ayah-label {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    font-weight: 700;
+}
+
+.daily-ayah-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.azkar-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    position: relative;
+    z-index: 3;
+}
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    padding: 10px 0;
+    border-radius: 14px;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.tab-btn.active {
+    background: var(--text-main);
+    color: #020617;
+    border-color: var(--text-main);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+}
+
+#zekr-text {
+    font-size: 1.3rem;
+    line-height: 1.7;
+    text-align: center;
+    min-height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.counter-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+    gap: 10px;
+    position: relative;
+    z-index: 3;
+}
+
+#zekr-count {
+    font-size: 3.5rem;
+    font-family: sans-serif;
+    font-weight: 400;
+}
+
+.sebha-btn {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    border: 4px solid rgba(255,255,255,0.1);
+    color: white;
+    font-family: var(--font-main);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.4);
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.sebha-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+}
+
+.zekr-target {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+#progress-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-family: sans-serif;
+}
+
+.control-btns {
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 3;
+}
+
+.btn-icon {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--card-border);
+    color: #fff;
+    width: 50px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.btn-icon:active { background: rgba(255,255,255,0.15); }
+
+.btn-main {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--card-border);
+    color: #fff;
+    padding: 14px 0;
+    border-radius: 16px;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-main:active { background: rgba(255, 255, 255, 0.15); }
+
+/* ==========================================================================
+   8. قسم المطور (About Section)
+   ========================================================================== */
+#about .info-card {
+    text-align: center;
+    padding: 35px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dev-badge {
+    width: 70px;
+    height: 70px;
+    background: var(--accent-gradient);
+    border-radius: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+    margin-bottom: 15px;
+}
+
+.dev-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.dev-title {
+    font-size: 0.95rem;
+    color: var(--accent-color);
+    letter-spacing: 1px;
+    margin-top: 2px;
+    font-family: sans-serif;
+}
+
+.dev-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.8);
+    font-style: italic;
+}
+
+/* ==========================================================================
+   9. شريط التنقل السفلي (Navigation Bar)
+   ========================================================================== */
+.nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    background: rgba(10, 22, 40, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px;
+    display: flex;
+    justify-content: space-around;
+    z-index: 10; /* جعل شريط التنقل في المقدمة دائماً */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    flex: 1;
+    transition: color 0.3s, transform 0.2s;
+}
+
+.nav-item i {
+    font-size: 1.25rem;
+}
+
+.nav-item span {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.nav-item.active {
+    color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   10. الحركات التجميلية (Animations)
+   ========================================================================== */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 10px #fef08a; }
 }
