@@ -5,8 +5,9 @@ let animationId = null;
 let currentWeather = 'default';
 
 function resizeCanvas() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    if (!canvas) return;
+    canvas.width = canvas.getBoundingClientRect().width || canvas.offsetWidth || window.innerWidth;
+    canvas.height = canvas.getBoundingClientRect().height || canvas.offsetHeight || window.innerHeight;
 }
 
 class Particle {
@@ -16,8 +17,9 @@ class Particle {
     }
 
     reset() {
-        const w = canvas.width;
-        const h = canvas.height;
+        const w = canvas.width || window.innerWidth;
+        const h = canvas.height || window.innerHeight;
+        
         switch(this.type) {
             case 'rain':
                 this.x = Math.random() * w;
@@ -44,7 +46,7 @@ class Particle {
                 this.twinkleDir = Math.random() > 0.5 ? 1 : -1;
                 break;
             case 'cloud':
-                this.x = Math.random() * w + w;
+                this.x = w + (Math.random() * w * 0.5);
                 this.y = 30 + Math.random() * 120;
                 this.speed = 0.3 + Math.random() * 0.4;
                 this.size = 60 + Math.random() * 80;
@@ -60,7 +62,7 @@ class Particle {
             case 'lightning':
                 this.active = false;
                 this.timer = Math.random() * 200;
-                this.x = Math.random() * canvas.width;
+                this.x = Math.random() * w;
                 break;
             case 'dust':
                 this.x = Math.random() * w;
@@ -268,4 +270,12 @@ function startDefaultAnimation() {
     animate();
 }
 
-window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+startDefaultAnimation();
+
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    particles.forEach(p => {
+        if (p.x > canvas.width || p.y > canvas.height) p.reset();
+    });
+});
