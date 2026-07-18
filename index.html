@@ -11,6 +11,8 @@
 <body>
 <div class="app-container">
 
+    <canvas id="weather-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;"></canvas>
+
     <section id="weather" class="page active">
         <div class="search-box">
             <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
@@ -93,7 +95,7 @@
             <p class="dev-title">Full-Stack Developer</p>
             <hr class="divider">
             <p class="dev-text">"هذا التطبيق يعمل بنظام الواجهات المنفصلة (Single Page Application) لضمان سرعة التنقل دون الحاجة لإعادة تحميل الصفحة."</p>
-            <p class="dev-title">v2.11</p>
+            <p class="dev-title">v2.12</p>
         </div>
     </section>
 
@@ -113,6 +115,7 @@
     </div>
 
 </div>
+<script src="weather-canvas.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
