@@ -11,48 +11,47 @@
 <body>
 <div class="app-container">
 
-    <canvas id="weather-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas>
-
-    <!-- صفحة الطقس -->
     <section id="weather" class="page active">
-        <div class="search-box">
-            <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
-            <button id="btn-search"><i class="fas fa-search"></i></button>
-        </div>
-        <div id="weather-result">
-            <h2 id="out-city">--</h2>
-            <h1 id="out-temp">--°</h1>
-            <p id="out-desc">ابحث لترى النتائج</p>
-        </div>
-        <div class="weather-details" id="out-details" style="display:none">
-            <div class="detail-pill">
-                <span class="label">رطوبة</span>
-                <span class="val" id="out-humidity">--%</span>
+        <canvas id="weather-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;"></canvas>
+        <div style="position:relative; z-index:1;">
+            <div class="search-box">
+                <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
+                <button onclick="getWeather()"><i class="fas fa-search"></i></button>
             </div>
-            <div class="detail-pill">
-                <span class="label">رياح</span>
-                <span class="val" id="out-wind">-- كم/س</span>
+            <div id="weather-result">
+                <h2 id="out-city">--</h2>
+                <h1 id="out-temp">--°</h1>
+                <p id="out-desc">ابحث لترى النتائج</p>
             </div>
-            <div class="detail-pill">
-                <span class="label">يُحس</span>
-                <span class="val" id="out-feels">--°</span>
+            <div class="weather-details" id="out-details" style="display:none">
+                <div class="detail-pill">
+                    <span class="label">رطوبة</span>
+                    <span class="val" id="out-humidity">--%</span>
+                </div>
+                <div class="detail-pill">
+                    <span class="label">رياح</span>
+                    <span class="val" id="out-wind">-- كم/س</span>
+                </div>
+                <div class="detail-pill">
+                    <span class="label">يُحس</span>
+                    <span class="val" id="out-feels">--°</span>
+                </div>
             </div>
-        </div>
-        <div id="forecast-section" style="display:none; margin-top:20px;">
-            <p class="section-label">توقعات 5 أيام</p>
-            <div id="out-forecast" class="forecast-container"></div>
-        </div>
-        <div id="suhail-card" class="suhail-card" style="display:none; margin-top:20px;">
-            <span class="suhail-star">⭐</span>
-            <div class="suhail-info">
-                <p class="suhail-title">نجم سهيل</p>
-                <p id="suhail-countdown-text" class="suhail-count"></p>
-                <p id="suhail-info" class="suhail-desc"></p>
+            <div id="forecast-section" style="display:none; margin-top:20px;">
+                <p class="section-label">توقعات 5 أيام</p>
+                <div id="out-forecast" class="forecast-container"></div>
+            </div>
+            <div id="suhail-card" class="suhail-card" style="display:none; margin-top:20px;">
+                <span class="suhail-star">⭐</span>
+                <div class="suhail-info">
+                    <p class="suhail-title">نجم سهيل</p>
+                    <p id="suhail-countdown-text" class="suhail-count"></p>
+                    <p id="suhail-info" class="suhail-desc"></p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- صفحة الصلاة -->
     <section id="prayer" class="page">
         <h2 class="page-title">🕋 مواقيت الصلاة</h2>
         <div id="prayer-countdown" class="countdown-card" style="display:none">
@@ -63,11 +62,10 @@
         <div id="prayer-output" class="info-card"><p>يرجى البحث عن مدينة أولاً</p></div>
     </section>
 
-    <!-- صفحة السماء -->
     <section id="sky" class="page">
         <h2 class="page-title">🌌 السماء</h2>
-        <div class="sky-canvas-container" style="position: relative;">
-            <canvas id="sky-canvas" style="display: block; width: 100%; height: 300px;"></canvas>
+        <div class="sky-canvas-container">
+            <canvas id="sky-canvas"></canvas>
         </div>
         <div id="suhail-big-card" class="suhail-big-card info-card">
             <div class="suhail-big-header">
@@ -80,85 +78,4 @@
             <div class="suhail-big-countdown" id="suhail-big-countdown">-- يوم</div>
             <p class="suhail-big-date" id="suhail-big-date"></p>
             <hr class="divider">
-            <p class="suhail-big-desc">يظهر نجم سهيل في الأفق الجنوبي مع نهاية الصيف، وعند ظهوره تنكسر موجات الحر وتبدأ الليالي تبرد 🍂</p>
-            <div class="stars-info">
-                <div class="star-item">
-                    <span>🌟</span>
-                    <p>سيريوس</p>
-                    <small>الأضيأ</small>
-                </div>
-                <div class="star-item">
-                    <span>⭐</span>
-                    <p>سهيل</p>
-                    <small>الثاني</small>
-                </div>
-                <div class="star-item">
-                    <span>✨</span>
-                    <p>المشتري</p>
-                    <small>كوكب</small>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- صفحة الأذكار -->
-    <section id="azkar" class="page">
-        <h2 class="page-title">📿 الأذكار</h2>
-        <div id="daily-ayah-card" class="daily-ayah-card">
-            <span class="daily-ayah-icon">🌙</span>
-            <div>
-                <p class="daily-ayah-label" id="daily-ayah-label">آية كريمة</p>
-                <p class="daily-ayah-text" id="daily-ayah-text"></p>
-            </div>
-        </div>
-        <div class="azkar-tabs">
-            <button class="tab-btn active" data-cat="sabah">صباح</button>
-            <button class="tab-btn" data-cat="masa">مساء</button>
-            <button class="tab-btn" data-cat="nawm">نوم</button>
-            <button class="tab-btn" data-cat="istiqaz">استيقاظ</button>
-        </div>
-        <div class="info-card">
-            <p id="zekr-text">اضغط على قسم لتبدأ</p>
-            <div class="counter-box">
-                <span id="zekr-count">0</span>
-                <button class="sebha-btn" id="btn-sebha">تسبيح</button>
-            </div>
-            <div class="zekr-target">
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="progress-fill"></div>
-                </div>
-                <span id="progress-label">0 / 0</span>
-            </div>
-            <div class="control-btns">
-                <button id="btn-reset" class="btn-icon"><i class="fas fa-redo"></i></button>
-                <button id="btn-next" class="btn-main">الذكر التالي</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- صفحة المطور -->
-    <section id="about" class="page">
-        <div class="info-card">
-            <div class="dev-badge">J A</div>
-            <h2 class="dev-name">عبدالرحمن الشديفات</h2>
-            <p class="dev-title">Full-Stack Developer</p>
-            <hr class="divider">
-            <p class="dev-text">"هذا التطبيق يعمل بنظام الواجهات المنفصلة (Single Page Application) لضمان سرعة التنقل دون الحاجة لإعادة تحميل الصفحة."</p>
-            <p class="dev-title">v2.13</p>
-        </div>
-    </section>
-
-    <!-- شريط التنقل السفلي -->
-    <nav class="nav-bar">
-        <div class="nav-item active" data-page="weather"><i class="fas fa-sun"></i><span>الطقس</span></div>
-        <div class="nav-item" data-page="prayer"><i class="fas fa-mosque"></i><span>الصلاة</span></div>
-        <div class="nav-item" data-page="sky"><i class="fas fa-star"></i><span>السماء</span></div>
-        <div class="nav-item" data-page="azkar"><i class="fas fa-book-open"></i><span>الأذكار</span></div>
-        <div class="nav-item" data-page="about"><i class="fas fa-user-circle"></i><span>المطور</span></div>
-    </nav>
-
-</div>
-<script src="weather-canvas.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+            
