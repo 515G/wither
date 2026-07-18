@@ -11,7 +11,8 @@
 <body>
 <div class="app-container">
 
-    <canvas id="weather-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none;"></canvas>
+    <!-- تم ضبط الأنماط المضمنة هنا لضمان تمرير النقرات نهائياً للخلفية -->
+    <canvas id="weather-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas>
 
     <section id="weather" class="page active">
         <div class="search-box">
@@ -63,8 +64,8 @@
 
     <section id="sky" class="page">
         <h2 class="page-title">🌌 السماء</h2>
-        <div class="sky-canvas-container">
-            <canvas id="sky-canvas"></canvas>
+        <div class="sky-canvas-container" style="position: relative;">
+            <canvas id="sky-canvas" style="display: block; width: 100%; height: 300px;"></canvas>
         </div>
         <div id="suhail-big-card" class="suhail-big-card info-card">
             <div class="suhail-big-header">
