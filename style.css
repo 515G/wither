@@ -26,6 +26,7 @@ body {
     background: radial-gradient(ellipse at 30% 10%, #1a3a5c 0%, #0a1628 40%, #060d1f 100%);
     box-shadow: 0 0 80px rgba(30,100,200,0.25);
     overflow: hidden;
+    isolation: isolate; /* التعديل الجديد لحصر سياق التكديس والتأثيرات البصرية داخل الحاوية */
 }
 
 .app-container::before {
@@ -148,7 +149,58 @@ body {
     backdrop-filter: blur(16px);
 }
 
-.page-title { font-size: 20px; margin-bottom: 14px; color: rgba(255,255,255,0.85); }
+/* =======================================================
+   تأثيرات كرت سـهيل الـمتحرك والـمتوهج
+   ======================================================= */
+.suhail-card {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 200, 50, 0.1), inset 0 0 20px rgba(255, 200, 50, 0.03);
+    animation: suhailGlow 3s ease-in-out infinite;
+}
+
+.suhail-card::before {
+    content: '✦ ✧ ★ ✦ ✧ ⭐ ✦ ★ ✧';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    font-size: 10px;
+    color: rgba(255, 200, 50, 0.15);
+    animation: starsMove 8s linear infinite;
+    white-space: nowrap;
+    letter-spacing: 8px;
+}
+
+.suhail-card::after {
+    content: '★ ✧ ✦ ⭐ ★ ✦ ✧ ✦ ★';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    font-size: 10px;
+    color: rgba(255, 200, 50, 0.1);
+    animation: starsMove 12s linear infinite reverse;
+    white-space: nowrap;
+    letter-spacing: 8px;
+}
+
+.suhail-star {
+    filter: drop-shadow(0 0 8px rgba(255, 200, 50, 0.8));
+}
+
+@keyframes starsMove {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+@keyframes suhailGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(255,200,50,0.1), inset 0 0 20px rgba(255,200,50,0.03); }
+    50%       { box-shadow: 0 0 30px rgba(255,200,50,0.2), inset 0 0 30px rgba(255,200,50,0.06); }
+}
+/* ======================================================= */
+
+.page-title { font-size: 20px; margin-bottom: 4px; color: rgba(255,255,255,0.85); }
 
 .prayer-row {
     display: flex; justify-content: space-between;
@@ -252,133 +304,4 @@ body {
     background: rgba(255,255,255,0.04);
     color: rgba(255,255,255,0.5);
     font-family: 'Amiri', serif; font-size: 13px;
-    cursor: pointer; transition: 0.3s;
 }
-
-.tab-btn.active { background: rgba(56,189,248,0.15); border-color: rgba(56,189,248,0.5); color: #38bdf8; font-weight: 700; }
-
-.zekr-target { margin: 14px 0 0; text-align: center; }
-
-.progress-bar-bg {
-    width: 100%; height: 6px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px; margin-bottom: 6px; overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, #38bdf8, #0ea5e9);
-    border-radius: 10px; transition: width 0.3s ease;
-}
-
-#progress-label { font-size: 12px; color: rgba(255,255,255,0.4); }
-
-.countdown-card {
-    background: rgba(56,189,248,0.06);
-    border: 1px solid rgba(56,189,248,0.2);
-    border-radius: 20px; padding: 18px;
-    margin-bottom: 14px;
-    backdrop-filter: blur(12px); text-align: center;
-}
-
-.countdown-label { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
-.countdown-timer { font-size: 2.8rem; font-weight: 700; color: #38bdf8; letter-spacing: 2px; text-shadow: 0 0 20px rgba(56,189,248,0.3); }
-.countdown-next { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 6px; }
-
-/* سهيل الصغير */
-.suhail-card {
-    background: rgba(255,200,50,0.06);
-    border: 1px solid rgba(255,200,50,0.2);
-    border-radius: 20px; padding: 16px 18px;
-    display: flex; align-items: center; gap: 14px;
-    text-align: right;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(255,200,50,0.1);
-    animation: suhailGlow 3s ease-in-out infinite;
-    position: relative; overflow: hidden;
-}
-
-.suhail-card::before {
-    content: '✦ ✧ ★ ✦ ✧ ⭐ ✦ ★ ✧ ✦ ✧ ★ ✦ ✧ ⭐';
-    position: absolute; top: -10px; left: 0; right: 0;
-    font-size: 10px; color: rgba(255,200,50,0.12);
-    animation: starsMove 8s linear infinite;
-    white-space: nowrap; letter-spacing: 8px;
-}
-
-@keyframes starsMove {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-}
-
-@keyframes suhailGlow {
-    0%, 100% { box-shadow: 0 0 15px rgba(255,200,50,0.1); }
-    50%       { box-shadow: 0 0 30px rgba(255,200,50,0.2); }
-}
-
-.suhail-star {
-    font-size: 2.2rem;
-    animation: pulse-star 2s infinite;
-    filter: drop-shadow(0 0 8px rgba(255,200,50,0.8));
-    flex-shrink: 0;
-}
-
-@keyframes pulse-star {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.15); opacity: 0.8; }
-}
-
-.suhail-info { flex: 1; }
-.suhail-title { font-size: 14px; color: rgba(255,200,50,0.9); font-weight: 700; margin-bottom: 4px; }
-.suhail-count { font-size: 1.1rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
-.suhail-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; }
-
-/* صفحة السماء */
-.sky-canvas-container {
-    width: 100%; height: 200px;
-    border-radius: 20px; overflow: hidden;
-    margin-bottom: 16px;
-    border: 1px solid rgba(255,255,255,0.06);
-    background: radial-gradient(ellipse at center, #0a1628 0%, #060d1f 100%);
-}
-
-#sky-canvas { width: 100%; height: 100%; }
-
-.suhail-big-card { text-align: right; }
-
-.suhail-big-header {
-    display: flex; align-items: center;
-    gap: 12px; margin-bottom: 14px;
-}
-
-.suhail-big-star {
-    font-size: 2.5rem;
-    animation: pulse-star 2s infinite;
-    filter: drop-shadow(0 0 10px rgba(255,200,50,0.8));
-}
-
-.suhail-big-title { font-size: 16px; font-weight: 700; color: rgba(255,200,50,0.9); }
-.suhail-big-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
-.suhail-big-countdown { font-size: 2.5rem; font-weight: 700; color: #38bdf8; text-align: center; margin: 10px 0 4px; text-shadow: 0 0 20px rgba(56,189,248,0.4); }
-.suhail-big-date { text-align: center; font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
-.suhail-big-desc { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.8; margin-top: 14px; text-align: center; }
-
-.stars-info { display: flex; justify-content: space-around; margin-top: 16px; }
-.star-item { text-align: center; }
-.star-item span { font-size: 1.8rem; display: block; margin-bottom: 4px; }
-.star-item p { font-size: 13px; color: rgba(255,255,255,0.7); }
-.star-item small { font-size: 11px; color: rgba(255,255,255,0.35); }
-
-/* كرت الآية اليومية */
-.daily-ayah-card {
-    background: rgba(56,189,248,0.06);
-    border: 1px solid rgba(56,189,248,0.15);
-    border-radius: 18px; padding: 14px 16px;
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 14px;
-    backdrop-filter: blur(10px);
-}
-
-.daily-ayah-icon { font-size: 1.6rem; flex-shrink: 0; }
-.daily-ayah-label { font-size: 10px; color: rgba(56,189,248,0.7); letter-spacing: 1px; margin-bottom: 4px; }
-.daily-ayah-text { font-size: 1rem; color: rgba(255,255,255,0.85); line-height: 1.7; }
