@@ -13,10 +13,11 @@
 
     <canvas id="weather-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas>
 
+    <!-- صفحة الطقس -->
     <section id="weather" class="page active">
         <div class="search-box">
             <input type="text" id="city-input" placeholder="اكتب اسم المدينة...">
-            <button onclick="window.getWeather()"><i class="fas fa-search"></i></button>
+            <button id="btn-search"><i class="fas fa-search"></i></button>
         </div>
         <div id="weather-result">
             <h2 id="out-city">--</h2>
@@ -51,6 +52,7 @@
         </div>
     </section>
 
+    <!-- صفحة الصلاة -->
     <section id="prayer" class="page">
         <h2 class="page-title">🕋 مواقيت الصلاة</h2>
         <div id="prayer-countdown" class="countdown-card" style="display:none">
@@ -61,6 +63,7 @@
         <div id="prayer-output" class="info-card"><p>يرجى البحث عن مدينة أولاً</p></div>
     </section>
 
+    <!-- صفحة السماء -->
     <section id="sky" class="page">
         <h2 class="page-title">🌌 السماء</h2>
         <div class="sky-canvas-container" style="position: relative;">
@@ -98,6 +101,7 @@
         </div>
     </section>
 
+    <!-- صفحة الأذكار -->
     <section id="azkar" class="page">
         <h2 class="page-title">📿 الأذكار</h2>
         <div id="daily-ayah-card" class="daily-ayah-card">
@@ -108,16 +112,16 @@
             </div>
         </div>
         <div class="azkar-tabs">
-            <button class="tab-btn active" onclick="window.switchCategory('sabah', this)">صباح</button>
-            <button class="tab-btn" onclick="window.switchCategory('masa', this)">مساء</button>
-            <button class="tab-btn" onclick="window.switchCategory('nawm', this)">نوم</button>
-            <button class="tab-btn" onclick="window.switchCategory('istiqaz', this)">استيقاظ</button>
+            <button class="tab-btn active" data-cat="sabah">صباح</button>
+            <button class="tab-btn" data-cat="masa">مساء</button>
+            <button class="tab-btn" data-cat="nawm">نوم</button>
+            <button class="tab-btn" data-cat="istiqaz">استيقاظ</button>
         </div>
         <div class="info-card">
             <p id="zekr-text">اضغط على قسم لتبدأ</p>
             <div class="counter-box">
                 <span id="zekr-count">0</span>
-                <button class="sebha-btn" onclick="window.incrementCount()">تسبيح</button>
+                <button class="sebha-btn" id="btn-sebha">تسبيح</button>
             </div>
             <div class="zekr-target">
                 <div class="progress-bar-bg">
@@ -126,12 +130,13 @@
                 <span id="progress-label">0 / 0</span>
             </div>
             <div class="control-btns">
-                <button onclick="window.resetZekr()" class="btn-icon"><i class="fas fa-redo"></i></button>
-                <button onclick="window.nextZekr()" class="btn-main">الذكر التالي</button>
+                <button id="btn-reset" class="btn-icon"><i class="fas fa-redo"></i></button>
+                <button id="btn-next" class="btn-main">الذكر التالي</button>
             </div>
         </div>
     </section>
 
+    <!-- صفحة المطور -->
     <section id="about" class="page">
         <div class="info-card">
             <div class="dev-badge">J A</div>
@@ -143,12 +148,13 @@
         </div>
     </section>
 
+    <!-- شريط التنقل العلوي/السفلي -->
     <nav class="nav-bar">
-        <div class="nav-item active" onclick="window.showPage('weather', this)"><i class="fas fa-sun"></i><span>الطقس</span></div>
-        <div class="nav-item" onclick="window.showPage('prayer', this)"><i class="fas fa-mosque"></i><span>الصلاة</span></div>
-        <div class="nav-item" onclick="window.showPage('sky', this)"><i class="fas fa-star"></i><span>السماء</span></div>
-        <div class="nav-item" onclick="window.showPage('azkar', this)"><i class="fas fa-book-open"></i><span>الأذكار</span></div>
-        <div class="nav-item" onclick="window.showPage('about', this)"><i class="fas fa-user-circle"></i><span>المطور</span></div>
+        <div class="nav-item active" data-page="weather"><i class="fas fa-sun"></i><span>الطقس</span></div>
+        <div class="nav-item" data-page="prayer"><i class="fas fa-mosque"></i><span>الصلاة</span></div>
+        <div class="nav-item" data-page="sky"><i class="fas fa-star"></i><span>السماء</span></div>
+        <div class="nav-item" data-page="azkar"><i class="fas fa-book-open"></i><span>الأذكار</span></div>
+        <div class="nav-item" data-page="about"><i class="fas fa-user-circle"></i><span>المطور</span></div>
     </nav>
 
 </div>
