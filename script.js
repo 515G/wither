@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. جلب آخر مدينة تم البحث عنها
     const lastCity = localStorage.getItem('lastCity');
     if (lastCity) {
-        document.getElementById("city-input").value = lastCity;
+        const cityInput = document.getElementById("city-input");
+        if (cityInput) cityInput.value = lastCity;
         getWeather();
     }
     // 2. تحديث عدادات ومعلومات نجم سهيل
@@ -17,18 +18,19 @@ document.addEventListener("DOMContentLoaded", () => {
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    element.classList.add('active');
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
+    if (element) element.classList.add('active');
     if (pageId === 'sky') startSkyCanvas();
 }
 
 function formatTime12(time) {
     if (!time) return "--:--";
     let [hours, minutes] = time.split(':');
-    hours = parseInt(hours);
-    const ampm = hours >= 12 ? 'م' : 'ص';
-    hours = hours % 12 || 12;
-    return `${hours}:${minutes} ${ampm}`;
+    let h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'م' : 'ص';
+    h = h % 12 || 12;
+    return `${h}:${minutes} ${ampm}`;
 }
 
 // تحديث لون خلفية التطبيق تفاعلياً مع الطقس والوقت
@@ -66,7 +68,7 @@ function updateSuhailCalculations() {
         suhailDate.setFullYear(currentYear + 1);
     }
 
-    const diffTime = suhailDate - now;
+    const diffTime = suhailDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const options = { day: 'numeric', month: 'long' };
     const formattedDate = suhailDate.toLocaleDateString('ar-JO', options);
@@ -83,7 +85,9 @@ function updateSuhailCalculations() {
 }
 
 async function getWeather() {
-    const city = document.getElementById("city-input").value.trim();
+    const cityInput = document.getElementById("city-input");
+    if (!cityInput) return;
+    const city = cityInput.value.trim();
     if (!city) return;
     try {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
@@ -101,8 +105,8 @@ async function getWeather() {
         localStorage.setItem('lastCity', city);
         
         updateDynamicBackground(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
-        if (typeof startWeatherAnimation === "function") {
-            startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
+        if (typeof window.startWeatherAnimation === "function") {
+            window.startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
         }
         
         getFiveDayForecast(city);
@@ -120,6 +124,7 @@ async function getFiveDayForecast(city) {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
         const forecastDiv = document.getElementById("out-forecast");
+        if (!forecastDiv) return;
         forecastDiv.innerHTML = "";
         for (let i = 0; i < data.list.length; i += 8) {
             const day = data.list[i];
@@ -127,7 +132,7 @@ async function getFiveDayForecast(city) {
             forecastDiv.innerHTML += `
                 <div class="forecast-item">
                     <div>${dayName}</div>
-                    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
+                    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" alt="weather icon">
                     <b>${Math.round(day.main.temp)}°</b>
                 </div>`;
         }
@@ -227,7 +232,7 @@ let count = 0;
 
 function switchCategory(cat, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    if (btn) btn.classList.add('active');
     currentCategory = cat;
     currentZekrIndex = 0;
     count = 0;
@@ -237,7 +242,7 @@ function switchCategory(cat, btn) {
 function loadZekr() {
     const zekr = azkarData[currentCategory][currentZekrIndex];
     document.getElementById("zekr-text").innerText = zekr.text;
-    document.getElementById("zekr-count").innerText = 0;
+    document.getElementById("zekr-count").innerText = "0";
     count = 0;
     updateProgress(0, zekr.count);
 }
@@ -254,7 +259,7 @@ function incrementCount() {
     const zekr = azkarData[currentCategory][currentZekrIndex];
     if (count >= zekr.count) return;
     count++;
-    document.getElementById("zekr-count").innerText = count;
+    document.getElementById("zekr-count").innerText = String(count);
     updateProgress(count, zekr.count);
     if (navigator.vibrate) navigator.vibrate(40);
     if (count >= zekr.count) {
@@ -280,7 +285,7 @@ function nextZekr() {
 function resetZekr() {
     count = 0;
     const zekr = azkarData[currentCategory][currentZekrIndex];
-    document.getElementById("zekr-count").innerText = 0;
+    document.getElementById("zekr-count").innerText = "0";
     updateProgress(0, zekr.count);
 }
 
@@ -308,7 +313,9 @@ function startSkyCanvas() {
     const canvas = document.getElementById("sky-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     const container = canvas.parentElement;
+    if (!container) return;
     canvas.width = container.clientWidth;
     canvas.height = 300;
 
@@ -326,6 +333,7 @@ function startSkyCanvas() {
     if (skyCanvasId) cancelAnimationFrame(skyCanvasId);
 
     function draw() {
+        if (!ctx || !canvas) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         stars.forEach(star => {
             star.alpha += star.speed;
@@ -339,3 +347,11 @@ function startSkyCanvas() {
     }
     draw();
 }
+
+// تصدير الدوال لنطاق الـ window لمنع أخطاء الـ Linter تماماً
+window.showPage = showPage;
+window.getWeather = getWeather;
+window.switchCategory = switchCategory;
+window.incrementCount = incrementCount;
+window.nextZekr = nextZekr;
+window.resetZekr = resetZekr;
