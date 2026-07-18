@@ -5,9 +5,8 @@ let animationId = null;
 let currentWeather = 'default';
 
 function resizeCanvas() {
-    if (!canvas) return;
-    canvas.width = canvas.getBoundingClientRect().width || canvas.offsetWidth || window.innerWidth;
-    canvas.height = canvas.getBoundingClientRect().height || canvas.offsetHeight || window.innerHeight;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 }
 
 class Particle {
@@ -17,9 +16,8 @@ class Particle {
     }
 
     reset() {
-        const w = canvas.width || window.innerWidth;
-        const h = canvas.height || window.innerHeight;
-        
+        const w = canvas.width;
+        const h = canvas.height;
         switch(this.type) {
             case 'rain':
                 this.x = Math.random() * w;
@@ -46,7 +44,7 @@ class Particle {
                 this.twinkleDir = Math.random() > 0.5 ? 1 : -1;
                 break;
             case 'cloud':
-                this.x = w + (Math.random() * w * 0.5);
+                this.x = Math.random() * w + w;
                 this.y = 30 + Math.random() * 120;
                 this.speed = 0.3 + Math.random() * 0.4;
                 this.size = 60 + Math.random() * 80;
@@ -62,7 +60,7 @@ class Particle {
             case 'lightning':
                 this.active = false;
                 this.timer = Math.random() * 200;
-                this.x = Math.random() * w;
+                this.x = Math.random() * canvas.width;
                 break;
             case 'dust':
                 this.x = Math.random() * w;
@@ -121,7 +119,7 @@ class Particle {
         ctx.save();
         switch(this.type) {
             case 'rain':
-                ctx.strokeStyle = `rgba(180, 220, 255, ${this.opacity})`;
+                ctx.strokeStyle = `rgba(180,220,255,${this.opacity})`;
                 ctx.lineWidth = this.width;
                 ctx.lineCap = 'round';
                 ctx.beginPath();
@@ -130,29 +128,29 @@ class Particle {
                 ctx.stroke();
                 break;
             case 'snow':
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity * 0.4})`;
+                ctx.fillStyle = `rgba(255,255,255,${this.opacity * 0.4})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
                 ctx.fill();
                 break;
             case 'star':
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
                 if (this.size > 1.5) {
-                    ctx.fillStyle = `rgba(180, 220, 255, ${this.opacity * 0.3})`;
+                    ctx.fillStyle = `rgba(180,220,255,${this.opacity * 0.3})`;
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
                     ctx.fill();
                 }
                 break;
             case 'cloud':
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fillStyle = `rgba(255,255,255,${this.opacity})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
                 ctx.arc(this.x + this.size * 0.4, this.y - this.size * 0.2, this.size * 0.4, 0, Math.PI * 2);
@@ -162,7 +160,7 @@ class Particle {
             case 'sun-ray':
                 const cx = canvas.width * 0.75;
                 const cy = 80;
-                ctx.strokeStyle = `rgba(255, 220, 80, ${this.opacity})`;
+                ctx.strokeStyle = `rgba(255,220,80,${this.opacity})`;
                 ctx.lineWidth = this.width;
                 ctx.lineCap = 'round';
                 ctx.beginPath();
@@ -172,10 +170,10 @@ class Particle {
                 break;
             case 'lightning':
                 if (this.active) {
-                    ctx.strokeStyle = `rgba(255, 255, 150, 0.9)`;
+                    ctx.strokeStyle = `rgba(255,255,150,0.9)`;
                     ctx.lineWidth = 2;
                     ctx.shadowBlur = 20;
-                    ctx.shadowColor = 'rgba(255, 255, 100, 0.8)';
+                    ctx.shadowColor = 'rgba(255,255,100,0.8)';
                     ctx.beginPath();
                     let lx = this.x, ly = 0;
                     ctx.moveTo(lx, ly);
@@ -188,7 +186,7 @@ class Particle {
                 }
                 break;
             case 'dust':
-                ctx.fillStyle = `rgba(210, 180, 120, ${this.opacity})`;
+                ctx.fillStyle = `rgba(210,180,120,${this.opacity})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -213,9 +211,7 @@ function setupParticles(weatherType) {
     };
     const config = configs[weatherType] || configs['default'];
     config.forEach(({ type, count }) => {
-        for (let i = 0; i < count; i++) {
-            particles.push(new Particle(type));
-        }
+        for (let i = 0; i < count; i++) particles.push(new Particle(type));
     });
 }
 
@@ -223,14 +219,14 @@ function drawSun() {
     const cx = canvas.width * 0.78;
     const cy = 75;
     const gradient = ctx.createRadialGradient(cx, cy, 10, cx, cy, 55);
-    gradient.addColorStop(0, 'rgba(255, 230, 80, 0.9)');
-    gradient.addColorStop(0.4, 'rgba(255, 180, 40, 0.5)');
-    gradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
+    gradient.addColorStop(0, 'rgba(255,230,80,0.9)');
+    gradient.addColorStop(0.4, 'rgba(255,180,40,0.5)');
+    gradient.addColorStop(1, 'rgba(255,150,0,0)');
     ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(cx, cy, 55, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = 'rgba(255, 240, 120, 0.95)';
+    ctx.fillStyle = 'rgba(255,240,120,0.95)';
     ctx.beginPath();
     ctx.arc(cx, cy, 22, 0, Math.PI * 2);
     ctx.fill();
@@ -270,12 +266,4 @@ function startDefaultAnimation() {
     animate();
 }
 
-resizeCanvas();
-startDefaultAnimation();
-
-window.addEventListener('resize', () => {
-    resizeCanvas();
-    particles.forEach(p => {
-        if (p.x > canvas.width || p.y > canvas.height) p.reset();
-    });
-});
+window.addEventListener('resize', resizeCanvas);
