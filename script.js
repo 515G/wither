@@ -1,5 +1,19 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
+// تشغيل عند تحميل الصفحة لتجهيز البيانات الأساسية
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. جلب آخر مدينة تم البحث عنها
+    const lastCity = localStorage.getItem('lastCity');
+    if (lastCity) {
+        document.getElementById("city-input").value = lastCity;
+        getWeather();
+    }
+    // 2. تحديث عدادات ومعلومات نجم سهيل
+    updateSuhailCalculations();
+    // 3. عرض آية/حديث اليوم عشوائياً
+    displayDailyQuote();
+});
+
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -17,6 +31,57 @@ function formatTime12(time) {
     return `${hours}:${minutes} ${ampm}`;
 }
 
+// تحديث لون خلفية التطبيق تفاعلياً مع الطقس والوقت
+function updateDynamicBackground(weatherId, sunrise, sunset) {
+    const container = document.querySelector('.app-container');
+    if (!container) return;
+
+    const now = Math.floor(Date.now() / 1000);
+    const isNight = now < sunrise || now > sunset;
+    let gradient = "radial-gradient(ellipse at 30% 10%, #1a3a5c 0%, #0a1628 40%, #060d1f 100%)"; 
+
+    if (isNight) {
+        gradient = "radial-gradient(ellipse at 30% 10%, #0f172a 0%, #090d16 50%, #020617 100%)"; 
+    } else {
+        if (weatherId >= 200 && weatherId < 600) {
+            gradient = "radial-gradient(ellipse at 30% 10%, #334155 0%, #1e293b 50%, #0f172a 100%)";
+        } else if (weatherId >= 600 && weatherId < 700) {
+            gradient = "radial-gradient(ellipse at 30% 10%, #475569 0%, #334155 60%, #1e293b 100%)";
+        } else if (weatherId >= 801 && weatherId < 900) {
+            gradient = "radial-gradient(ellipse at 30% 10%, #1e3a8a 0%, #0f172a 60%, #020617 100%)";
+        } else if (weatherId === 800) {
+            gradient = "radial-gradient(ellipse at 30% 10%, #0369a1 0%, #0c4a6e 40%, #060d1f 100%)";
+        }
+    }
+    container.style.background = gradient;
+}
+
+// حسابات نجم سهيل فلكياً (24 آب/أغسطس من كل عام)
+function updateSuhailCalculations() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    let suhailDate = new Date(currentYear, 7, 24); 
+
+    if (now > suhailDate) {
+        suhailDate.setFullYear(currentYear + 1);
+    }
+
+    const diffTime = suhailDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const options = { day: 'numeric', month: 'long' };
+    const formattedDate = suhailDate.toLocaleDateString('ar-JO', options);
+
+    const suhailCountdownText = document.getElementById("suhail-countdown-text");
+    const suhailInfo = document.getElementById("suhail-info");
+    if (suhailCountdownText) suhailCountdownText.innerText = `متبقي ${diffDays} يوم على ظهوره`;
+    if (suhailInfo) suhailInfo.innerText = `الموافق ${formattedDate} — ينكسر الحر وتبرد الليالي.`;
+
+    const suhailBigCountdown = document.getElementById("suhail-big-countdown");
+    const suhailBigDate = document.getElementById("suhail-big-date");
+    if (suhailBigCountdown) suhailBigCountdown.innerText = `${diffDays} يوم`;
+    if (suhailBigDate) suhailBigDate.innerText = `الموعد الفلكي القادم: ${formattedDate}`;
+}
+
 async function getWeather() {
     const city = document.getElementById("city-input").value.trim();
     if (!city) return;
@@ -24,6 +89,7 @@ async function getWeather() {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
         if (data.cod !== 200) { alert("المدينة غير موجودة!"); return; }
+        
         document.getElementById("out-city").innerText = "📍 " + data.name;
         document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
         document.getElementById("out-desc").innerText = data.weather[0].description;
@@ -31,11 +97,18 @@ async function getWeather() {
         document.getElementById("out-wind").innerText = Math.round(data.wind.speed * 3.6) + " كم/س";
         document.getElementById("out-feels").innerText = Math.round(data.main.feels_like) + "°";
         document.getElementById("out-details").style.display = "flex";
+        
         localStorage.setItem('lastCity', city);
-        startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
+        
+        updateDynamicBackground(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
+        if (typeof startWeatherAnimation === "function") {
+            startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
+        }
+        
         getFiveDayForecast(city);
         getPrayers(city);
-        showSuhailCard();
+        
+        document.getElementById("suhail-card").style.display = "block";
     } catch (e) {
         alert("حدث خطأ، تحقق من اتصالك بالإنترنت!");
         console.error(e);
@@ -171,8 +244,10 @@ function loadZekr() {
 
 function updateProgress(current, target) {
     const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
-    document.getElementById("progress-fill").style.width = pct + "%";
-    document.getElementById("progress-label").innerText = `${current} / ${target}`;
+    const progressFill = document.getElementById("progress-fill");
+    const progressLabel = document.getElementById("progress-label");
+    if (progressFill) progressFill.style.width = pct + "%";
+    if (progressLabel) progressLabel.innerText = `${current} / ${target}`;
 }
 
 function incrementCount() {
@@ -210,11 +285,57 @@ function resetZekr() {
 }
 
 const ayahHadithList = [
-    { type: "آية كريمة", text: "أَلَا بِذكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوب" },
-    { type: "آية كريمة", text: "فَاذْكرُونِي أَذْكُرْكُمْ واشْكُرُوا لِي وَلَا تَكفُرُونِ" },
-    { type: "آية كريمة", text: "إِنَّ مَعَ الْعسْرِ يُسْرًا" },
-    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يَجْعل لَّهُ مَخْرَجًا" },
+    { type: "آية كريمة", text: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ" },
+    { type: "آية كريمة", text: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ" },
+    { type: "آية كريمة", text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا" },
+    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا" },
     { type: "آية كريمة", text: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ" },
-    { type: "آية كريمة", text: "وَاللَّهُ مَعَ الصَّابِرِين" },
-    { type: "حديث شريف", text: "الدُّعاءُ هُوَ الْعِبَادَةُ" },
-    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِّبَةُ صَد
+    { type: "آية كريمة", text: "وَاللَّهُ مَعَ الصَّابِرِينَ" },
+    { type: "حديث شريف", text: "الدُّعَاءُ هُوَ الْعِبَادَةُ" },
+    { type: "حديث شريف", text: "الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" }
+];
+
+function displayDailyQuote() {
+    const randomItem = ayahHadithList[Math.floor(Math.random() * ayahHadithList.length)];
+    const labelEl = document.getElementById("daily-ayah-label");
+    const textEl = document.getElementById("daily-ayah-text");
+    if (labelEl) labelEl.innerText = randomItem.type;
+    if (textEl) textEl.innerText = randomItem.text;
+}
+
+let skyCanvasId = null;
+function startSkyCanvas() {
+    const canvas = document.getElementById("sky-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = 300;
+
+    const stars = [];
+    for (let i = 0; i < 45; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5 + 0.5,
+            alpha: Math.random(),
+            speed: Math.random() * 0.02 + 0.01
+        });
+    }
+
+    if (skyCanvasId) cancelAnimationFrame(skyCanvasId);
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(star => {
+            star.alpha += star.speed;
+            if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
+            ctx.fill();
+        });
+        skyCanvasId = requestAnimationFrame(draw);
+    }
+    draw();
+}
