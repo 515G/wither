@@ -58,7 +58,7 @@ body {
     padding-bottom: 100px;
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 1;
+    z-index: 2;
 }
 
 .page.active {
@@ -285,7 +285,6 @@ body {
 .countdown-timer { font-size: 2.8rem; font-weight: 700; color: #38bdf8; letter-spacing: 2px; text-shadow: 0 0 20px rgba(56,189,248,0.3); }
 .countdown-next { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 6px; }
 
-/* سهيل الصغير */
 .suhail-card {
     background: rgba(255,200,50,0.06);
     border: 1px solid rgba(255,200,50,0.2);
@@ -293,7 +292,6 @@ body {
     display: flex; align-items: center; gap: 14px;
     text-align: right;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(255,200,50,0.1);
     animation: suhailGlow 3s ease-in-out infinite;
     position: relative; overflow: hidden;
 }
@@ -333,7 +331,6 @@ body {
 .suhail-count { font-size: 1.1rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
 .suhail-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; }
 
-/* صفحة السماء */
 .sky-canvas-container {
     width: 100%; height: 200px;
     border-radius: 20px; overflow: hidden;
@@ -369,7 +366,6 @@ body {
 .star-item p { font-size: 13px; color: rgba(255,255,255,0.7); }
 .star-item small { font-size: 11px; color: rgba(255,255,255,0.35); }
 
-/* كرت الآية اليومية */
 .daily-ayah-card {
     background: rgba(56,189,248,0.06);
     border: 1px solid rgba(56,189,248,0.15);
