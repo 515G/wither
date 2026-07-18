@@ -1,10 +1,17 @@
-const canvas = document.getElementById('weather-canvas');
-const ctx = canvas.getContext('2d');
+let canvas, ctx;
 let particles = [];
 let animationId = null;
 let currentWeather = 'default';
 
+function initCanvas() {
+    canvas = document.getElementById('weather-canvas');
+    if (!canvas) return false;
+    ctx = canvas.getContext('2d');
+    return true;
+}
+
 function resizeCanvas() {
+    if (!canvas) return;
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 }
@@ -16,6 +23,7 @@ class Particle {
     }
 
     reset() {
+        if (!canvas) return;
         const w = canvas.width;
         const h = canvas.height;
         switch(this.type) {
@@ -60,7 +68,7 @@ class Particle {
             case 'lightning':
                 this.active = false;
                 this.timer = Math.random() * 200;
-                this.x = Math.random() * canvas.width;
+                this.x = Math.random() * (canvas ? canvas.width : 300);
                 break;
             case 'dust':
                 this.x = Math.random() * w;
@@ -74,6 +82,7 @@ class Particle {
     }
 
     update() {
+        if (!canvas) return;
         const w = canvas.width;
         const h = canvas.height;
         switch(this.type) {
@@ -116,6 +125,7 @@ class Particle {
     }
 
     draw() {
+        if (!ctx) return;
         ctx.save();
         switch(this.type) {
             case 'rain':
@@ -216,6 +226,7 @@ function setupParticles(weatherType) {
 }
 
 function drawSun() {
+    if (!ctx || !canvas) return;
     const cx = canvas.width * 0.78;
     const cy = 75;
     const gradient = ctx.createRadialGradient(cx, cy, 10, cx, cy, 55);
@@ -233,6 +244,7 @@ function drawSun() {
 }
 
 function animate() {
+    if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (currentWeather === 'clear-day') drawSun();
     particles.forEach(p => { p.update(); p.draw(); });
@@ -250,6 +262,7 @@ function getWeatherType(weatherId, isNight) {
 }
 
 function startWeatherAnimation(weatherId, sunrise, sunset) {
+    if (!initCanvas()) return;
     if (animationId) cancelAnimationFrame(animationId);
     resizeCanvas();
     const now = Date.now() / 1000;
@@ -260,10 +273,13 @@ function startWeatherAnimation(weatherId, sunrise, sunset) {
 }
 
 function startDefaultAnimation() {
+    if (!initCanvas()) return;
     if (animationId) cancelAnimationFrame(animationId);
     resizeCanvas();
     setupParticles('default');
     animate();
 }
 
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', () => {
+    if (canvas) resizeCanvas();
+});
