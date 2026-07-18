@@ -1,99 +1,29 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// تشغيل عند تحميل الصفحة لتجهيز البيانات الأساسية
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. جلب آخر مدينة تم البحث عنها
-    const lastCity = localStorage.getItem('lastCity');
-    if (lastCity) {
-        const cityInput = document.getElementById("city-input");
-        if (cityInput) cityInput.value = lastCity;
-        getWeather();
-    }
-    // 2. تحديث عدادات ومعلومات نجم سهيل
-    updateSuhailCalculations();
-    // 3. عرض آية/حديث اليوم عشوائياً
-    displayDailyQuote();
-});
-
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) targetPage.classList.add('active');
-    if (element) element.classList.add('active');
+    document.getElementById(pageId).classList.add('active');
+    element.classList.add('active');
     if (pageId === 'sky') startSkyCanvas();
 }
 
 function formatTime12(time) {
     if (!time) return "--:--";
     let [hours, minutes] = time.split(':');
-    let h = parseInt(hours, 10);
-    const ampm = h >= 12 ? 'م' : 'ص';
-    h = h % 12 || 12;
-    return `${h}:${minutes} ${ampm}`;
-}
-
-// تحديث لون خلفية التطبيق تفاعلياً مع الطقس والوقت
-function updateDynamicBackground(weatherId, sunrise, sunset) {
-    const container = document.querySelector('.app-container');
-    if (!container) return;
-
-    const now = Math.floor(Date.now() / 1000);
-    const isNight = now < sunrise || now > sunset;
-    let gradient = "radial-gradient(ellipse at 30% 10%, #1a3a5c 0%, #0a1628 40%, #060d1f 100%)"; 
-
-    if (isNight) {
-        gradient = "radial-gradient(ellipse at 30% 10%, #0f172a 0%, #090d16 50%, #020617 100%)"; 
-    } else {
-        if (weatherId >= 200 && weatherId < 600) {
-            gradient = "radial-gradient(ellipse at 30% 10%, #334155 0%, #1e293b 50%, #0f172a 100%)";
-        } else if (weatherId >= 600 && weatherId < 700) {
-            gradient = "radial-gradient(ellipse at 30% 10%, #475569 0%, #334155 60%, #1e293b 100%)";
-        } else if (weatherId >= 801 && weatherId < 900) {
-            gradient = "radial-gradient(ellipse at 30% 10%, #1e3a8a 0%, #0f172a 60%, #020617 100%)";
-        } else if (weatherId === 800) {
-            gradient = "radial-gradient(ellipse at 30% 10%, #0369a1 0%, #0c4a6e 40%, #060d1f 100%)";
-        }
-    }
-    container.style.background = gradient;
-}
-
-// حسابات نجم سهيل فلكياً (24 آب/أغسطس من كل عام)
-function updateSuhailCalculations() {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    let suhailDate = new Date(currentYear, 7, 24); 
-
-    if (now > suhailDate) {
-        suhailDate.setFullYear(currentYear + 1);
-    }
-
-    const diffTime = suhailDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const options = { day: 'numeric', month: 'long' };
-    const formattedDate = suhailDate.toLocaleDateString('ar-JO', options);
-
-    const suhailCountdownText = document.getElementById("suhail-countdown-text");
-    const suhailInfo = document.getElementById("suhail-info");
-    if (suhailCountdownText) suhailCountdownText.innerText = `متبقي ${diffDays} يوم على ظهوره`;
-    if (suhailInfo) suhailInfo.innerText = `الموافق ${formattedDate} — ينكسر الحر وتبرد الليالي.`;
-
-    const suhailBigCountdown = document.getElementById("suhail-big-countdown");
-    const suhailBigDate = document.getElementById("suhail-big-date");
-    if (suhailBigCountdown) suhailBigCountdown.innerText = `${diffDays} يوم`;
-    if (suhailBigDate) suhailBigDate.innerText = `الموعد الفلكي القادم: ${formattedDate}`;
+    hours = parseInt(hours);
+    const ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
 }
 
 async function getWeather() {
-    const cityInput = document.getElementById("city-input");
-    if (!cityInput) return;
-    const city = cityInput.value.trim();
+    const city = document.getElementById("city-input").value.trim();
     if (!city) return;
     try {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
         if (data.cod !== 200) { alert("المدينة غير موجودة!"); return; }
-        
         document.getElementById("out-city").innerText = "📍 " + data.name;
         document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
         document.getElementById("out-desc").innerText = data.weather[0].description;
@@ -101,18 +31,11 @@ async function getWeather() {
         document.getElementById("out-wind").innerText = Math.round(data.wind.speed * 3.6) + " كم/س";
         document.getElementById("out-feels").innerText = Math.round(data.main.feels_like) + "°";
         document.getElementById("out-details").style.display = "flex";
-        
         localStorage.setItem('lastCity', city);
-        
-        updateDynamicBackground(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
-        if (typeof window.startWeatherAnimation === "function") {
-            window.startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
-        }
-        
+        startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
         getFiveDayForecast(city);
         getPrayers(city);
-        
-        document.getElementById("suhail-card").style.display = "block";
+        showSuhailCard();
     } catch (e) {
         alert("حدث خطأ، تحقق من اتصالك بالإنترنت!");
         console.error(e);
@@ -124,7 +47,6 @@ async function getFiveDayForecast(city) {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
         const data = await res.json();
         const forecastDiv = document.getElementById("out-forecast");
-        if (!forecastDiv) return;
         forecastDiv.innerHTML = "";
         for (let i = 0; i < data.list.length; i += 8) {
             const day = data.list[i];
@@ -132,7 +54,7 @@ async function getFiveDayForecast(city) {
             forecastDiv.innerHTML += `
                 <div class="forecast-item">
                     <div>${dayName}</div>
-                    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" alt="weather icon">
+                    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
                     <b>${Math.round(day.main.temp)}°</b>
                 </div>`;
         }
@@ -198,31 +120,31 @@ function startCountdown(names, prayerMins) {
 
 const azkarData = {
     sabah: [
-        { text: "أَصْبحْنَا وَأَصْبَحَ الْمُلكُ لِلَّهِ وَالْحَمْدُ لِلَّه", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَصبَحْنَا وَبِكَ أَمْسَيْنَا وَبِك نَحْيَا وَبِكَ نَمُوتُ وَإِليْكَ النُّشُورُ", count: 1 },
-        { text: "سبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
-        { text: "لا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شرِيكَ لَهُ", count: 10 },
-        { text: "اللَّهُمَّ صَل وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
+        { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
+        { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ", count: 1 },
+        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
+        { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
+        { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
     ],
     masa: [
         { text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
         { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ", count: 1 },
         { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
-        { text: "أَعُوذُ بِكَلمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ ما خَلَقَ", count: 3 },
+        { text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ", count: 3 },
         { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
     ],
     nawm: [
-        { text: "بِاسْمِكَ اللَّهُم أَمُوتُ وَأَحْيَا", count: 1 },
-        { text: "اللَّهُمَّ قِنِي عَذَابَكَ يوْمَ تَبْعَثُ عِبَادَكَ", count: 3 },
+        { text: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا", count: 1 },
+        { text: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ", count: 3 },
         { text: "سُبْحَانَ اللَّهِ", count: 33 },
         { text: "الْحَمْدُ لِلَّهِ", count: 33 },
-        { text: "اللَّهُ أَكبَرُ", count: 34 },
+        { text: "اللَّهُ أَكْبَرُ", count: 34 },
     ],
     istiqaz: [
-        { text: "الحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنا وَإِلَيْهِ النُّشُورُ", count: 1 },
-        { text: "لَا إِلَه إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
-        { text: "سبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 10 },
-        { text: "أَستَغْفِرُ اللَّهَ الْعَظِيمَ وَأتُوبُ إِلَيْهِ", count: 3 },
+        { text: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ", count: 1 },
+        { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
+        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 10 },
+        { text: "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ", count: 3 },
     ],
 };
 
@@ -232,7 +154,7 @@ let count = 0;
 
 function switchCategory(cat, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
+    btn.classList.add('active');
     currentCategory = cat;
     currentZekrIndex = 0;
     count = 0;
@@ -242,24 +164,22 @@ function switchCategory(cat, btn) {
 function loadZekr() {
     const zekr = azkarData[currentCategory][currentZekrIndex];
     document.getElementById("zekr-text").innerText = zekr.text;
-    document.getElementById("zekr-count").innerText = "0";
+    document.getElementById("zekr-count").innerText = 0;
     count = 0;
     updateProgress(0, zekr.count);
 }
 
 function updateProgress(current, target) {
     const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
-    const progressFill = document.getElementById("progress-fill");
-    const progressLabel = document.getElementById("progress-label");
-    if (progressFill) progressFill.style.width = pct + "%";
-    if (progressLabel) progressLabel.innerText = `${current} / ${target}`;
+    document.getElementById("progress-fill").style.width = pct + "%";
+    document.getElementById("progress-label").innerText = `${current} / ${target}`;
 }
 
 function incrementCount() {
     const zekr = azkarData[currentCategory][currentZekrIndex];
     if (count >= zekr.count) return;
     count++;
-    document.getElementById("zekr-count").innerText = String(count);
+    document.getElementById("zekr-count").innerText = count;
     updateProgress(count, zekr.count);
     if (navigator.vibrate) navigator.vibrate(40);
     if (count >= zekr.count) {
@@ -285,7 +205,7 @@ function nextZekr() {
 function resetZekr() {
     count = 0;
     const zekr = azkarData[currentCategory][currentZekrIndex];
-    document.getElementById("zekr-count").innerText = "0";
+    document.getElementById("zekr-count").innerText = 0;
     updateProgress(0, zekr.count);
 }
 
@@ -297,61 +217,126 @@ const ayahHadithList = [
     { type: "آية كريمة", text: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ" },
     { type: "آية كريمة", text: "وَاللَّهُ مَعَ الصَّابِرِينَ" },
     { type: "حديث شريف", text: "الدُّعَاءُ هُوَ الْعِبَادَةُ" },
-    { type: "حديث شريف", text: "الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" }
+    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" },
+    { type: "حديث شريف", text: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
+    { type: "حديث شريف", text: "الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
+    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحَمْ لَا يُرْحَمْ" },
+    { type: "حديث شريف", text: "إِنَّ اللَّهَ يُحِبُّ إِذَا عَمِلَ أَحَدُكُمْ عَمَلاً أَنْ يُتْقِنَهُ" },
 ];
 
-function displayDailyQuote() {
-    const randomItem = ayahHadithList[Math.floor(Math.random() * ayahHadithList.length)];
-    const labelEl = document.getElementById("daily-ayah-label");
-    const textEl = document.getElementById("daily-ayah-text");
-    if (labelEl) labelEl.innerText = randomItem.type;
-    if (textEl) textEl.innerText = randomItem.text;
+function loadDailyAyah() {
+    const item = ayahHadithList[Math.floor(Math.random() * ayahHadithList.length)];
+    document.getElementById('daily-ayah-label').innerText = item.type;
+    document.getElementById('daily-ayah-text').innerText = item.text;
 }
 
-let skyCanvasId = null;
+function getSuhailDate(lat) {
+    const year = new Date().getFullYear();
+    let dayOfYear;
+    if (lat >= 30)      dayOfYear = 236;
+    else if (lat >= 24) dayOfYear = 231;
+    else if (lat >= 20) dayOfYear = 228;
+    else                dayOfYear = 225;
+    const date = new Date(year, 0);
+    date.setDate(dayOfYear);
+    date.setHours(3, 0, 0, 0);
+    if (date < new Date()) date.setFullYear(year + 1);
+    return date;
+}
+
+function showSuhailCard() {
+    navigator.geolocation.getCurrentPosition(pos => {
+        updateSuhail(pos.coords.latitude);
+    }, () => {
+        updateSuhail(31);
+    });
+}
+
+function updateSuhail(lat) {
+    const suhailDate = getSuhailDate(lat);
+    const now = new Date();
+    const diff = suhailDate - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const dateStr = suhailDate.toLocaleDateString('ar-JO', { day: 'numeric', month: 'long' });
+    let countdownText = days > 0 ? `باقي ${days} يوم و ${hours} ساعة` :
+                        hours > 0 ? `باقي ${hours} ساعة فقط!` : '🌟 سهيل يطلع الليلة!';
+    document.getElementById('suhail-countdown-text').innerText = countdownText;
+    document.getElementById('suhail-info').innerText =
+        `ثاني أضيأ نجم • يظهر ${dateStr} • عند ظهوره ينكسر الصيف 🍂`;
+    document.getElementById('suhail-card').style.display = 'flex';
+    document.getElementById('suhail-big-countdown').innerText =
+        days > 0 ? `${days} يوم و ${hours} ساعة` :
+        hours > 0 ? `${hours} ساعة فقط!` : '🌟 الليلة!';
+    document.getElementById('suhail-big-date').innerText = `موعد الظهور: ${dateStr}`;
+}
+
+let skyAnimId = null;
+
 function startSkyCanvas() {
-    const canvas = document.getElementById("sky-canvas");
+    const canvas = document.getElementById('sky-canvas');
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const container = canvas.parentElement;
-    if (!container) return;
-    canvas.width = container.clientWidth;
-    canvas.height = 300;
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    if (skyAnimId) cancelAnimationFrame(skyAnimId);
 
-    const stars = [];
-    for (let i = 0; i < 45; i++) {
-        stars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            radius: Math.random() * 1.5 + 0.5,
-            alpha: Math.random(),
-            speed: Math.random() * 0.02 + 0.01
-        });
-    }
+    const stars = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: 0.5 + Math.random() * 2,
+        opacity: 0.3 + Math.random() * 0.7,
+        speed: 0.01 + Math.random() * 0.02,
+        dir: Math.random() > 0.5 ? 1 : -1,
+    }));
 
-    if (skyCanvasId) cancelAnimationFrame(skyCanvasId);
+    const suhail = { x: canvas.width * 0.3, y: canvas.height * 0.65, size: 4, pulse: 0 };
 
-    function draw() {
-        if (!ctx || !canvas) return;
+    function drawSky() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        stars.forEach(star => {
-            star.alpha += star.speed;
-            if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
+        stars.forEach(s => {
+            s.opacity += s.speed * s.dir;
+            if (s.opacity > 1 || s.opacity < 0.1) s.dir *= -1;
+            ctx.fillStyle = `rgba(255,255,255,${s.opacity})`;
             ctx.beginPath();
-            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
             ctx.fill();
         });
-        skyCanvasId = requestAnimationFrame(draw);
+        suhail.pulse += 0.05;
+        const glow = Math.sin(suhail.pulse) * 0.3 + 0.7;
+        const grad = ctx.createRadialGradient(suhail.x, suhail.y, 0, suhail.x, suhail.y, 20);
+        grad.addColorStop(0, `rgba(255,220,80,${glow})`);
+        grad.addColorStop(0.4, `rgba(255,180,40,${glow * 0.5})`);
+        grad.addColorStop(1, 'rgba(255,150,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(suhail.x, suhail.y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(255,240,150,${glow})`;
+        ctx.beginPath();
+        ctx.arc(suhail.x, suhail.y, suhail.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(255,220,80,${glow * 0.8})`;
+        ctx.font = '11px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('سهيل', suhail.x, suhail.y + 28);
+        skyAnimId = requestAnimationFrame(drawSky);
     }
-    draw();
+
+    drawSky();
 }
 
-// تصدير الدوال لنطاق الـ window لمنع أخطاء الـ Linter تماماً
-window.showPage = showPage;
-window.getWeather = getWeather;
-window.switchCategory = switchCategory;
-window.incrementCount = incrementCount;
-window.nextZekr = nextZekr;
-window.resetZekr = resetZekr;
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('city-input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') getWeather();
+    });
+    const saved = localStorage.getItem('lastCity');
+    if (saved) {
+        document.getElementById('city-input').value = saved;
+        getWeather();
+    }
+    loadZekr();
+    loadDailyAyah();
+    showSuhailCard();
+    startDefaultAnimation();
+});
