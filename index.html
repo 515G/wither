@@ -61,8 +61,52 @@
         <div id="prayer-output" class="info-card"><p>يرجى البحث عن مدينة أولاً</p></div>
     </section>
 
+    <section id="sky" class="page">
+        <h2 class="page-title">🌌 السماء</h2>
+        <div class="sky-canvas-container">
+            <canvas id="sky-canvas"></canvas>
+        </div>
+        <div id="suhail-big-card" class="suhail-big-card info-card">
+            <div class="suhail-big-header">
+                <span class="suhail-big-star">⭐</span>
+                <div>
+                    <p class="suhail-big-title">نجم سهيل — Canopus</p>
+                    <p class="suhail-big-sub">ثاني أضيأ نجم في السماء</p>
+                </div>
+            </div>
+            <div class="suhail-big-countdown" id="suhail-big-countdown">-- يوم</div>
+            <p class="suhail-big-date" id="suhail-big-date"></p>
+            <hr class="divider">
+            <p class="suhail-big-desc">يظهر نجم سهيل في الأفق الجنوبي مع نهاية الصيف، وعند ظهوره تنكسر موجات الحر وتبدأ الليالي تبرد 🍂</p>
+            <div class="stars-info">
+                <div class="star-item">
+                    <span>🌟</span>
+                    <p>سيريوس</p>
+                    <small>الأضيأ</small>
+                </div>
+                <div class="star-item">
+                    <span>⭐</span>
+                    <p>سهيل</p>
+                    <small>الثاني</small>
+                </div>
+                <div class="star-item">
+                    <span>✨</span>
+                    <p>المشتري</p>
+                    <small>كوكب</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="azkar" class="page">
         <h2 class="page-title">📿 الأذكار</h2>
+        <div id="daily-ayah-card" class="daily-ayah-card">
+            <span class="daily-ayah-icon">🌙</span>
+            <div>
+                <p class="daily-ayah-label" id="daily-ayah-label">آية كريمة</p>
+                <p class="daily-ayah-text" id="daily-ayah-text"></p>
+            </div>
+        </div>
         <div class="azkar-tabs">
             <button class="tab-btn active" onclick="switchCategory('sabah', this)">صباح</button>
             <button class="tab-btn" onclick="switchCategory('masa', this)">مساء</button>
@@ -95,24 +139,17 @@
             <p class="dev-title">Full-Stack Developer</p>
             <hr class="divider">
             <p class="dev-text">"هذا التطبيق يعمل بنظام الواجهات المنفصلة (Single Page Application) لضمان سرعة التنقل دون الحاجة لإعادة تحميل الصفحة."</p>
-            <p class="dev-title">v2.12</p>
+            <p class="dev-title">v2.13</p>
         </div>
     </section>
 
     <nav class="nav-bar">
         <div class="nav-item active" onclick="showPage('weather', this)"><i class="fas fa-sun"></i><span>الطقس</span></div>
         <div class="nav-item" onclick="showPage('prayer', this)"><i class="fas fa-mosque"></i><span>الصلاة</span></div>
+        <div class="nav-item" onclick="showPage('sky', this)"><i class="fas fa-star"></i><span>السماء</span></div>
         <div class="nav-item" onclick="showPage('azkar', this)"><i class="fas fa-book-open"></i><span>الأذكار</span></div>
         <div class="nav-item" onclick="showPage('about', this)"><i class="fas fa-user-circle"></i><span>المطور</span></div>
     </nav>
-
-    <div id="ayah-overlay" class="ayah-overlay"></div>
-    <div id="ayah-banner" class="ayah-banner">
-        <i class="fas fa-xmark ayah-close" onclick="dismissAyah()"></i>
-        <i class="fas fa-feather ayah-icon"></i>
-        <span class="ayah-label" id="ayah-label">آية كريمة</span>
-        <p id="ayah-text"></p>
-    </div>
 
 </div>
 <script src="weather-canvas.js"></script>
