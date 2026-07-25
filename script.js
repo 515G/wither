@@ -1,11 +1,17 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
+// 1. التنقل بين الصفحات وتفعيل رسم السماء
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     element.classList.add('active');
-    if (pageId === 'sky') startSkyCanvas();
+    
+    if (pageId === 'sky') {
+        setTimeout(() => {
+            startSkyCanvas();
+        }, 50);
+    }
 }
 
 function formatTime12(time) {
@@ -17,6 +23,7 @@ function formatTime12(time) {
     return `${hours}:${minutes} ${ampm}`;
 }
 
+// 2. وظائف الطقس
 async function getWeather() {
     const city = document.getElementById("city-input").value.trim();
     if (!city) return;
@@ -62,6 +69,7 @@ async function getFiveDayForecast(city) {
     } catch (e) { console.error(e); }
 }
 
+// 3. أوقات الصلاة والعد التنازلي
 let countdownInterval = null;
 
 async function getPrayers(city) {
@@ -118,6 +126,7 @@ function startCountdown(names, prayerMins) {
     countdownInterval = setInterval(update, 1000);
 }
 
+// 4. الأذكار والسبحة الإلكترونية
 const azkarData = {
     sabah: [
         { text: "أَصبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْد لِلَّهِ", count: 1 },
@@ -209,6 +218,7 @@ function resetZekr() {
     updateProgress(0, zekr.count);
 }
 
+// 5. الآيات والأحاديث اليومية
 const ayahHadithList = [
     { type: "آية كريمة", text: "ألَا بِذِكْرِ اللَّهِ تَطمَئِنُّ الْقُلُوبُ" },
     { type: "آية كريمة", text: "فَاذْكُرُونِي أذْكُرْكُمْ وَاشكُرُوا لِي وَلَا تَكْفرُونِ" },
@@ -230,6 +240,7 @@ function loadDailyAyah() {
     document.getElementById('daily-ayah-text').innerText = item.text;
 }
 
+// 6. نجم سهيل
 function getSuhailDate(lat) {
     const year = new Date().getFullYear();
     let dayOfYear;
@@ -270,16 +281,24 @@ function updateSuhail(lat) {
     document.getElementById('suhail-big-date').innerText = `موعد الظهور: ${dateStr}`;
 }
 
+// 7. دالة رسم خريطة السماء والنجوم المعدلة (Canvas)
 let skyAnimId = null;
 
-// الدالة الجديدة المحدثة لرسم خريطة السماء والنجوم
 function startSkyCanvas() {
     const canvas = document.getElementById('sky-canvas');
     if (!canvas) return;
+    
+    if (skyAnimId) {
+        cancelAnimationFrame(skyAnimId);
+        skyAnimId = null;
+    }
+
     const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    if (skyAnimId) cancelAnimationFrame(skyAnimId);
+    
+    // إعطاء أبعاد دقيقة بناءً على الحجم الظاهر للكانفاس
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width || canvas.offsetWidth || 300;
+    canvas.height = rect.height || canvas.offsetHeight || 200;
 
     const stars = Array.from({ length: 100 }, () => ({
         x: Math.random() * canvas.width,
@@ -290,7 +309,6 @@ function startSkyCanvas() {
         dir: Math.random() > 0.5 ? 1 : -1,
     }));
 
-    // نجوم مشهورة بمواقع نسبية ثابتة
     const namedStars = [
         { nameAr: 'سهيل',    nameEn: 'Canopus',   x: 0.25, y: 0.70, size: 5, color: 'rgba(255,220,80)',  glow: 20 },
         { nameAr: 'الشعرى',  nameEn: 'Sirius',    x: 0.70, y: 0.25, size: 6, color: 'rgba(180,220,255)', glow: 25 },
@@ -306,7 +324,7 @@ function startSkyCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         pulseAngle += 0.03;
 
-        // نجوم عادية
+        // رسم النجوم العامة
         stars.forEach(s => {
             s.opacity += s.speed * s.dir;
             if (s.opacity > 1 || s.opacity < 0.1) s.dir *= -1;
@@ -316,13 +334,13 @@ function startSkyCanvas() {
             ctx.fill();
         });
 
-        // نجوم مشهورة
+        // رسم النجوم المشهورة مع أسمائها وهالاتها
         namedStars.forEach(star => {
             const x = star.x * canvas.width;
             const y = star.y * canvas.height;
             const glow = Math.sin(pulseAngle + star.x * 5) * 0.3 + 0.7;
 
-            // هالة
+            // الهالة
             const grad = ctx.createRadialGradient(x, y, 0, x, y, star.glow);
             grad.addColorStop(0, `${star.color},${glow})`);
             grad.addColorStop(0.4, `${star.color},${glow * 0.4})`);
@@ -340,24 +358,22 @@ function startSkyCanvas() {
 
             // الاسم العربي
             ctx.fillStyle = `rgba(255,255,255,${glow * 0.9})`;
-            ctx.font = 'bold 11px Amiri, serif';
+            ctx.font = 'bold 11px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(star.nameAr, x, y + star.size + 14);
 
             // الاسم الإنجليزي
             ctx.fillStyle = `rgba(255,255,255,${glow * 0.4})`;
-            ctx.font = '9px serif';
+            ctx.font = '9px sans-serif';
             ctx.fillText(star.nameEn, x, y + star.size + 25);
         });
 
-        // خطوط توصيل خفيفة بين بعض النجوم
-        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        // خطوط توصيل
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        const s1 = namedStars[0];
-        const s2 = namedStars[1];
-        ctx.moveTo(s1.x * canvas.width, s1.y * canvas.height);
-        ctx.lineTo(s2.x * canvas.width, s2.y * canvas.height);
+        ctx.moveTo(namedStars[0].x * canvas.width, namedStars[0].y * canvas.height);
+        ctx.lineTo(namedStars[1].x * canvas.width, namedStars[1].y * canvas.height);
         ctx.stroke();
 
         skyAnimId = requestAnimationFrame(drawSky);
@@ -366,6 +382,7 @@ function startSkyCanvas() {
     drawSky();
 }
 
+// 8. التهيئة عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('city-input').addEventListener('keypress', e => {
         if (e.key === 'Enter') getWeather();
@@ -378,5 +395,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadZekr();
     loadDailyAyah();
     showSuhailCard();
-    startDefaultAnimation();
 });
