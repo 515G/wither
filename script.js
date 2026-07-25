@@ -272,6 +272,7 @@ function updateSuhail(lat) {
 
 let skyAnimId = null;
 
+// الدالة الجديدة المحدثة لرسم خريطة السماء والنجوم
 function startSkyCanvas() {
     const canvas = document.getElementById('sky-canvas');
     if (!canvas) return;
@@ -280,19 +281,32 @@ function startSkyCanvas() {
     canvas.height = canvas.offsetHeight;
     if (skyAnimId) cancelAnimationFrame(skyAnimId);
 
-    const stars = Array.from({ length: 120 }, () => ({
+    const stars = Array.from({ length: 100 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: 0.5 + Math.random() * 2,
+        size: 0.5 + Math.random() * 1.5,
         opacity: 0.3 + Math.random() * 0.7,
         speed: 0.01 + Math.random() * 0.02,
         dir: Math.random() > 0.5 ? 1 : -1,
     }));
 
-    const suhail = { x: canvas.width * 0.3, y: canvas.height * 0.65, size: 4, pulse: 0 };
+    // نجوم مشهورة بمواقع نسبية ثابتة
+    const namedStars = [
+        { nameAr: 'سهيل',    nameEn: 'Canopus',   x: 0.25, y: 0.70, size: 5, color: 'rgba(255,220,80)',  glow: 20 },
+        { nameAr: 'الشعرى',  nameEn: 'Sirius',    x: 0.70, y: 0.25, size: 6, color: 'rgba(180,220,255)', glow: 25 },
+        { nameAr: 'المريخ',  nameEn: 'Mars',      x: 0.50, y: 0.40, size: 4, color: 'rgba(255,100,80)',  glow: 15 },
+        { nameAr: 'الزهرة',  nameEn: 'Venus',     x: 0.80, y: 0.55, size: 5, color: 'rgba(255,240,200)', glow: 18 },
+        { nameAr: 'النجم القطبي', nameEn: 'Polaris', x: 0.15, y: 0.15, size: 3, color: 'rgba(200,220,255)', glow: 12 },
+        { nameAr: 'العقرب',  nameEn: 'Antares',   x: 0.60, y: 0.75, size: 4, color: 'rgba(255,80,60)',   glow: 14 },
+    ];
+
+    let pulseAngle = 0;
 
     function drawSky() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pulseAngle += 0.03;
+
+        // نجوم عادية
         stars.forEach(s => {
             s.opacity += s.speed * s.dir;
             if (s.opacity > 1 || s.opacity < 0.1) s.dir *= -1;
@@ -301,24 +315,51 @@ function startSkyCanvas() {
             ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
             ctx.fill();
         });
-        suhail.pulse += 0.05;
-        const glow = Math.sin(suhail.pulse) * 0.3 + 0.7;
-        const grad = ctx.createRadialGradient(suhail.x, suhail.y, 0, suhail.x, suhail.y, 20);
-        grad.addColorStop(0, `rgba(255,220,80,${glow})`);
-        grad.addColorStop(0.4, `rgba(255,180,40,${glow * 0.5})`);
-        grad.addColorStop(1, 'rgba(255,150,0,0)');
-        ctx.fillStyle = grad;
+
+        // نجوم مشهورة
+        namedStars.forEach(star => {
+            const x = star.x * canvas.width;
+            const y = star.y * canvas.height;
+            const glow = Math.sin(pulseAngle + star.x * 5) * 0.3 + 0.7;
+
+            // هالة
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, star.glow);
+            grad.addColorStop(0, `${star.color},${glow})`);
+            grad.addColorStop(0.4, `${star.color},${glow * 0.4})`);
+            grad.addColorStop(1, `${star.color},0)`);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(x, y, star.glow, 0, Math.PI * 2);
+            ctx.fill();
+
+            // النجمة
+            ctx.fillStyle = `${star.color},${glow})`;
+            ctx.beginPath();
+            ctx.arc(x, y, star.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // الاسم العربي
+            ctx.fillStyle = `rgba(255,255,255,${glow * 0.9})`;
+            ctx.font = 'bold 11px Amiri, serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(star.nameAr, x, y + star.size + 14);
+
+            // الاسم الإنجليزي
+            ctx.fillStyle = `rgba(255,255,255,${glow * 0.4})`;
+            ctx.font = '9px serif';
+            ctx.fillText(star.nameEn, x, y + star.size + 25);
+        });
+
+        // خطوط توصيل خفيفة بين بعض النجوم
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.arc(suhail.x, suhail.y, 20, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = `rgba(255,240,150,${glow})`;
-        ctx.beginPath();
-        ctx.arc(suhail.x, suhail.y, suhail.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = `rgba(255,220,80,${glow * 0.8})`;
-        ctx.font = '11px serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('سهيل', suhail.x, suhail.y + 28);
+        const s1 = namedStars[0];
+        const s2 = namedStars[1];
+        ctx.moveTo(s1.x * canvas.width, s1.y * canvas.height);
+        ctx.lineTo(s2.x * canvas.width, s2.y * canvas.height);
+        ctx.stroke();
+
         skyAnimId = requestAnimationFrame(drawSky);
     }
 
