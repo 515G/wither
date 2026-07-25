@@ -1,17 +1,11 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// 1. التنقل بين الصفحات وتفعيل رسم السماء
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     element.classList.add('active');
-    
-    if (pageId === 'sky') {
-        setTimeout(() => {
-            startSkyCanvas();
-        }, 50);
-    }
+    if (pageId === 'sky') startSkyCanvas();
 }
 
 function formatTime12(time) {
@@ -23,7 +17,6 @@ function formatTime12(time) {
     return `${hours}:${minutes} ${ampm}`;
 }
 
-// 2. وظائف الطقس
 async function getWeather() {
     const city = document.getElementById("city-input").value.trim();
     if (!city) return;
@@ -69,7 +62,6 @@ async function getFiveDayForecast(city) {
     } catch (e) { console.error(e); }
 }
 
-// 3. أوقات الصلاة والعد التنازلي
 let countdownInterval = null;
 
 async function getPrayers(city) {
@@ -126,34 +118,33 @@ function startCountdown(names, prayerMins) {
     countdownInterval = setInterval(update, 1000);
 }
 
-// 4. الأذكار والسبحة الإلكترونية
 const azkarData = {
     sabah: [
-        { text: "أَصبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْد لِلَّهِ", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَينَا وَبِكَ نَحْيَا وبِكَ نَمُوتُ وَإِلَيْكَ النشُورُ", count: 1 },
-        { text: "سُبْحَانَ اللَّهِ وبِحَمْدِهِ", count: 100 },
+        { text: "أَصبَحْنَا وَأَصبَحَ الْمُلْكُ لِلَّهِ والْحَمْد لِلَّهِ", count: 1 },
+        { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبكَ أَمْسَينَا وَبِكَ نَحْيَا وبِكَ نَموتُ وَإِلَيْكَ النشورُ", count: 1 },
+        { text: "سُبْحَانَ اللَّهِ وبحَمْدِهِ", count: 100 },
         { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
         { text: "اللَّهُمَّ صلِّ وَسَلِّمْ عَلَى نَبِيِّنَا محَمَّدٍ", count: 10 },
     ],
     masa: [
         { text: "أَمسَيْنَا وَأَمْسَى الْمُلْكُ للَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ", count: 1 },
-        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100 },
-        { text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ ما خَلَقَ", count: 3 },
-        { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ علَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
+        { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصيرُ", count: 1 },
+        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدهِ", count: 100 },
+        { text: "أَعُوذُ بِكَلِماتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ ما خَلَقَ", count: 3 },
+        { text: "اللَّهُمَّ صلِّ وَسَلِّمْ علَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
     ],
     nawm: [
         { text: "باسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا", count: 1 },
-        { text: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ", count: 3 },
+        { text: "اللَّهُمَّ قِنِي عذَابَكَ يَوْمَ تَبْعَثُ عبَادَكَ", count: 3 },
         { text: "سُبْحَانَ اللَّهِ", count: 33 },
         { text: "الحَمْدُ لِلَّهِ", count: 33 },
         { text: "اللَّهُ أَكْبَرُ", count: 34 },
     ],
     istiqaz: [
-        { text: "الحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ", count: 1 },
+        { text: "الحَمْدُ لِلَّهِ الذِي أَحْيَانَا بعْدَ ما أَمَاتَنَا وَإِلَيْه النُّشُورُ", count: 1 },
         { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
         { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 10 },
-        { text: "أَسْتَغْفِرُ اللَّهَ الْعظِيمَ وَأَتُوبُ إِلَيْهِ", count: 3 },
+        { text: "أَسْتغْفِرُ اللَّهَ الْعظِيمَ وأَتُوبُ إِلَيْهِ", count: 3 },
     ],
 };
 
@@ -218,20 +209,19 @@ function resetZekr() {
     updateProgress(0, zekr.count);
 }
 
-// 5. الآيات والأحاديث اليومية
 const ayahHadithList = [
-    { type: "آية كريمة", text: "ألَا بِذِكْرِ اللَّهِ تَطمَئِنُّ الْقُلُوبُ" },
-    { type: "آية كريمة", text: "فَاذْكُرُونِي أذْكُرْكُمْ وَاشكُرُوا لِي وَلَا تَكْفرُونِ" },
-    { type: "آية كريمة", text: "إِنَّ مَعَ الْعُسْرِ يُسْرا" },
-    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يجْعَل لَّهُ مَخْرَجًا" },
-    { type: "آية كريمة", text: "حَسْبُنا اللَّهُ وَنِعْمَ الْوَكيلُ" },
+    { type: "آية كريمة", text: "ألا بِذِكْرِ اللَّهِ تطمَئِنُّ الْقُلُوبُ" },
+    { type: "آية كريمة", text: "فَاذْكُرُونِي أذْكُرْكُمْ واشكُرُوا لِي وَلَا تَكْفرُونِ" },
+    { type: "آية كريمة", text: "إِنَّ مَع الْعُسْرِ يُسْرا" },
+    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يجعَل لَّهُ مَخْرَجًا" },
+    { type: "آية كريمة", text: "حسْبُنا اللَّهُ وَنِعْمَ الوَكيلُ" },
     { type: "آية كريمة", text: "وَاللَّهُ مَعَ الصَّابِرِينَ" },
-    { type: "حديث شريف", text: "الدُعَاءُ هُوَ الْعِبَادَةُ" },
-    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِبَةُ صَدَقَةٌ" },
-    { type: "حديث شريف", text: "خَيْرُكمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
-    { type: "حديث شريف", text: "الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
-    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحمْ لَا يُرْحَمْ" },
-    { type: "حديث شريف", text: "إِنَّ اللَّهَ يُحِبُّ إِذَا عمِلَ أَحَدُكُمْ عَمَلاً أَنْ يُتْقِنَه" },
+    { type: "حديث شريف", text: "الدُعاءُ هُوَ الْعِبَادَةُ" },
+    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِبَةُ صدَقَةٌ" },
+    { type: "حديث شريف", text: "خَيْرُكم مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
+    { type: "حديث شريف", text: "الْمسْلِمُ مَنْ سَلِمَ المُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
+    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحمْ لا يُرْحَمْ" },
+    { type: "حديث شريف", text: "إِنَّ اللَّهَ يُحِبُّ إِذَا عمِلَ أحَدُكُمْ عَمَلاً أَن يُتْقِنَه" },
 ];
 
 function loadDailyAyah() {
@@ -240,7 +230,6 @@ function loadDailyAyah() {
     document.getElementById('daily-ayah-text').innerText = item.text;
 }
 
-// 6. نجم سهيل
 function getSuhailDate(lat) {
     const year = new Date().getFullYear();
     let dayOfYear;
@@ -281,24 +270,15 @@ function updateSuhail(lat) {
     document.getElementById('suhail-big-date').innerText = `موعد الظهور: ${dateStr}`;
 }
 
-// 7. دالة رسم خريطة السماء والنجوم المعدلة (Canvas)
 let skyAnimId = null;
 
 function startSkyCanvas() {
     const canvas = document.getElementById('sky-canvas');
     if (!canvas) return;
-    
-    if (skyAnimId) {
-        cancelAnimationFrame(skyAnimId);
-        skyAnimId = null;
-    }
-
     const ctx = canvas.getContext('2d');
-    
-    // إعطاء أبعاد دقيقة بناءً على الحجم الظاهر للكانفاس
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width || canvas.offsetWidth || 300;
-    canvas.height = rect.height || canvas.offsetHeight || 200;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    if (skyAnimId) cancelAnimationFrame(skyAnimId);
 
     const stars = Array.from({ length: 100 }, () => ({
         x: Math.random() * canvas.width,
@@ -310,12 +290,12 @@ function startSkyCanvas() {
     }));
 
     const namedStars = [
-        { nameAr: 'سهيل',    nameEn: 'Canopus',   x: 0.25, y: 0.70, size: 5, color: 'rgba(255,220,80)',  glow: 20 },
-        { nameAr: 'الشعرى',  nameEn: 'Sirius',    x: 0.70, y: 0.25, size: 6, color: 'rgba(180,220,255)', glow: 25 },
-        { nameAr: 'المريخ',  nameEn: 'Mars',      x: 0.50, y: 0.40, size: 4, color: 'rgba(255,100,80)',  glow: 15 },
-        { nameAr: 'الزهرة',  nameEn: 'Venus',     x: 0.80, y: 0.55, size: 5, color: 'rgba(255,240,200)', glow: 18 },
-        { nameAr: 'النجم القطبي', nameEn: 'Polaris', x: 0.15, y: 0.15, size: 3, color: 'rgba(200,220,255)', glow: 12 },
-        { nameAr: 'العقرب',  nameEn: 'Antares',   x: 0.60, y: 0.75, size: 4, color: 'rgba(255,80,60)',   glow: 14 },
+        { nameAr: 'سهيل',         nameEn: 'Canopus',  x: 0.25, y: 0.70, size: 5, color: '255,220,80',  glow: 20 },
+        { nameAr: 'الشِّعرى',     nameEn: 'Sirius',   x: 0.70, y: 0.22, size: 6, color: '180,220,255', glow: 25 },
+        { nameAr: 'المريخ',       nameEn: 'Mars',     x: 0.50, y: 0.38, size: 4, color: '255,100,80',  glow: 15 },
+        { nameAr: 'الزهرة',       nameEn: 'Venus',    x: 0.82, y: 0.55, size: 5, color: '255,240,200', glow: 18 },
+        { nameAr: 'القطبي',       nameEn: 'Polaris',  x: 0.15, y: 0.12, size: 3, color: '200,220,255', glow: 12 },
+        { nameAr: 'قلب العقرب',   nameEn: 'Antares',  x: 0.60, y: 0.78, size: 4, color: '255,80,60',   glow: 14 },
     ];
 
     let pulseAngle = 0;
@@ -324,7 +304,7 @@ function startSkyCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         pulseAngle += 0.03;
 
-        // رسم النجوم العامة
+        // نجوم عشوائية
         stars.forEach(s => {
             s.opacity += s.speed * s.dir;
             if (s.opacity > 1 || s.opacity < 0.1) s.dir *= -1;
@@ -334,47 +314,50 @@ function startSkyCanvas() {
             ctx.fill();
         });
 
-        // رسم النجوم المشهورة مع أسمائها وهالاتها
-        namedStars.forEach(star => {
+        // خطوط توصيل خفيفة
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 0.5;
+        const connections = [[0,1],[1,2],[0,5]];
+        connections.forEach(([a, b]) => {
+            ctx.beginPath();
+            ctx.moveTo(namedStars[a].x * canvas.width, namedStars[a].y * canvas.height);
+            ctx.lineTo(namedStars[b].x * canvas.width, namedStars[b].y * canvas.height);
+            ctx.stroke();
+        });
+
+        // نجوم مشهورة
+        namedStars.forEach((star, i) => {
             const x = star.x * canvas.width;
             const y = star.y * canvas.height;
-            const glow = Math.sin(pulseAngle + star.x * 5) * 0.3 + 0.7;
+            const glow = Math.sin(pulseAngle + i * 1.2) * 0.3 + 0.7;
 
-            // الهالة
+            // هالة
             const grad = ctx.createRadialGradient(x, y, 0, x, y, star.glow);
-            grad.addColorStop(0, `${star.color},${glow})`);
-            grad.addColorStop(0.4, `${star.color},${glow * 0.4})`);
-            grad.addColorStop(1, `${star.color},0)`);
+            grad.addColorStop(0, `rgba(${star.color},${glow})`);
+            grad.addColorStop(0.4, `rgba(${star.color},${glow * 0.3})`);
+            grad.addColorStop(1, `rgba(${star.color},0)`);
             ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.arc(x, y, star.glow, 0, Math.PI * 2);
             ctx.fill();
 
             // النجمة
-            ctx.fillStyle = `${star.color},${glow})`;
+            ctx.fillStyle = `rgba(${star.color},${glow})`;
             ctx.beginPath();
             ctx.arc(x, y, star.size, 0, Math.PI * 2);
             ctx.fill();
 
             // الاسم العربي
             ctx.fillStyle = `rgba(255,255,255,${glow * 0.9})`;
-            ctx.font = 'bold 11px sans-serif';
+            ctx.font = 'bold 11px Amiri, serif';
             ctx.textAlign = 'center';
             ctx.fillText(star.nameAr, x, y + star.size + 14);
 
             // الاسم الإنجليزي
             ctx.fillStyle = `rgba(255,255,255,${glow * 0.4})`;
-            ctx.font = '9px sans-serif';
+            ctx.font = '9px serif';
             ctx.fillText(star.nameEn, x, y + star.size + 25);
         });
-
-        // خطوط توصيل
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(namedStars[0].x * canvas.width, namedStars[0].y * canvas.height);
-        ctx.lineTo(namedStars[1].x * canvas.width, namedStars[1].y * canvas.height);
-        ctx.stroke();
 
         skyAnimId = requestAnimationFrame(drawSky);
     }
@@ -382,7 +365,6 @@ function startSkyCanvas() {
     drawSky();
 }
 
-// 8. التهيئة عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('city-input').addEventListener('keypress', e => {
         if (e.key === 'Enter') getWeather();
@@ -395,4 +377,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadZekr();
     loadDailyAyah();
     showSuhailCard();
+    startDefaultAnimation();
 });
