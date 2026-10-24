@@ -1,381 +1,213 @@
-const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
+/* ===== أدوات ===== */
+const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
+const pad = n => String(n).padStart(2, '0'), R = Math.round;
+const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+addEventListener('error', e => { const c = document.getElementById('cond'); if (c) c.textContent = 'خطأ: ' + e.message; });
+const getJSON = async u => { const c = new AbortController(), t = setTimeout(() => c.abort(), 12000); try { return await (await fetch(u, { signal: c.signal })).json(); } finally { clearTimeout(t); } };
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-function showPage(pageId, element) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    element.classList.add('active');
-    if (pageId === 'sky') startSkyCanvas();
-}
-
-function formatTime12(time) {
-    if (!time) return "--:--";
-    let [hours, minutes] = time.split(':');
-    hours = parseInt(hours);
-    const ampm = hours >= 12 ? 'م' : 'ص';
-    hours = hours % 12 || 12;
-    return `${hours}:${minutes} ${ampm}`;
-}
-
-async function getWeather() {
-    const city = document.getElementById("city-input").value.trim();
-    if (!city) return;
-    try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
-        const data = await res.json();
-        if (data.cod !== 200) { alert("المدينة غير موجودة!"); return; }
-        document.getElementById("out-city").innerText = "📍 " + data.name;
-        document.getElementById("out-temp").innerText = Math.round(data.main.temp) + "°";
-        document.getElementById("out-desc").innerText = data.weather[0].description;
-        document.getElementById("out-humidity").innerText = data.main.humidity + "%";
-        document.getElementById("out-wind").innerText = Math.round(data.wind.speed * 3.6) + " كم/س";
-        document.getElementById("out-feels").innerText = Math.round(data.main.feels_like) + "°";
-        document.getElementById("out-details").style.display = "flex";
-        localStorage.setItem('lastCity', city);
-        startWeatherAnimation(data.weather[0].id, data.sys.sunrise, data.sys.sunset);
-        getFiveDayForecast(city);
-        getPrayers(city);
-        showSuhailCard();
-    } catch (e) {
-        alert("حدث خطأ، تحقق من اتصالك بالإنترنت!");
-        console.error(e);
-    }
-}
-
-async function getFiveDayForecast(city) {
-    try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=ar`);
-        const data = await res.json();
-        const forecastDiv = document.getElementById("out-forecast");
-        forecastDiv.innerHTML = "";
-        for (let i = 0; i < data.list.length; i += 8) {
-            const day = data.list[i];
-            const dayName = new Date(day.dt * 1000).toLocaleDateString('ar-JO', { weekday: 'short' });
-            forecastDiv.innerHTML += `
-                <div class="forecast-item">
-                    <div>${dayName}</div>
-                    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
-                    <b>${Math.round(day.main.temp)}°</b>
-                </div>`;
-        }
-        document.getElementById("forecast-section").style.display = "block";
-    } catch (e) { console.error(e); }
-}
-
-let countdownInterval = null;
-
-async function getPrayers(city) {
-    try {
-        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=4`);
-        const d = await res.json();
-        const t = d.data.timings;
-        const times = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-        const names = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
-        const now = new Date();
-        const currentMins = now.getHours() * 60 + now.getMinutes();
-        const prayerMins = times.map(p => {
-            const [h, m] = t[p].split(':').map(Number);
-            return h * 60 + m;
-        });
-        let nextIndex = prayerMins.findIndex(m => m > currentMins);
-        if (nextIndex === -1) nextIndex = 0;
-        let html = '';
-        times.forEach((time, i) => {
-            const isNext = i === nextIndex;
-            html += `<div class="prayer-row${isNext ? ' next-prayer' : ''}">
-                <span>${names[i]}${isNext ? ' 🔔' : ''}</span>
-                <b>${formatTime12(t[time])}</b>
-            </div>`;
-        });
-        document.getElementById("prayer-output").innerHTML = html;
-        startCountdown(names, prayerMins);
-    } catch (e) { console.error(e); }
-}
-
-function startCountdown(names, prayerMins) {
-    if (countdownInterval) clearInterval(countdownInterval);
-    document.getElementById("prayer-countdown").style.display = "block";
-    function update() {
-        const now = new Date();
-        const currentMins = now.getHours() * 60 + now.getMinutes();
-        const currentSecs = now.getSeconds();
-        let idx = prayerMins.findIndex(m => m > currentMins);
-        let diffSecs;
-        if (idx === -1) {
-            idx = 0;
-            diffSecs = (1440 - currentMins + prayerMins[0]) * 60 - currentSecs;
-        } else {
-            diffSecs = (prayerMins[idx] - currentMins) * 60 - currentSecs;
-        }
-        const h = Math.floor(diffSecs / 3600);
-        const m = Math.floor((diffSecs % 3600) / 60);
-        const s = diffSecs % 60;
-        const pad = n => String(Math.abs(n)).padStart(2, '0');
-        document.getElementById("countdown-timer").innerText = `${pad(h)}:${pad(m)}:${pad(s)}`;
-        document.getElementById("countdown-next").innerText = `الصلاة القادمة: ${names[idx]}`;
-    }
-    update();
-    countdownInterval = setInterval(update, 1000);
-}
-
-const azkarData = {
-    sabah: [
-        { text: "أَصبَحْنَا وَأَصبَحَ الْمُلْكُ لِلَّهِ والْحَمْد لِلَّهِ", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبكَ أَمْسَينَا وَبِكَ نَحْيَا وبِكَ نَموتُ وَإِلَيْكَ النشورُ", count: 1 },
-        { text: "سُبْحَانَ اللَّهِ وبحَمْدِهِ", count: 100 },
-        { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
-        { text: "اللَّهُمَّ صلِّ وَسَلِّمْ عَلَى نَبِيِّنَا محَمَّدٍ", count: 10 },
-    ],
-    masa: [
-        { text: "أَمسَيْنَا وَأَمْسَى الْمُلْكُ للَّهِ وَالْحَمْدُ لِلَّهِ", count: 1 },
-        { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصيرُ", count: 1 },
-        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدهِ", count: 100 },
-        { text: "أَعُوذُ بِكَلِماتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ ما خَلَقَ", count: 3 },
-        { text: "اللَّهُمَّ صلِّ وَسَلِّمْ علَى نَبِيِّنَا مُحَمَّدٍ", count: 10 },
-    ],
-    nawm: [
-        { text: "باسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا", count: 1 },
-        { text: "اللَّهُمَّ قِنِي عذَابَكَ يَوْمَ تَبْعَثُ عبَادَكَ", count: 3 },
-        { text: "سُبْحَانَ اللَّهِ", count: 33 },
-        { text: "الحَمْدُ لِلَّهِ", count: 33 },
-        { text: "اللَّهُ أَكْبَرُ", count: 34 },
-    ],
-    istiqaz: [
-        { text: "الحَمْدُ لِلَّهِ الذِي أَحْيَانَا بعْدَ ما أَمَاتَنَا وَإِلَيْه النُّشُورُ", count: 1 },
-        { text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", count: 10 },
-        { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 10 },
-        { text: "أَسْتغْفِرُ اللَّهَ الْعظِيمَ وأَتُوبُ إِلَيْهِ", count: 3 },
-    ],
+/* ===== البيانات ===== */
+const CITIES = {
+  amman: { n: 'عمّان', lat: 31.9539, lon: 35.9106 }, irbid: { n: 'إربد', lat: 32.5556, lon: 35.85 },
+  zarqa: { n: 'الزرقاء', lat: 32.0728, lon: 36.0876 }, salt: { n: 'السلط', lat: 32.0392, lon: 35.7272 },
+  madaba: { n: 'مأدبا', lat: 31.7197, lon: 35.7936 }, jerash: { n: 'جرش', lat: 32.2747, lon: 35.8961 },
+  karak: { n: 'الكرك', lat: 31.1853, lon: 35.7048 }, aqaba: { n: 'العقبة', lat: 29.532, lon: 35.0063 }
+};
+const BANNER = [
+  ['﴿ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ ﴾', 'سورة الرعد · ٢٨'],
+  ['﴿ فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ﴾', 'سورة الشرح · ٥'],
+  ['﴿ وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ ﴾', 'سورة الطلاق · ٣'],
+  ['﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾', 'سورة طه · ١١٤'],
+  ['إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ', 'حديث شريف · متفق عليه'],
+  ['الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ', 'حديث شريف · متفق عليه'],
+  ['الدِّينُ النَّصِيحَةُ', 'حديث شريف · رواه مسلم']
+];
+const COMMON = [
+  ['قُلْ هُوَ اللَّهُ أَحَدٌ', 3], ['قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ', 3], ['قُلْ أَعُوذُ بِرَبِّ النَّاسِ', 3],
+  ['سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', 100], ['أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', 100],
+  ['اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', 10]
+];
+const AZKAR = {
+  morning: [['أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ', 1], ['حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ', 7], ...COMMON],
+  evening: [['أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ', 1], ['أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ', 3], ...COMMON]
 };
 
-let currentCategory = 'sabah';
-let currentZekrIndex = 0;
-let count = 0;
+/* ===== الأيقونات ===== */
+const CL = '<path d="M7 18h10.5a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.3 8.6 4.7 4.7 0 0 0 7 18z"/>';
+const IC = {
+  clear: '<circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>',
+  night: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  partly: '<circle cx="8" cy="8" r="3"/><path d="M8 2v1.3M2 8h1.3M3.8 3.8l.9.9M12.2 3.8l-.9.9"/><path transform="translate(2 2)" d="M7 18h10.5a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.3 8.6 4.7 4.7 0 0 0 7 18z"/>',
+  cloud: CL, fog: '<path d="M4 9h16M3 13h18M6 17h12"/>',
+  rain: CL + '<path d="M8 20l1-2M12 20l1-2M16 20l1-2"/>', snow: CL + '<path d="M8 19.5h.01M12 20.5h.01M16 19.5h.01"/>',
+  storm: CL + '<path d="M12.5 15l-2 3h3l-2 3"/>'
+};
+const icon = k => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+const ring = (f, s = 46, w = 3) => {
+  const r = (s - w) / 2, c = 2 * Math.PI * r, m = s / 2;
+  return `<svg class="rg" viewBox="0 0 ${s} ${s}"><circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="${w}"/><circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="#fff" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - Math.max(0, Math.min(1, f)))}" transform="rotate(-90 ${m} ${m})"/></svg>`;
+};
 
-function switchCategory(cat, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentCategory = cat;
-    currentZekrIndex = 0;
-    count = 0;
-    loadZekr();
+/* ===== رموز الطقس ===== */
+const kind = c => c === 0 ? 'clear' : c <= 2 ? 'partly' : c === 3 ? 'cloud' : c <= 48 ? 'fog' : (c <= 67 || (c >= 80 && c <= 82)) ? 'rain' : (c <= 77 || c === 85 || c === 86) ? 'snow' : 'storm';
+const LABEL = { clear: 'سماء صافية', partly: 'غائم جزئياً', cloud: 'غائم', fog: 'ضباب', rain: 'أمطار', snow: 'ثلوج', storm: 'عاصفة رعدية' };
+const icoKind = (c, d) => (!d && (kind(c) === 'clear' || kind(c) === 'partly')) ? 'night' : kind(c);
+const skyOf = (c, d) => { const k = kind(c); if (['rain', 'snow', 'storm'].includes(k)) return k; if (!d) return 'night'; return (k === 'clear' || k === 'partly') ? 'clear' : 'cloud'; };
+
+/* ===== خلفية متحركة ===== */
+const cv = $('#fx'), cx = cv.getContext('2d'), dpr = Math.min(devicePixelRatio || 1, 2);
+let W, H, P = [], mode = 'clear', flash = 0;
+function seed() {
+  const n = { rain: 140, storm: 190, snow: 90, night: 90 }[mode] || 0;
+  P = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, v: Math.random(), r: Math.random() }));
+  if (mode === 'clear' || mode === 'cloud') P = Array.from({ length: 6 }, (_, i) => ({ x: Math.random() * W, y: H * (.08 + .15 * i), v: .15 + Math.random() * .35, r: 130 + Math.random() * 120 }));
+}
+function size() { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); seed(); }
+function draw(t) {
+  cx.clearRect(0, 0, W, H);
+  if (mode === 'rain' || mode === 'storm') {
+    cx.strokeStyle = 'rgba(255,255,255,.35)'; cx.lineWidth = 1.2; cx.beginPath();
+    for (const p of P) { cx.moveTo(p.x, p.y); cx.lineTo(p.x - 2, p.y + 12 + p.v * 10); p.y += 9 + p.v * 9; p.x -= 1; if (p.y > H) { p.y = -20; p.x = Math.random() * W; } }
+    cx.stroke();
+    if (mode === 'storm' && Math.random() < .006) flash = 1;
+    if (flash > 0) { cx.fillStyle = `rgba(255,255,255,${flash * .5})`; cx.fillRect(0, 0, W, H); flash -= .06; }
+  } else if (mode === 'snow') {
+    cx.fillStyle = 'rgba(255,255,255,.85)';
+    for (const p of P) { cx.beginPath(); cx.arc(p.x, p.y, 1.5 + p.r * 2.5, 0, 7); cx.fill(); p.y += .6 + p.v * 1.2; p.x += Math.sin(p.y / 40 + p.r * 6) * .4; if (p.y > H) { p.y = -5; p.x = Math.random() * W; } }
+  } else if (mode === 'night') {
+    for (const p of P) { cx.fillStyle = `rgba(255,255,255,${.3 + .7 * Math.abs(Math.sin(t / 900 + p.r * 9))})`; cx.beginPath(); cx.arc(p.x, p.y * .8, .6 + p.r * 1.3, 0, 7); cx.fill(); }
+  } else {
+    if (mode === 'clear') { const g = cx.createRadialGradient(W * .8, H * .1, 0, W * .8, H * .1, 300); g.addColorStop(0, 'rgba(255,255,255,.4)'); g.addColorStop(1, 'rgba(255,255,255,0)'); cx.fillStyle = g; cx.fillRect(0, 0, W, H); }
+    for (const p of P) { const g = cx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r); g.addColorStop(0, `rgba(255,255,255,${mode === 'cloud' ? .2 : .11})`); g.addColorStop(1, 'rgba(255,255,255,0)'); cx.fillStyle = g; cx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); p.x += p.v; if (p.x - p.r > W) p.x = -p.r; }
+  }
+}
+function loop(t) { draw(t); requestAnimationFrame(loop); }
+function setFx(m) { mode = m; seed(); if (reduce) draw(0); }
+addEventListener('resize', size); size();
+reduce ? draw(0) : requestAnimationFrame(loop);
+
+/* ===== الحالة ===== */
+const state = { city: store.get('naseem-city') || 'amman', set: new Date().getHours() >= 15 ? 'evening' : 'morning' };
+
+/* ===== الطقس ===== */
+function countTo(el, v) {
+  if (reduce) { el.textContent = v; return; }
+  const t0 = performance.now();
+  (function s(t) { const k = Math.min(1, (t - t0) / 900); el.textContent = R(v * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(s); })(t0);
+}
+async function loadWeather() {
+  const c = CITIES[state.city];
+  $('#miniCity').textContent = c.n;
+  const u = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto&forecast_days=7`;
+  try { renderWeather(await getJSON(u)); }
+  catch (e) { $('#cond').textContent = 'تعذّر تحميل الطقس، تحقق من الاتصال'; }
+}
+function renderWeather(w) {
+  const c = w.current, d = w.daily, day = !!c.is_day, sky = skyOf(c.weather_code, day);
+  document.body.dataset.sky = sky; setFx(sky);
+  countTo($('#temp'), R(c.temperature_2m));
+  $('#cond').textContent = $('#miniCond').textContent = LABEL[kind(c.weather_code)];
+  $('#miniTemp').textContent = R(c.temperature_2m) + '°';
+  $('#hl').textContent = `الكبرى ${R(d.temperature_2m_max[0])}°   الصغرى ${R(d.temperature_2m_min[0])}°`;
+
+  const f = Math.max(0, w.hourly.time.findIndex(t => t.slice(0, 13) >= c.time.slice(0, 13))), hs = [];
+  for (let i = f; i < f + 24 && i < w.hourly.time.length; i++)
+    hs.push({ h: +w.hourly.time[i].slice(11, 13), k: icoKind(w.hourly.weather_code[i], w.hourly.is_day[i]), t: w.hourly.temperature_2m[i] });
+  const ts = hs.map(x => x.t), mn = Math.min(...ts), sp = (Math.max(...ts) - mn) || 1, Wd = hs.length * 62;
+  const pts = hs.map((x, i) => [i * 62 + 31, 8 + (1 - (x.t - mn) / sp) * 28]);
+  $('#hours').innerHTML = `<div style="width:${Wd}px"><div class="row">${hs.map((x, i) => `<div><span>${i ? `${x.h % 12 || 12} ${x.h < 12 ? 'ص' : 'م'}` : 'الآن'}</span>${icon(x.k)}</div>`).join('')}</div>
+    <svg class="spark" width="${Wd}" height="44"><path d="M${pts.map(p => p.join(',')).join('L')}"/>${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3"/>`).join('')}</svg>
+    <div class="row">${hs.map(x => `<div><b>${R(x.t)}°</b></div>`).join('')}</div></div>`;
+
+  const lo = Math.min(...d.temperature_2m_min), hi = Math.max(...d.temperature_2m_max), s = hi - lo || 1;
+  $('#days').innerHTML = d.time.map((t, i) => {
+    const a = d.temperature_2m_min[i], b = d.temperature_2m_max[i];
+    return `<li><span class="nm">${i ? new Date(t + 'T12:00').toLocaleDateString('ar-JO', { weekday: 'long' }) : 'اليوم'}</span>${icon(icoKind(d.weather_code[i], true))}
+      <div class="rg2"><span class="lo">${R(a)}°</span><div class="trk"><i style="left:${(a - lo) / s * 100}%;width:${Math.max((b - a) / s * 100, 6)}%"></i></div><span>${R(b)}°</span></div></li>`;
+  }).join('');
+
+  const sr = new Date(d.sunrise[0]), ss = new Date(d.sunset[0]), fr = (new Date(c.time) - sr) / (ss - sr), k = Math.max(0, Math.min(1, fr)), an = Math.PI * (1 - k);
+  $('#sun').innerHTML = `<svg class="arc" viewBox="0 0 300 112"><path class="a0" d="M20 100A130 130 0 0 1 280 100"/><path class="a1" pathLength="1" stroke-dasharray="${k} 1" d="M20 100A130 130 0 0 1 280 100"/>${fr >= 0 && fr <= 1 ? `<circle class="dot" cx="${150 + 130 * Math.cos(an)}" cy="${100 - 130 * Math.sin(an)}" r="9"/>` : ''}</svg>
+    <div class="sunt"><span>الشروق ${d.sunrise[0].slice(11, 16)}</span><span>الغروب ${d.sunset[0].slice(11, 16)}</span></div>`;
+
+  $('#tiles').innerHTML = [['تبدو كأنها', R(c.apparent_temperature) + '°'], ['الرطوبة', R(c.relative_humidity_2m) + '%'], ['الرياح', R(c.wind_speed_10m) + ' كم/س'], ['الأشعة فوق البنفسجية', R(d.uv_index_max[0])]]
+    .map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('');
 }
 
-function loadZekr() {
-    const zekr = azkarData[currentCategory][currentZekrIndex];
-    document.getElementById("zekr-text").innerText = zekr.text;
-    document.getElementById("zekr-count").innerText = 0;
-    count = 0;
-    updateProgress(0, zekr.count);
+/* ===== مواقيت الصلاة ===== */
+const PR = [['Fajr', 'الفجر'], ['Sunrise', 'الشروق'], ['Dhuhr', 'الظهر'], ['Asr', 'العصر'], ['Maghrib', 'المغرب'], ['Isha', 'العشاء']];
+let pr = { t: null, m: null, nx: null, pv: null }, tm;
+const toDate = (b, s) => { const [h, m] = s.slice(0, 5).split(':').map(Number), d = new Date(b); d.setHours(h, m, 0, 0); return d; };
+async function timings(date, c) {
+  return (await getJSON(`https://api.aladhan.com/v1/timings/${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}?latitude=${c.lat}&longitude=${c.lon}&method=23`)).data.timings;
+}
+async function loadPrayer() {
+  const c = CITIES[state.city], n = new Date();
+  try { [pr.t, pr.m] = await Promise.all([timings(n, c), timings(new Date(n.getTime() + 864e5), c)]); renderPrayer(); }
+  catch (e) { $('#nextName').textContent = 'تعذّر تحميل المواقيت'; }
+}
+function renderPrayer() {
+  if (!pr.t) return;
+  const now = new Date(), ev = PR.filter(p => p[0] !== 'Sunrise').map(([k, n]) => ({ k, n, t: toDate(now, pr.t[k]) }));
+  ev.push({ k: 'Fajr', n: 'الفجر', t: toDate(new Date(now.getTime() + 864e5), pr.m.Fajr) });
+  const i = ev.findIndex(e => e.t > now), nx = ev[i];
+  pr.nx = nx; pr.pv = i > 0 ? ev[i - 1].t : new Date(ev[4].t.getTime() - 864e5);
+  $('#nextName').textContent = `${nx.n} بعد`;
+  $('#times').innerHTML = PR.map(([k, n]) => `<li class="${k === 'Sunrise' ? 's' : ''} ${k === nx.k ? 'n' : ''}"><span>${n}</span><b>${pr.t[k].slice(0, 5)}</b></li>`).join('');
+  tick(); clearInterval(tm); tm = setInterval(tick, 1000);
+}
+function tick() {
+  if (!pr.nx) return;
+  const diff = pr.nx.t - new Date();
+  if (diff <= 0) return renderPrayer();
+  const s = Math.floor(diff / 1000);
+  $('#countdown').textContent = `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s % 3600 / 60))}:${pad(s % 60)}`;
+  $('#prRing').innerHTML = ring((new Date() - pr.pv) / (pr.nx.t - pr.pv), 190, 5);
 }
 
-function updateProgress(current, target) {
-    const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
-    document.getElementById("progress-fill").style.width = pct + "%";
-    document.getElementById("progress-label").innerText = `${current} / ${target}`;
+/* ===== الأذكار ===== */
+const azKey = () => { const d = new Date(); return `naseem-azkar-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const azLoad = () => { try { return JSON.parse(store.get(azKey())) || {}; } catch (e) { return {}; } };
+function renderAzkar() {
+  const L = AZKAR[state.set], sv = azLoad()[state.set] || [];
+  $('#zikr').innerHTML = L.map(([t, c], i) => {
+    const dn = Math.min(c, sv[i] || 0), left = c - dn;
+    return `<li class="${left ? '' : 'd'}"><button data-i="${i}"><span class="t">${t}</span><span class="n">${ring(dn / c)}${left ? left : '✓'}</span></button></li>`;
+  }).join('');
+  const tot = L.reduce((a, z) => a + z[1], 0), dn = L.reduce((a, z, i) => a + Math.min(z[1], sv[i] || 0), 0);
+  $('#barFill').style.width = dn / tot * 100 + '%';
+  $('#barLabel').textContent = `${L.filter((z, i) => (sv[i] || 0) >= z[1]).length} من ${L.length} أذكار مكتملة`;
 }
-
-function incrementCount() {
-    const zekr = azkarData[currentCategory][currentZekrIndex];
-    if (count >= zekr.count) return;
-    count++;
-    document.getElementById("zekr-count").innerText = count;
-    updateProgress(count, zekr.count);
-    if (navigator.vibrate) navigator.vibrate(40);
-    if (count >= zekr.count) {
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        setTimeout(() => {
-            const list = azkarData[currentCategory];
-            if (currentZekrIndex < list.length - 1) {
-                currentZekrIndex++;
-                loadZekr();
-            } else {
-                document.getElementById("zekr-text").innerText = "✅ أتممت أذكار هذا القسم";
-            }
-        }, 600);
-    }
-}
-
-function nextZekr() {
-    const list = azkarData[currentCategory];
-    currentZekrIndex = (currentZekrIndex + 1) % list.length;
-    loadZekr();
-}
-
-function resetZekr() {
-    count = 0;
-    const zekr = azkarData[currentCategory][currentZekrIndex];
-    document.getElementById("zekr-count").innerText = 0;
-    updateProgress(0, zekr.count);
-}
-
-const ayahHadithList = [
-    { type: "آية كريمة", text: "ألا بِذِكْرِ اللَّهِ تطمَئِنُّ الْقُلُوبُ" },
-    { type: "آية كريمة", text: "فَاذْكُرُونِي أذْكُرْكُمْ واشكُرُوا لِي وَلَا تَكْفرُونِ" },
-    { type: "آية كريمة", text: "إِنَّ مَع الْعُسْرِ يُسْرا" },
-    { type: "آية كريمة", text: "وَمَن يَتَّقِ اللَّهَ يجعَل لَّهُ مَخْرَجًا" },
-    { type: "آية كريمة", text: "حسْبُنا اللَّهُ وَنِعْمَ الوَكيلُ" },
-    { type: "آية كريمة", text: "وَاللَّهُ مَعَ الصَّابِرِينَ" },
-    { type: "حديث شريف", text: "الدُعاءُ هُوَ الْعِبَادَةُ" },
-    { type: "حديث شريف", text: "الكَلِمَةُ الطَّيِبَةُ صدَقَةٌ" },
-    { type: "حديث شريف", text: "خَيْرُكم مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
-    { type: "حديث شريف", text: "الْمسْلِمُ مَنْ سَلِمَ المُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
-    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحمْ لا يُرْحَمْ" },
-    { type: "حديث شريف", text: "إِنَّ اللَّهَ يُحِبُّ إِذَا عمِلَ أحَدُكُمْ عَمَلاً أَن يُتْقِنَه" },
-];
-
-function loadDailyAyah() {
-    const item = ayahHadithList[Math.floor(Math.random() * ayahHadithList.length)];
-    document.getElementById('daily-ayah-label').innerText = item.type;
-    document.getElementById('daily-ayah-text').innerText = item.text;
-}
-
-function getSuhailDate(lat) {
-    const year = new Date().getFullYear();
-    let dayOfYear;
-    if (lat >= 30)      dayOfYear = 236;
-    else if (lat >= 24) dayOfYear = 231;
-    else if (lat >= 20) dayOfYear = 228;
-    else                dayOfYear = 225;
-    const date = new Date(year, 0);
-    date.setDate(dayOfYear);
-    date.setHours(3, 0, 0, 0);
-    if (date < new Date()) date.setFullYear(year + 1);
-    return date;
-}
-
-function showSuhailCard() {
-    navigator.geolocation.getCurrentPosition(
-        pos => updateSuhail(pos.coords.latitude),
-        () => updateSuhail(31)
-    );
-}
-
-function updateSuhail(lat) {
-    const suhailDate = getSuhailDate(lat);
-    const now = new Date();
-    const diff = suhailDate - now;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const dateStr = suhailDate.toLocaleDateString('ar-JO', { day: 'numeric', month: 'long' });
-    let countdownText = days > 0 ? `باقي ${days} يوم و ${hours} ساعة` :
-                        hours > 0 ? `باقي ${hours} ساعة فقط!` : '🌟 سهيل يطلع الليلة!';
-    document.getElementById('suhail-countdown-text').innerText = countdownText;
-    document.getElementById('suhail-info').innerText =
-        `ثاني أضيأ نجم • يظهر ${dateStr} • عند ظهوره ينكسر الصيف 🍂`;
-    document.getElementById('suhail-card').style.display = 'flex';
-    document.getElementById('suhail-big-countdown').innerText =
-        days > 0 ? `${days} يوم و ${hours} ساعة` :
-        hours > 0 ? `${hours} ساعة فقط!` : '🌟 الليلة!';
-    document.getElementById('suhail-big-date').innerText = `موعد الظهور: ${dateStr}`;
-}
-
-let skyAnimId = null;
-
-function startSkyCanvas() {
-    const canvas = document.getElementById('sky-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    if (skyAnimId) cancelAnimationFrame(skyAnimId);
-
-    const stars = Array.from({ length: 100 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: 0.5 + Math.random() * 1.5,
-        opacity: 0.3 + Math.random() * 0.7,
-        speed: 0.01 + Math.random() * 0.02,
-        dir: Math.random() > 0.5 ? 1 : -1,
-    }));
-
-    const namedStars = [
-        { nameAr: 'سهيل',         nameEn: 'Canopus',  x: 0.25, y: 0.70, size: 5, color: '255,220,80',  glow: 20 },
-        { nameAr: 'الشِّعرى',     nameEn: 'Sirius',   x: 0.70, y: 0.22, size: 6, color: '180,220,255', glow: 25 },
-        { nameAr: 'المريخ',       nameEn: 'Mars',     x: 0.50, y: 0.38, size: 4, color: '255,100,80',  glow: 15 },
-        { nameAr: 'الزهرة',       nameEn: 'Venus',    x: 0.82, y: 0.55, size: 5, color: '255,240,200', glow: 18 },
-        { nameAr: 'القطبي',       nameEn: 'Polaris',  x: 0.15, y: 0.12, size: 3, color: '200,220,255', glow: 12 },
-        { nameAr: 'قلب العقرب',   nameEn: 'Antares',  x: 0.60, y: 0.78, size: 4, color: '255,80,60',   glow: 14 },
-    ];
-
-    let pulseAngle = 0;
-
-    function drawSky() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pulseAngle += 0.03;
-
-        // نجوم عشوائية
-        stars.forEach(s => {
-            s.opacity += s.speed * s.dir;
-            if (s.opacity > 1 || s.opacity < 0.1) s.dir *= -1;
-            ctx.fillStyle = `rgba(255,255,255,${s.opacity})`;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        // خطوط توصيل خفيفة
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 0.5;
-        const connections = [[0,1],[1,2],[0,5]];
-        connections.forEach(([a, b]) => {
-            ctx.beginPath();
-            ctx.moveTo(namedStars[a].x * canvas.width, namedStars[a].y * canvas.height);
-            ctx.lineTo(namedStars[b].x * canvas.width, namedStars[b].y * canvas.height);
-            ctx.stroke();
-        });
-
-        // نجوم مشهورة
-        namedStars.forEach((star, i) => {
-            const x = star.x * canvas.width;
-            const y = star.y * canvas.height;
-            const glow = Math.sin(pulseAngle + i * 1.2) * 0.3 + 0.7;
-
-            // هالة
-            const grad = ctx.createRadialGradient(x, y, 0, x, y, star.glow);
-            grad.addColorStop(0, `rgba(${star.color},${glow})`);
-            grad.addColorStop(0.4, `rgba(${star.color},${glow * 0.3})`);
-            grad.addColorStop(1, `rgba(${star.color},0)`);
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(x, y, star.glow, 0, Math.PI * 2);
-            ctx.fill();
-
-            // النجمة
-            ctx.fillStyle = `rgba(${star.color},${glow})`;
-            ctx.beginPath();
-            ctx.arc(x, y, star.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            // الاسم العربي
-            ctx.fillStyle = `rgba(255,255,255,${glow * 0.9})`;
-            ctx.font = 'bold 11px Amiri, serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(star.nameAr, x, y + star.size + 14);
-
-            // الاسم الإنجليزي
-            ctx.fillStyle = `rgba(255,255,255,${glow * 0.4})`;
-            ctx.font = '9px serif';
-            ctx.fillText(star.nameEn, x, y + star.size + 25);
-        });
-
-        skyAnimId = requestAnimationFrame(drawSky);
-    }
-
-    drawSky();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('city-input').addEventListener('keypress', e => {
-        if (e.key === 'Enter') getWeather();
-    });
-    const saved = localStorage.getItem('lastCity');
-    if (saved) {
-        document.getElementById('city-input').value = saved;
-        getWeather();
-    }
-    loadZekr();
-    loadDailyAyah();
-    showSuhailCard();
-    startDefaultAnimation();
+$('#zikr').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const i = +b.dataset.i, all = azLoad(), a = all[state.set] || [];
+  if ((a[i] || 0) < AZKAR[state.set][i][1]) a[i] = (a[i] || 0) + 1;
+  all[state.set] = a;
+  store.set(azKey(), JSON.stringify(all));
+  if (navigator.vibrate) navigator.vibrate(8);
+  renderAzkar();
 });
+const segSync = () => $$('.seg button').forEach(x => x.setAttribute('aria-selected', x.dataset.set === state.set));
+$$('.seg button').forEach(b => b.addEventListener('click', () => { state.set = b.dataset.set; segSync(); renderAzkar(); }));
+
+/* ===== البنر ===== */
+let bi = Math.floor(Math.random() * BANNER.length);
+const showBanner = () => { $('#bt').textContent = BANNER[bi][0]; $('#bs').textContent = BANNER[bi][1]; };
+setInterval(() => { $('#banner').classList.add('f'); setTimeout(() => { bi = (bi + 1) % BANNER.length; showBanner(); $('#banner').classList.remove('f'); }, 600); }, 9000);
+
+/* ===== واجهة ===== */
+new IntersectionObserver(([e]) => $('#mini').classList.toggle('show', !e.isIntersecting), { threshold: .12 }).observe($('#hero'));
+const dk = $$('.dock a');
+const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && dk.forEach(a => a.classList.toggle('on', a.hash === '#' + e.target.id))), { rootMargin: '-45% 0px -45% 0px' });
+$$('main>section').forEach(s => io.observe(s));
+
+const sel = $('#city');
+sel.innerHTML = Object.entries(CITIES).map(([k, c]) => `<option value="${k}">${c.n}</option>`).join('');
+sel.value = state.city;
+sel.addEventListener('change', () => {
+  state.city = sel.value; store.set('naseem-city', state.city);
+  pr = { t: null, m: null, nx: null, pv: null }; loadWeather(); loadPrayer();
+});
+
+segSync(); showBanner(); renderAzkar(); loadWeather(); loadPrayer();
+setInterval(loadWeather, 15 * 60 * 1000);
