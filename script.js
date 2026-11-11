@@ -1,6 +1,6 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// 1. التنقل بين الصفحات وتفعيل رسم السماء مباشرة
+// 1. التنقل بين الصفحات
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -8,12 +8,6 @@ function showPage(pageId, element) {
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.add('active');
     if (element) element.classList.add('active');
-    
-    if (pageId === 'sky') {
-        setTimeout(() => {
-            startSkyCanvas();
-        }, 100);
-    }
 }
 
 function formatTime12(time) {
@@ -329,101 +323,7 @@ function updateSuhail(lat) {
     if (bigDate) bigDate.innerText = `موعد الظهور: ${dateStr}`;
 }
 
-// 7. دالة رسم خريطة السماء والنجوم (Canvas) المضمنة والجاهزة
-let skyAnimId = null;
-
-function startSkyCanvas() {
-    const canvas = document.getElementById('sky-canvas');
-    if (!canvas) return;
-    
-    if (skyAnimId) {
-        cancelAnimationFrame(skyAnimId);
-        skyAnimId = null;
-    }
-
-    const ctx = canvas.getContext('2d');
-    const container = canvas.parentElement;
-    
-    // إجبار أخذ الأبعاد الصحيحة من الحاوية لتفادي مشكلة الصفر
-    canvas.width = container ? container.clientWidth : 350;
-    canvas.height = 250;
-
-    const stars = Array.from({ length: 120 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: 0.5 + Math.random() * 2,
-        opacity: 0.3 + Math.random() * 0.7,
-        speed: 0.01 + Math.random() * 0.03,
-        dir: Math.random() > 0.5 ? 1 : -1,
-    }));
-
-    const namedStars = [
-        { nameAr: 'سهيل',    nameEn: 'Canopus',   x: 0.25, y: 0.70, size: 5, color: 'rgba(255,220,80)',  glow: 20 },
-        { nameAr: 'الشعرى',  nameEn: 'Sirius',    x: 0.70, y: 0.25, size: 6, color: 'rgba(180,220,255)', glow: 25 },
-        { nameAr: 'المريخ',  nameEn: 'Mars',      x: 0.50, y: 0.40, size: 4, color: 'rgba(255,100,80)',  glow: 15 },
-        { nameAr: 'الزهرة',  nameEn: 'Venus',     x: 0.80, y: 0.55, size: 5, color: 'rgba(255,240,200)', glow: 18 },
-        { nameAr: 'النجم القطبي', nameEn: 'Polaris', x: 0.15, y: 0.15, size: 3, color: 'rgba(200,220,255)', glow: 12 },
-        { nameAr: 'العقرب',  nameEn: 'Antares',   x: 0.60, y: 0.75, size: 4, color: 'rgba(255,80,60)',   glow: 14 },
-    ];
-
-    let pulseAngle = 0;
-
-    function drawSky() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pulseAngle += 0.03;
-
-        stars.forEach(s => {
-            s.opacity += s.speed * s.dir;
-            if (s.opacity > 1 || s.opacity < 0.1) s.dir *= -1;
-            ctx.fillStyle = `rgba(255,255,255,${s.opacity})`;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        namedStars.forEach(star => {
-            const x = star.x * canvas.width;
-            const y = star.y * canvas.height;
-            const glow = Math.sin(pulseAngle + star.x * 5) * 0.3 + 0.7;
-
-            const grad = ctx.createRadialGradient(x, y, 0, x, y, star.glow);
-            grad.addColorStop(0, `${star.color},${glow})`);
-            grad.addColorStop(0.4, `${star.color},${glow * 0.4})`);
-            grad.addColorStop(1, `${star.color},0)`);
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(x, y, star.glow, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = `${star.color},${glow})`;
-            ctx.beginPath();
-            ctx.arc(x, y, star.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = `rgba(255,255,255,${glow * 0.9})`;
-            ctx.font = 'bold 11px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(star.nameAr, x, y + star.size + 14);
-
-            ctx.fillStyle = `rgba(255,255,255,${glow * 0.4})`;
-            ctx.font = '9px sans-serif';
-            ctx.fillText(star.nameEn, x, y + star.size + 25);
-        });
-
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(namedStars[0].x * canvas.width, namedStars[0].y * canvas.height);
-        ctx.lineTo(namedStars[1].x * canvas.width, namedStars[1].y * canvas.height);
-        ctx.stroke();
-
-        skyAnimId = requestAnimationFrame(drawSky);
-    }
-
-    drawSky();
-}
-
-// 8. تهيئة الأحداث عند التحميل
+// 7. التهيئة عند التحميل
 document.addEventListener("DOMContentLoaded", () => {
     const navItems = document.querySelectorAll('.nav-bar .nav-item');
     navItems.forEach(item => {
