@@ -1,6 +1,6 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// 1. التنقل بين الصفحات وتفعيل رسم السماء
+// 1. التنقل بين الصفحات وتفعيل رسم السماء مباشرة
 function showPage(pageId, element) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -12,7 +12,7 @@ function showPage(pageId, element) {
     if (pageId === 'sky') {
         setTimeout(() => {
             startSkyCanvas();
-        }, 50);
+        }, 100);
     }
 }
 
@@ -329,7 +329,7 @@ function updateSuhail(lat) {
     if (bigDate) bigDate.innerText = `موعد الظهور: ${dateStr}`;
 }
 
-// 7. دالة رسم خريطة السماء والنجوم (Canvas)
+// 7. دالة رسم خريطة السماء والنجوم (Canvas) المضمنة والجاهزة
 let skyAnimId = null;
 
 function startSkyCanvas() {
@@ -342,16 +342,18 @@ function startSkyCanvas() {
     }
 
     const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width || canvas.offsetWidth || 300;
-    canvas.height = rect.height || canvas.offsetHeight || 200;
+    const container = canvas.parentElement;
+    
+    // إجبار أخذ الأبعاد الصحيحة من الحاوية لتفادي مشكلة الصفر
+    canvas.width = container ? container.clientWidth : 350;
+    canvas.height = 250;
 
-    const stars = Array.from({ length: 100 }, () => ({
+    const stars = Array.from({ length: 120 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: 0.5 + Math.random() * 1.5,
+        size: 0.5 + Math.random() * 2,
         opacity: 0.3 + Math.random() * 0.7,
-        speed: 0.01 + Math.random() * 0.02,
+        speed: 0.01 + Math.random() * 0.03,
         dir: Math.random() > 0.5 ? 1 : -1,
     }));
 
