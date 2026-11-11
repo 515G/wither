@@ -1,62 +1,20 @@
 const API_KEY = "6b7edc82798b727dce5282c19e9298a6";
 
-// تشغيل عند تحميل الصفحة وتجهيز الأحداث والمستمعين
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. ربط أزرار شريط التنقل السفلي والتبديل الآمن
-    const navItems = document.querySelectorAll('.nav-bar .nav-item');
-    navItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const pageId = this.getAttribute('data-page');
-            
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.add('active');
-                this.classList.add('active');
-            }
-            
-            if (pageId === 'sky') {
-                setTimeout(() => {
-                    startSkyCanvas();
-                }, 50);
-            }
-        });
-    });
-
-    // 2. ربط أزرار التبديل بين الأذكار
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const cat = this.getAttribute('data-cat');
-            switchCategory(cat, this);
-        });
-    });
-
-    // 3. ربط أزرار التحكم والسبحة والبحث بقيم المعرفات id
-    document.getElementById("btn-search")?.addEventListener("click", getWeather);
-    document.getElementById("btn-sebha")?.addEventListener("click", incrementCount);
-    document.getElementById("btn-next")?.addEventListener("click", nextZekr);
-    document.getElementById("btn-reset")?.addEventListener("click", resetZekr);
-
-    // 4. حقل إدخال المدينة بالإنتر
-    document.getElementById('city-input')?.addEventListener('keypress', e => {
-        if (e.key === 'Enter') getWeather();
-    });
-
-    // 5. جلب آخر مدينة تم البحث عنها من الذاكرة
-    const lastCity = localStorage.getItem('lastCity');
-    if (lastCity) {
-        const cityInput = document.getElementById("city-input");
-        if (cityInput) cityInput.value = lastCity;
-        getWeather();
+// 1. التنقل بين الصفحات وتفعيل رسم السماء
+function showPage(pageId, element) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
+    if (element) element.classList.add('active');
+    
+    if (pageId === 'sky') {
+        setTimeout(() => {
+            startSkyCanvas();
+        }, 50);
     }
-
-    // 6. الحسابات الفلكية والأقوال التلقائية عند الإقلاع
-    loadZekr();
-    loadDailyAyah();
-    updateSuhailCalculations();
-});
+}
 
 function formatTime12(time) {
     if (!time) return "--:--";
@@ -67,6 +25,7 @@ function formatTime12(time) {
     return `${h}:${minutes} ${ampm}`;
 }
 
+// 2. الخلفيات والطقس
 function updateDynamicBackground(weatherId, sunrise, sunset) {
     const container = document.querySelector('.app-container');
     if (!container) return;
@@ -89,31 +48,6 @@ function updateDynamicBackground(weatherId, sunrise, sunset) {
         }
     }
     container.style.background = gradient;
-}
-
-function updateSuhailCalculations() {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    let suhailDate = new Date(currentYear, 7, 24); 
-
-    if (now > suhailDate) {
-        suhailDate.setFullYear(currentYear + 1);
-    }
-
-    const diffTime = suhailDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const options = { day: 'numeric', month: 'long' };
-    const formattedDate = suhailDate.toLocaleDateString('ar-JO', options);
-
-    const suhailCountdownText = document.getElementById("suhail-countdown-text");
-    const suhailInfo = document.getElementById("suhail-info");
-    if (suhailCountdownText) suhailCountdownText.innerText = `متبقي ${diffDays} يوم على ظهوره`;
-    if (suhailInfo) suhailInfo.innerText = `الموافق ${formattedDate} — ينكسر الحر وتبرد الليالي.`;
-
-    const suhailBigCountdown = document.getElementById("suhail-big-countdown");
-    const suhailBigDate = document.getElementById("suhail-big-date");
-    if (suhailBigCountdown) suhailBigCountdown.innerText = `${diffDays} يوم`;
-    if (suhailBigDate) suhailBigDate.innerText = `الموعد الفلكي القادم: ${formattedDate}`;
 }
 
 async function getWeather() {
@@ -143,8 +77,7 @@ async function getWeather() {
         
         getFiveDayForecast(city);
         getPrayers(city);
-        
-        document.getElementById("suhail-card").style.display = "block";
+        showSuhailCard();
     } catch (e) {
         alert("حدث خطأ، تحقق من اتصالك بالإنترنت!");
         console.error(e);
@@ -172,6 +105,7 @@ async function getFiveDayForecast(city) {
     } catch (e) { console.error(e); }
 }
 
+// 3. أوقات الصلاة والعد التنازلي
 let countdownInterval = null;
 
 async function getPrayers(city) {
@@ -228,6 +162,7 @@ function startCountdown(names, prayerMins) {
     countdownInterval = setInterval(update, 1000);
 }
 
+// 4. الأذكار والسبحة الإلكترونية
 const azkarData = {
     sabah: [
         { text: "أَصْبحْنَا وَأَصْبَحَ الْمُلكُ لِلَّهِ وَالْحَمْدُ لِلَّه", count: 1 },
@@ -321,6 +256,7 @@ function resetZekr() {
     updateProgress(0, zekr.count);
 }
 
+// 5. الآيات والأحاديث اليومية
 const ayahHadithList = [
     { type: "آية كريمة", text: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ" },
     { type: "آية كريمة", text: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ" },
@@ -329,7 +265,11 @@ const ayahHadithList = [
     { type: "آية كريمة", text: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ" },
     { type: "آية كريمة", text: "وَاللَّهُ مَعَ الصَّابِرِينَ" },
     { type: "حديث شريف", text: "الدُّعَاءُ هُوَ الْعِبَادَةُ" },
-    { type: "حديث شريف", text: "الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" }
+    { type: "حديث شريف", text: "الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ" },
+    { type: "حديث شريف", text: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ" },
+    { type: "حديث شريف", text: "الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ" },
+    { type: "حديث شريف", text: "مَنْ لَمْ يَرْحَمْ لَا يُرْحَمْ" },
+    { type: "حديث شريف", text: "إِنَّ اللَّهَ يُحِبُّ إِذَا عَمِلَ أَحَدُكُمْ عَمَلًا أَنْ يُتْقِنَهُ" }
 ];
 
 function loadDailyAyah() {
@@ -340,6 +280,56 @@ function loadDailyAyah() {
     if (textEl) textEl.innerText = randomItem.text;
 }
 
+// 6. حسابات نجم سهيل
+function getSuhailDate(lat) {
+    const year = new Date().getFullYear();
+    let dayOfYear;
+    if (lat >= 30)      dayOfYear = 236;
+    else if (lat >= 24) dayOfYear = 231;
+    else if (lat >= 20) dayOfYear = 228;
+    else                dayOfYear = 225;
+    const date = new Date(year, 0);
+    date.setDate(dayOfYear);
+    date.setHours(3, 0, 0, 0);
+    if (date < new Date()) date.setFullYear(year + 1);
+    return date;
+}
+
+function showSuhailCard() {
+    navigator.geolocation.getCurrentPosition(
+        pos => updateSuhail(pos.coords.latitude),
+        () => updateSuhail(31)
+    );
+}
+
+function updateSuhail(lat) {
+    const suhailDate = getSuhailDate(lat);
+    const now = new Date();
+    const diff = suhailDate - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const dateStr = suhailDate.toLocaleDateString('ar-JO', { day: 'numeric', month: 'long' });
+    let countdownText = days > 0 ? `باقي ${days} يوم و ${hours} ساعة` :
+                        hours > 0 ? `باقي ${hours} ساعة فقط!` : '🌟 سهيل يطلع الليلة!';
+    
+    const cardCountdownText = document.getElementById('suhail-countdown-text');
+    const cardInfo = document.getElementById('suhail-info');
+    const suhailCard = document.getElementById('suhail-card');
+    const bigCountdown = document.getElementById('suhail-big-countdown');
+    const bigDate = document.getElementById('suhail-big-date');
+
+    if (cardCountdownText) cardCountdownText.innerText = countdownText;
+    if (cardInfo) cardInfo.innerText = `ثاني أضيأ نجم • يظهر ${dateStr} • عند ظهوره ينكسر الصيف 🍂`;
+    if (suhailCard) suhailCard.style.display = 'flex';
+    
+    if (bigCountdown) {
+        bigCountdown.innerText = days > 0 ? `${days} يوم و ${hours} ساعة` :
+                                hours > 0 ? `${hours} ساعة فقط!` : '🌟 الليلة!';
+    }
+    if (bigDate) bigDate.innerText = `موعد الظهور: ${dateStr}`;
+}
+
+// 7. دالة رسم خريطة السماء والنجوم (Canvas)
 let skyAnimId = null;
 
 function startSkyCanvas() {
@@ -430,3 +420,41 @@ function startSkyCanvas() {
 
     drawSky();
 }
+
+// 8. تهيئة الأحداث عند التحميل
+document.addEventListener("DOMContentLoaded", () => {
+    const navItems = document.querySelectorAll('.nav-bar .nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const pageId = this.getAttribute('data-page');
+            showPage(pageId, this);
+        });
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cat = this.getAttribute('data-cat');
+            switchCategory(cat, this);
+        });
+    });
+
+    document.getElementById("btn-search")?.addEventListener("click", getWeather);
+    document.getElementById("btn-sebha")?.addEventListener("click", incrementCount);
+    document.getElementById("btn-next")?.addEventListener("click", nextZekr);
+    document.getElementById("btn-reset")?.addEventListener("click", resetZekr);
+
+    document.getElementById('city-input')?.addEventListener('keypress', e => {
+        if (e.key === 'Enter') getWeather();
+    });
+
+    const saved = localStorage.getItem('lastCity');
+    if (saved) {
+        const cityInput = document.getElementById("city-input");
+        if (cityInput) cityInput.value = saved;
+        getWeather();
+    }
+
+    loadZekr();
+    loadDailyAyah();
+    showSuhailCard();
+});
